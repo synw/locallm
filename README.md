@@ -1,11 +1,17 @@
 # LocalLm
 
-Tooling to work with local language
+An api to query local language models using different backends
 
 | Version | Name | Description | Doc
 | --- | --- | --- | --- |
 | [![pub package](https://img.shields.io/npm/v/@locallm/types)](https://www.npmjs.com/package/@locallm/types) | [@locallm/types](packages/types) | The shared data types | [Api doc](https://synw.github.io/locallm/types/index.html) - [Readme](packages/types)
 | [![pub package](https://img.shields.io/npm/v/@locallm/api)](https://www.npmjs.com/package/@locallm/api) | [@locallm/api](packages/api) | The javascript api to run local language models using different backends |  [Api doc](https://synw.github.io/locallm/api/index.html) - [Readme](packages/api)
+
+### Supported backends
+
+- [Koboldcpp](https://github.com/LostRuins/koboldcpp)
+- [Ollama](https://github.com/jmorganca/ollama)
+- [Goinfer](https://github.com/synw/goinfer)
 
 ## Quickstart
 
