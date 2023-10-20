@@ -1,12 +1,12 @@
 import { useApi } from "restmix";
 import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
-import { loadModelFromConf } from "../utils.js";
+import { loadModelFromConf } from "./utils.js";
 
 
 class OllamaProvider implements LmProvider {
   name: string;
   api: ReturnType<typeof useApi>;
-  onToken: (t: string) => void;
+  onToken?: (t: string) => void;
   onStartEmit?: (data?: any) => void;
   onError?: (err: string) => void;
   // state
@@ -62,9 +62,10 @@ class OllamaProvider implements LmProvider {
    * @param {string} name - The name of the model to load.
    * @param {number} [ctx] - The optional context window length.
    * @param {string} [template] - The name of the template to use with the model.
+   * @param {gpu_layers} [gpu_layers] - The number of layers to offload to the GPU
    * @returns {Promise<void>}
    */
-  async loadModel(name: string, ctx?: number, template?: string): Promise<void> {
+  async loadModel(name: string, ctx?: number, template?: string, gpu_layers?: number): Promise<void> {
     this.model = loadModelFromConf(name, this.models, ctx, template)
   }
 
@@ -105,7 +106,6 @@ class OllamaProvider implements LmProvider {
       throw new Error("No response body")
     }
     const reader = response.body.getReader();
-    let text = '';
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
@@ -115,8 +115,10 @@ class OllamaProvider implements LmProvider {
         break
       }
       const t = d["response"];
-      text += t;
-      this.onToken(t);
+      buf.push(t);
+      if (this.onToken) {
+        this.onToken(t);
+      }
     }
 
     return {

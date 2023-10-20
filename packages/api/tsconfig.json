@@ -10,6 +10,7 @@
     "declaration": true,
     "allowSyntheticDefaultImports": true,
     "outDir": "./dist",
+    "rootDir": "./src",
     "allowJs": true,
     "removeComments": true,
     "strictFunctionTypes": true,

@@ -14,12 +14,13 @@ async function main() {
   process.on('SIGINT', () => {
     lm.abort().then(() => process.exit());
   });
-  const _prompt = template.replace("{prompt}", "list the planet of the solar system names. Important: answer in json");
-  await lm.infer(_prompt, {
-    temperature: 0,
-    top_p: 0.35,
+  const _prompt = template.replace("{prompt}", "list the planet of the solar system");
+  const res = await lm.infer(_prompt, {
+    temperature: 0.5,
+    top_p: 0.55,
     n_predict: 300,
-  })
+  });
+  console.log("\n", res)
 }
 
 (async () => {

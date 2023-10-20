@@ -20,10 +20,11 @@ import { ModelConf } from "@locallm/types";
  * const conf = loadModelFromConf('somemodel.gguf', models);
  * console.log(conf); // { name: 'somemodel.gguf', ctx: 2048, template: 'alpaca' }
  */
-function loadModelFromConf(name: string, models: Array<ModelConf>, ctx?: number, template?: string): ModelConf {
+function loadModelFromConf(name: string, models: Array<ModelConf>, ctx?: number, template?: string, gpu_layers?: number): ModelConf {
   const modelConf = models.find(item => item.name == name);
   let t: string | undefined = undefined;
   let c: number | undefined = undefined;
+  let g: number | undefined = undefined;
   if (modelConf) {
     // found a model conf
     if (!ctx) {
@@ -32,8 +33,11 @@ function loadModelFromConf(name: string, models: Array<ModelConf>, ctx?: number,
     if (!template) {
       t = modelConf.template;
     }
+    if (!gpu_layers) {
+      g = modelConf.gpu_layers;
+    }
   }
-  return { name: name, ctx: c, template: t }
+  return { name: name, ctx: c, template: t, gpu_layers: g }
 }
 
 export { loadModelFromConf }

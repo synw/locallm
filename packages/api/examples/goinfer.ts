@@ -18,6 +18,7 @@ async function main() {
   await lm.loadModel(model, 4096);
   const _prompt = template.replace("{prompt}", "list the planets in the solar system");
   const res = await lm.infer(_prompt, {
+    stream: true,
     temperature: 0.1,
     top_p: 0.55,
     n_predict: 200,

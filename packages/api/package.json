@@ -1,19 +1,18 @@
 {
   "name": "@locallm/api",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "An api to query local language models using different backends",
   "repository": "https://github.com/synw/locallm",
   "scripts": {
     "build": "rm -rf dist/* && rollup -c",
+    "build2": "rm -rf dist/* && tsc",
     "docs": "typedoc --entryPointStrategy expand"
   },
   "dependencies": {
-    "@goinfer/api": "^0.3.0",
     "restmix": "^0.3.1"
   },
   "devDependencies": {
-    "@goinfer/types": "^0.1.0",
-    "@locallm/types": "^0.0.1",
+    "@locallm/types": "^0.0.2",
     "@rollup/plugin-node-resolve": "^13.3.0",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^8.5.0",

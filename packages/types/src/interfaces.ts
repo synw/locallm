@@ -1,4 +1,3 @@
-import { useGoinfer } from "@goinfer/api";
 import { useApi } from "restmix";
 
 /**
@@ -8,11 +7,13 @@ import { useApi } from "restmix";
  * @property {string} name - The unique name of the model.
  * @property {number | undefined} ctx - The context window length, typically used to define how much of the previous data to consider.
  * @property {string | undefined} template - The name of the template to use with the model.
+ * @property {number | undefined} gpu_layers - The number of layers to offload to the GPU.
  */
 interface ModelConf {
   name: string;
   ctx?: number;
   template?: string;
+  gpu_layers?: number;
 }
 
 /**
@@ -21,7 +22,9 @@ interface ModelConf {
  * @interface InferenceParams
  * @property {boolean | undefined} stream - Indicates if results should be streamed progressively.
  * @property {ModelConf | undefined} model - The model configuration details for inference.
+ * @property {template | undefined} template - The template to use, for the backends that support it.
  * @property {number | undefined} threads - The number of threads to use for parallel processing.
+ * @property {number | undefined} gpu_layers - The number of layers to offload to the GPU.
  * @property {number | undefined} n_predict - The number of predictions to return.
  * @property {number | undefined} top_k - Limits the result set to the top K results.
  * @property {number | undefined} top_p - Filters results based on cumulative probability.
@@ -36,7 +39,9 @@ interface ModelConf {
 interface InferenceParams {
   stream?: boolean;
   model?: ModelConf;
+  template?: string;
   threads?: number;
+  gpu_layers?: number;
   n_predict?: number;
   top_k?: number;
   top_p?: number;
@@ -66,7 +71,7 @@ interface InferenceResult {
  *
  * @interface LmProvider
  * @property {string} name - Identifier for the LM provider.
- * @property {ReturnType<typeof useApi> | ReturnType<typeof useGoinfer>} api - API utility being used (either restmix or goinfer based).
+ * @property {ReturnType<typeof useApi>} api - API utility being used (either restmix or goinfer based).
  * @property {string} serverUrl - The URL endpoint for the provider's server.
  * @property {string} apiKey - The key used for authentication with the provider's API.
  * @property {ModelConf} model - Active model configuration.
@@ -82,7 +87,7 @@ interface InferenceResult {
  */
 interface LmProvider {
   name: string;
-  api: ReturnType<typeof useApi> | ReturnType<typeof useGoinfer>;
+  api: ReturnType<typeof useApi>;
   serverUrl: string;
   apiKey: string;
   model: ModelConf;
@@ -91,7 +96,7 @@ interface LmProvider {
   loadModel: (name: string, ctx?: number, template?: string) => Promise<void>;
   infer: (prompt: string, params: InferenceParams) => Promise<InferenceResult>;
   abort: () => Promise<void>;
-  onToken: (t: string) => void;
+  onToken?: (t: string) => void;
   onStartEmit?: (data?: any) => void;
   onError?: (err: string) => void;
   defaults?: LmDefaults;
@@ -101,13 +106,11 @@ interface LmProvider {
  * Default parameters that can be used with an LM provider.
  *
  * @interface LmDefaults
- * @property {number | undefined} ctx - Default context window length.
- * @property {string | undefined} model - Default model name to use.
+ * @property {ModelConf | undefined} model - Default model conf to use.
  * @property {InferenceParams | undefined} inferenceParams - Default inference parameters.
  */
 interface LmDefaults {
-  ctx?: number;
-  model?: string;
+  model?: ModelConf;
   inferenceParams?: InferenceParams;
 }
 
@@ -127,7 +130,7 @@ interface LmProviderParams {
   name: string;
   serverUrl: string;
   apiKey: string;
-  onToken: (t: string) => void;
+  onToken?: (t: string) => void;
   onStartEmit?: (data?: any) => void;
   onError?: (err: string) => void;
   defaults?: LmDefaults;

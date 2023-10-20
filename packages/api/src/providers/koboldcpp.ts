@@ -5,7 +5,7 @@ import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelCo
 class KoboldcppProvider implements LmProvider {
   name: string;
   api: ReturnType<typeof useApi>;
-  onToken: (t: string) => void;
+  onToken?: (t: string) => void;
   onStartEmit?: (data?: any) => void;
   onError?: (err: string) => void;
   // state
@@ -63,9 +63,10 @@ class KoboldcppProvider implements LmProvider {
    * @param {string} name - The name of the model to load.
    * @param {number} [ctx] - The optional context window length.
    * @param {string} [template] - The name of the template to use with the model.
+   * @param {gpu_layers} [gpu_layers] - The number of layers to offload to the GPU
    * @returns {Promise<void>}
    */
-  async loadModel(name: string, ctx?: number, template?: string): Promise<void> {
+  async loadModel(name: string, ctx?: number, template?: string, gpu_layers?: number): Promise<void> {
     // load ctx
     const res = await this.api.get<{ value: number }>("/api/extra/true_max_context_length");
     if (res.ok) {
@@ -148,14 +149,17 @@ class KoboldcppProvider implements LmProvider {
           .replace('\\"', '"')
           .replace("\\n", "\n");
         //console.log(t + "|end|")
-        this.onToken(t);
+        if (this.onToken) {
+          this.onToken(t);
+        }
+        ++i
       }
     }
 
     return {
       text: text,
       stats: {
-        totalTokens: buf.length,
+        totalTokens: i,
       }
     } as InferenceResult
   }

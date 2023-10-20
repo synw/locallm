@@ -1,6 +1,6 @@
 {
   "name": "@locallm/types",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Shared data types for the LocalLm api",
   "repository": "https://github.com/synw/locallm",
   "scripts": {
@@ -8,7 +8,6 @@
     "docs": "typedoc --entryPointStrategy expand"
   },
   "devDependencies": {
-    "@goinfer/api": "^0.3.0",
     "restmix": "^0.3.1",
     "@rollup/plugin-node-resolve": "^13.3.0",
     "@rollup/plugin-typescript": "^8.5.0",

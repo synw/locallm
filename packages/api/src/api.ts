@@ -1,8 +1,7 @@
 import { useApi } from "restmix";
-import { useGoinfer } from "@goinfer/api";
 import { InferenceParams, InferenceResult, LmDefaults, LmParams, LmProvider, LmProviderType, ModelConf } from "@locallm/types";
 import { KoboldcppProvider } from './providers/koboldcpp.js';
-import { GoinferProvider } from "./providers/goinfer.js";
+import { GoinferProvider } from "./providers/goinfer/provider.js";
 import { OllamaProvider } from "./providers/ollama.js";
 
 /**
@@ -13,8 +12,8 @@ import { OllamaProvider } from "./providers/ollama.js";
  */
 class Lm implements LmProvider {
   name: string;
-  api: ReturnType<typeof useApi> | ReturnType<typeof useGoinfer>;
-  onToken: (t: string) => void;
+  api: ReturnType<typeof useApi>;
+  onToken?: (t: string) => void;
   onStartEmit?: (data?: any) => void;
   onError?: (err: string) => void;
   modelsInfo: () => Promise<void>;

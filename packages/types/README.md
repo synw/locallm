@@ -21,6 +21,7 @@ Represents the configuration of a model.
 - **name**: `string` - The unique name of the model.
 - **ctx**: `number | undefined` - The context window length, typically used to define how much of the previous data to consider.
 - **template**: `string | undefined` - The name of the template to use with the model.
+- **gpu_layers**: `number | undefined` - The number of layers to offload to the GPU.
 
 ---
 
@@ -30,6 +31,7 @@ Describes the parameters for making an inference request.
 
 - **stream**: `boolean | undefined` - Indicates if results should be streamed progressively.
 - **model**: `ModelConf | undefined` - The model configuration details for inference.
+- **template**: `string | undefined` - The template to use, for the backends that support it.
 - **threads**: `number | undefined` - The number of threads to use for parallel processing.
 - **n_predict**: `number | undefined` - The number of predictions to return.
 - **top_k**: `number | undefined` - Limits the result set to the top K results.
