@@ -65,6 +65,9 @@ class GoinferProvider implements LmProvider {
         ctx: template.ctx,
         template: template.name,
       });
+    };
+    if (res.data.isModelLoaded) {
+      this.model = res.data.loadedModel
     }
   }
 

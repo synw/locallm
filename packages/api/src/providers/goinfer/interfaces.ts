@@ -17,8 +17,7 @@ interface ModelTemplate {
  * @interface ModelState
  * @property {Record<string, ModelTemplate>;} models - The models info object (name, template name, context window size)
  * @property {boolean} isModelLoaded - Indicates whether a model is loaded or not.
- * @property {string} loadedModel - The name of the loaded model, empty if no model is loaded.
- * @property {number} ctx - The context value.
+ * @property {ModelConf} loadedModel - The loaded model conf, empty if no model is loaded.
  */
 interface ModelState {
   models: Record<string, ModelTemplate>;

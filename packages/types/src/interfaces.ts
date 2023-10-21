@@ -76,6 +76,7 @@ interface InferenceResult {
  * @property {string} apiKey - The key used for authentication with the provider's API.
  * @property {ModelConf} model - Active model configuration.
  * @property {Array<ModelConf>} models - List of available model configurations.
+ * @property {boolean} isModelLoaded - Is the model loaded: read only.
  * @property {Function} modelsInfo - Retrieves information about available models.
  * @property {Function} loadModel - Loads a model by name, with optional context and template.
  * @property {Function} infer - Makes an inference based on provided prompt and parameters.
@@ -92,6 +93,7 @@ interface LmProvider {
   apiKey: string;
   model: ModelConf;
   models: Array<ModelConf>;
+  readonly isModelLoaded: boolean;
   modelsInfo: () => Promise<void>;
   loadModel: (name: string, ctx?: number, template?: string) => Promise<void>;
   infer: (prompt: string, params: InferenceParams) => Promise<InferenceResult>;
