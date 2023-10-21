@@ -35,15 +35,6 @@ class OllamaProvider implements LmProvider {
   }
 
   /**
-   * Checks if a model is currently loaded.
-   *
-   * @returns {boolean} - Returns true if a model is loaded, otherwise false.
-   */
-  get isModelLoaded(): boolean {
-    return this.model.name.length > 0
-  }
-
-  /**
    * Not implemented for this provider
    *
    * @async

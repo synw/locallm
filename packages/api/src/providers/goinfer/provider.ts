@@ -43,15 +43,6 @@ class GoinferProvider implements LmProvider {
   }
 
   /**
-   * Checks if a model is currently loaded.
-   *
-   * @returns {boolean} - Returns true if a model is loaded, otherwise false.
-   */
-  get isModelLoaded(): boolean {
-    return this.model.name.length > 0;
-  }
-
-  /**
    * Fetches and stores the list of available models from the Goinfer API.
    *
    * @async
@@ -59,6 +50,7 @@ class GoinferProvider implements LmProvider {
    */
   async modelsInfo(): Promise<void> {
     const res = await this.api.get<ModelState>("/model/state");
+    console.log("RES", res.data);
     for (const [modelName, template] of Object.entries(res.data.models)) {
       this.models.push({
         name: modelName,
@@ -67,7 +59,11 @@ class GoinferProvider implements LmProvider {
       });
     };
     if (res.data.isModelLoaded) {
-      this.model = res.data.loadedModel
+      this.model = {
+        name: res.data.loadedModel,
+        ctx: res.data.ctx,
+      }
+      console.log("Model loaded:", this.model)
     }
   }
 

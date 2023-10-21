@@ -26,7 +26,7 @@
 <ul class="tsd-hierarchy">
 <li><span class="target">ModelState</span></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/synw/locallm/blob/bc21ccd/packages/api/src/providers/goinfer/interfaces.ts#L22">src/providers/goinfer/interfaces.ts:22</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/synw/locallm/blob/bd70f88/packages/api/src/providers/goinfer/interfaces.ts#L23">src/providers/goinfer/interfaces.ts:23</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -34,12 +34,21 @@
 <div class="tsd-accordion-details">
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Properties</h3>
-<div class="tsd-index-list"><a href="providers_goinfer_interfaces.ModelState.html#isModelLoaded" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>is<wbr/>Model<wbr/>Loaded</span></a>
+<div class="tsd-index-list"><a href="providers_goinfer_interfaces.ModelState.html#ctx" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>ctx</span></a>
+<a href="providers_goinfer_interfaces.ModelState.html#isModelLoaded" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>is<wbr/>Model<wbr/>Loaded</span></a>
 <a href="providers_goinfer_interfaces.ModelState.html#loadedModel" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>loaded<wbr/>Model</span></a>
 <a href="providers_goinfer_interfaces.ModelState.html#models" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>models</span></a>
 </div></section></div></details></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Properties</h2>
+<section class="tsd-panel tsd-member"><a id="ctx" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>ctx</span><a href="#ctx" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">ctx</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+<div class="tsd-comment tsd-typography"><p>The loaded model context widow size, 0 if no model is loaded.</p>
+</div>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/synw/locallm/blob/bd70f88/packages/api/src/providers/goinfer/interfaces.ts#L27">src/providers/goinfer/interfaces.ts:27</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="isModelLoaded" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>is<wbr/>Model<wbr/>Loaded</span><a href="#isModelLoaded" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">is<wbr/>Model<wbr/>Loaded</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
@@ -47,15 +56,15 @@
 </div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/synw/locallm/blob/bc21ccd/packages/api/src/providers/goinfer/interfaces.ts#L24">src/providers/goinfer/interfaces.ts:24</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/synw/locallm/blob/bd70f88/packages/api/src/providers/goinfer/interfaces.ts#L25">src/providers/goinfer/interfaces.ts:25</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="loadedModel" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>loaded<wbr/>Model</span><a href="#loadedModel" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<div class="tsd-signature"><span class="tsd-kind-property">loaded<wbr/>Model</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">ModelConf</span></div>
-<div class="tsd-comment tsd-typography"><p>The loaded model conf, empty if no model is loaded.</p>
+<div class="tsd-signature"><span class="tsd-kind-property">loaded<wbr/>Model</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-comment tsd-typography"><p>The loaded model name, empty if no model is loaded.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/synw/locallm/blob/bc21ccd/packages/api/src/providers/goinfer/interfaces.ts#L25">src/providers/goinfer/interfaces.ts:25</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/synw/locallm/blob/bd70f88/packages/api/src/providers/goinfer/interfaces.ts#L26">src/providers/goinfer/interfaces.ts:26</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="models" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>models</span><a href="#models" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">models</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="providers_goinfer_interfaces.ModelTemplate.html" class="tsd-signature-type tsd-kind-interface">ModelTemplate</a><span class="tsd-signature-symbol">&gt;</span></div>
@@ -63,7 +72,7 @@
 </div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/synw/locallm/blob/bc21ccd/packages/api/src/providers/goinfer/interfaces.ts#L23">src/providers/goinfer/interfaces.ts:23</a></li></ul></aside></section></section></div>
+<li>Defined in <a href="https://github.com/synw/locallm/blob/bd70f88/packages/api/src/providers/goinfer/interfaces.ts#L24">src/providers/goinfer/interfaces.ts:24</a></li></ul></aside></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -83,6 +92,7 @@
 <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="#icon-chevronDown"></use></svg>On This Page</h3></summary>
 <div class="tsd-accordion-details">
 <ul>
+<li><a href="#ctx" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>ctx</span></a></li>
 <li><a href="#isModelLoaded" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>is<wbr/>Model<wbr/>Loaded</span></a></li>
 <li><a href="#loadedModel" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>loaded<wbr/>Model</span></a></li>
 <li><a href="#models" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>models</span></a></li></ul></div></details></div>

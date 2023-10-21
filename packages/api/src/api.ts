@@ -89,10 +89,6 @@ class Lm implements LmProvider {
     this.defaults = this.provider.defaults;
     this.models = this.provider.models;
   }
-
-  get isModelLoaded(): boolean {
-    return this.provider.isModelLoaded
-  }
 }
 
 

@@ -17,12 +17,14 @@ interface ModelTemplate {
  * @interface ModelState
  * @property {Record<string, ModelTemplate>;} models - The models info object (name, template name, context window size)
  * @property {boolean} isModelLoaded - Indicates whether a model is loaded or not.
- * @property {ModelConf} loadedModel - The loaded model conf, empty if no model is loaded.
+ * @property {string} loadedModel - The loaded model name, empty if no model is loaded.
+ * @property {number} ctx - The loaded model context widow size, 0 if no model is loaded.
  */
 interface ModelState {
   models: Record<string, ModelTemplate>;
   isModelLoaded: boolean;
-  loadedModel: ModelConf;
+  loadedModel: string;
+  ctx: number;
 }
 
 enum MsgType {

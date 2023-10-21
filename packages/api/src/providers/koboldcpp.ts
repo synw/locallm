@@ -34,16 +34,6 @@ class KoboldcppProvider implements LmProvider {
   }
 
   /**
-   * Checks if a model is currently loaded. Note: it is useless with this 
-   * provider as it does not support multiple models
-   *
-   * @returns {boolean} - Returns true if a model is loaded, otherwise false.
-   */
-  get isModelLoaded(): boolean {
-    return this.model.name.length > 0
-  }
-
-  /**
    * Not implemented for this provider
    *
    * @async
@@ -91,7 +81,7 @@ class KoboldcppProvider implements LmProvider {
    */
   async infer(prompt: string, params: InferenceParams): Promise<InferenceResult> {
     // autoload model
-    if (!this.isModelLoaded) {
+    if (this.model.name.length > 0) {
       await this.loadModel("")
     }
     this.abortController = new AbortController();
