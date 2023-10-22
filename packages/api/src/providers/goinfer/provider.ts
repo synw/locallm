@@ -50,7 +50,7 @@ class GoinferProvider implements LmProvider {
    */
   async modelsInfo(): Promise<void> {
     const res = await this.api.get<ModelState>("/model/state");
-    console.log("RES", res.data);
+    //console.log("RES", res.data);
     for (const [modelName, template] of Object.entries(res.data.models)) {
       this.models.push({
         name: modelName,
@@ -63,7 +63,7 @@ class GoinferProvider implements LmProvider {
         name: res.data.loadedModel,
         ctx: res.data.ctx,
       }
-      console.log("Model loaded:", this.model)
+      //console.log("Model loaded:", this.model)
     }
   }
 

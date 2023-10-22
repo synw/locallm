@@ -17,7 +17,7 @@ class Lm implements LmProvider {
   onStartEmit?: (data?: any) => void;
   onError?: (err: string) => void;
   modelsInfo: () => Promise<void>;
-  loadModel: (name: string, ctx?: number, template?: string) => Promise<void>;
+  loadModel: (name: string, ctx?: number, template?: string, gpu_layers?: number) => Promise<void>;
   infer: (prompt: string, params: InferenceParams) => Promise<InferenceResult>;
   abort: () => Promise<void>;
   models = new Array<ModelConf>();
