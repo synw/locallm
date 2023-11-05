@@ -27,6 +27,8 @@ class KoboldcppProvider implements LmProvider {
     this.onError = params.onError;
     this.api = useApi({
       serverUrl: params.serverUrl,
+      credentials: "omit",
+
     });
     this.apiKey = params.apiKey;
     this.serverUrl = params.serverUrl;
@@ -85,6 +87,9 @@ class KoboldcppProvider implements LmProvider {
       await this.loadModel("")
     }
     this.abortController = new AbortController();
+    if (params?.template) {
+      prompt = params.template.replace("{prompt}", prompt);
+    }
     const inferParams = {
       prompt: prompt,
       max_context_length: this.model.ctx,
@@ -99,7 +104,6 @@ class KoboldcppProvider implements LmProvider {
     };
     const body = JSON.stringify({ ...inferParams });
     const url = `${this.serverUrl}/api/extra/generate/stream`;
-    const buf = new Array<string>();
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -138,6 +142,11 @@ class KoboldcppProvider implements LmProvider {
           .slice(0, -2)
           .replace('\\"', '"')
           .replace("\\n", "\n");
+        if (i == 1) {
+          if (this.onStartEmit) {
+            this.onStartEmit();
+          }
+        }
         //console.log(t + "|end|")
         if (this.onToken) {
           this.onToken(t);
@@ -162,9 +171,8 @@ class KoboldcppProvider implements LmProvider {
    */
   async abort(): Promise<void> {
     this.abortController.abort();
-    // TOFIX: 404 status here:
-    //const res = await this.api.get("/api/extra/abort");
-    //console.log(res)
+    const res = await this.api.post("/api/extra/abort", { genKey: "" });
+    console.log(res)
   }
 }
 
