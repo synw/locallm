@@ -52,7 +52,12 @@ class LlamacppProvider implements LmProvider {
    * @returns {Promise<void>}
    */
   async loadModel(name: string, ctx?: number, template?: string, gpu_layers?: number): Promise<void> {
-    console.warn("Not implemented for this provider")
+    const res = await this.api.post<Record<string, any>>("/completion", {});
+    if (res.ok) {
+      //console.log("RES", res.data)
+      this.model.ctx = res.data.generation_settings.n_ctx;
+      this.model.name = res.data.model.split("/").pop();
+    }
   }
 
   /**
