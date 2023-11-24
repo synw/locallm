@@ -21,7 +21,7 @@ async function main() {
     stream: true,
     temperature: 0.1,
     top_p: 0.55,
-    n_predict: 200,
+    max_tokens: 200,
   });
   console.log("Result:", res)
 }

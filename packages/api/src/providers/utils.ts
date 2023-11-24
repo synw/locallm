@@ -1,4 +1,4 @@
-import { ModelConf } from "../packages/types/interfaces.js";
+import { ModelConf } from "@locallm/types";
 
 /**
  * Fetches a model configuration based on its name, and then fills in missing

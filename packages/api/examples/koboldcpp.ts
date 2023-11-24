@@ -18,7 +18,7 @@ async function main() {
   const res = await lm.infer(_prompt, {
     temperature: 0.5,
     top_p: 0.55,
-    n_predict: 300,
+    max_tokens: 300,
   });
   console.log("\n", res)
 }

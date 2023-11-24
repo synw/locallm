@@ -1,4 +1,4 @@
-import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf, ModelState } from "../../packages/types/interfaces.js";
+import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf, ModelState } from "@locallm/types";
 import { useApi } from "restmix";
 import { loadModelFromConf } from "../utils.js";
 import { StreamedMessage, TempInferStats } from "./interfaces.js";

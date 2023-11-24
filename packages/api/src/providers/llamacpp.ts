@@ -1,5 +1,5 @@
 import { useApi } from 'restmix';
-import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "../packages/types/interfaces.js";
+import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
 
 
 class LlamacppProvider implements LmProvider {
