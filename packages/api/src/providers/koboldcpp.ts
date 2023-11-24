@@ -1,5 +1,5 @@
 import { useApi } from 'restmix';
-import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
+import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "../packages/types/interfaces.js";
 
 
 class KoboldcppProvider implements LmProvider {
@@ -62,7 +62,7 @@ class KoboldcppProvider implements LmProvider {
     // load ctx
     const res = await this.api.get<{ value: number }>("/api/extra/true_max_context_length");
     if (res.ok) {
-      //console.log("R:", res.data.value)
+      //console.log("Setting model ctx to", res.data.value)
       this.model.ctx = res.data.value
     }
     // load model name
@@ -93,16 +93,16 @@ class KoboldcppProvider implements LmProvider {
     const inferParams = {
       prompt: prompt,
       max_context_length: this.model.ctx,
-      max_length: params.n_predict,
+      max_length: params.max_tokens,
       rep_pen: params.repeat_penalty,
       stop_sequence: params.stop,
       temperature: params.temperature,
-      tfs: params.tfs_z,
+      tfs: params.tfs,
       top_k: params.top_k,
       top_p: params.top_p,
       ...params.extra,
     };
-    const body = JSON.stringify({ ...inferParams });
+    const body = JSON.stringify(inferParams);
     const url = `${this.serverUrl}/api/extra/generate/stream`;
     const response = await fetch(url, {
       method: 'POST',

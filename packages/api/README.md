@@ -2,6 +2,7 @@
 
 An api to query local language models using different backends. Supported backends:
 
+- [Llama.cpp](https://github.com/ggerganov/llama.cpp/tree/master/examples/server)
 - [Koboldcpp](https://github.com/LostRuins/koboldcpp)
 - [Ollama](https://github.com/jmorganca/ollama)
 - [Goinfer](https://github.com/synw/goinfer)
@@ -31,12 +32,11 @@ const lm = new Lm({
 const template = "<s>[INST] {prompt} [/INST]";
 const _prompt = template.replace("{prompt}", "list the planets in the solar system");
 // run the inference query
-const res = await lm.infer(_prompt, {
+await lm.infer(_prompt, {
+  stream: true,
   temperature: 0,
-  top_p: 0.35,
   n_predict: 200,
 });
-console.log(res);
 ```
 
 Check the [examples](examples) directory for more examples

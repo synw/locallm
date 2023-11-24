@@ -1,7 +1,7 @@
-import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
+import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf, ModelState } from "../../packages/types/interfaces.js";
 import { useApi } from "restmix";
 import { loadModelFromConf } from "../utils.js";
-import { ModelState, StreamedMessage, TempInferStats } from "./interfaces.js";
+import { StreamedMessage, TempInferStats } from "./interfaces.js";
 
 /**
  * Implements the language model provider for the Goinfer service.

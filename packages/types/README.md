@@ -33,15 +33,18 @@ Describes the parameters for making an inference request.
 - **model**: `ModelConf | undefined` - The model configuration details for inference.
 - **template**: `string | undefined` - The template to use, for the backends that support it.
 - **threads**: `number | undefined` - The number of threads to use for parallel processing.
-- **n_predict**: `number | undefined` - The number of predictions to return.
+- **max_tokens**: `number | undefined` - The number of predictions to return.
+- **temperature**: `number | undefined` - Adjusts randomness in sampling; higher values mean more randomness.
 - **top_k**: `number | undefined` - Limits the result set to the top K results.
 - **top_p**: `number | undefined` - Filters results based on cumulative probability.
-- **temperature**: `number | undefined` - Adjusts randomness in sampling; higher values mean more randomness.
+- **min_p**: `number | undefined` - The minimum probability for a token to be considered, relative to the probability of the most likely token.
 - **frequency_penalty**: `number | undefined` - Adjusts penalty for frequency of tokens.
 - **presence_penalty**: `number | undefined` - Adjusts penalty for presence of tokens.
 - **repeat_penalty**: `number | undefined` - Adjusts penalty for repeated tokens.
-- **tfs_z**: `number | undefined` - Used for custom tuning.
+- **tfs**: `number | undefined` - Used for custom tuning.
 - **stop**: `Array<string> | undefined` - List of stop words or phrases to halt predictions.
+- **grammar**: `string | undefined` - The gnbf grammar to use for grammar-based sampling.
+- **image_data**: `Array<{ data: string, id: number }> | undefined`: The base64 images data (for multimodal models).
 
 ---
 

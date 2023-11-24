@@ -1,8 +1,10 @@
 import { useApi } from "restmix";
-import { InferenceParams, InferenceResult, LmDefaults, LmParams, LmProvider, LmProviderType, ModelConf } from "@locallm/types";
+//import { InferenceParams, InferenceResult, LmDefaults, LmParams, LmProvider, LmProviderType, ModelConf } from "@locallm/types";
+import { InferenceParams, InferenceResult, LmDefaults, LmParams, LmProvider, LmProviderType, ModelConf } from "./packages/types/interfaces.js";
 import { KoboldcppProvider } from './providers/koboldcpp.js';
 import { GoinferProvider } from "./providers/goinfer/provider.js";
 import { OllamaProvider } from "./providers/ollama.js";
+import { LlamacppProvider } from "./providers/llamacpp.js";
 
 /**
  * Represents a Language Model (LM) which acts as a high-level interface to various underlying LM providers.
@@ -37,6 +39,17 @@ class Lm implements LmProvider {
   constructor(params: LmParams) {
     this.providerType = params.providerType;
     switch (params.providerType) {
+      case "llamacpp":
+        this.name = "llamacpp";
+        this.provider = new LlamacppProvider({
+          name: "Llamacpp",
+          serverUrl: params.serverUrl,
+          apiKey: "",
+          onToken: params.onToken,
+          onStartEmit: params.onStartEmit,
+          onError: params.onError,
+        });
+        break;
       case "koboldcpp":
         this.name = "Koboldcpp";
         this.provider = new KoboldcppProvider({

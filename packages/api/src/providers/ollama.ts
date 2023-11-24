@@ -1,5 +1,5 @@
 import { useApi } from "restmix";
-import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
+import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "../packages/types/interfaces.js";
 import { loadModelFromConf } from "./utils.js";
 
 
@@ -79,10 +79,10 @@ class OllamaProvider implements LmProvider {
       repeat_penalty: params.repeat_penalty,
       stop_sequence: params.stop ? params.stop.join(",") : undefined,
       temperature: params.temperature,
-      tfs_z: params.tfs_z,
+      tfs_z: params.tfs,
       top_k: params.top_k,
       top_p: params.top_p,
-      num_predict: params.n_predict,
+      num_predict: params.max_tokens,
       ...params.extra,
     };
     const body = JSON.stringify({ ...inferParams });

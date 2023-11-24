@@ -1,32 +1,3 @@
-import { ModelConf } from "@locallm/types";
-
-/** Template information for model
-*
-* @interface ModelTemplate
-* @property {string} name - The name of the template
-* @property {number} ctx - The context window size for the model
-*/
-interface ModelTemplate {
-  name: string;
-  ctx: number;
-}
-
-/**
- * Represents the state of the available models on server.
- *
- * @interface ModelState
- * @property {Record<string, ModelTemplate>;} models - The models info object (name, template name, context window size)
- * @property {boolean} isModelLoaded - Indicates whether a model is loaded or not.
- * @property {string} loadedModel - The loaded model name, empty if no model is loaded.
- * @property {number} ctx - The loaded model context widow size, 0 if no model is loaded.
- */
-interface ModelState {
-  models: Record<string, ModelTemplate>;
-  isModelLoaded: boolean;
-  loadedModel: string;
-  ctx: number;
-}
-
 enum MsgType {
   TokenMsgType = "token",
   SystemMsgType = "system",
@@ -61,4 +32,4 @@ interface TempInferStats {
   thinkingTimeFormat: string;
 }
 
-export { ModelState, ModelTemplate, MsgType, StreamedMessage, TempInferStats }
+export { MsgType, StreamedMessage, TempInferStats }
