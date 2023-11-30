@@ -3,5 +3,8 @@
   "devDependencies": {
     "@types/node": "^20.8.2",
     "ts-node": "^10.9.1"
+  },
+  "dependencies": {
+    "@intrinsicai/gbnfgen": "^0.10.0"
   }
 }
