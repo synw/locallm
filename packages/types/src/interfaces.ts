@@ -24,7 +24,7 @@ interface ModelConf {
  */
 interface ImgData {
   id: string;
-  data: string;
+  data: number;
 }
 
 /**
