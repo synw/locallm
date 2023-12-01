@@ -30,7 +30,7 @@
 <ul class="tsd-hierarchy">
 <li><span class="tsd-signature-type ">LmProvider</span></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/synw/locallm/blob/f7d071d/packages/api/src/api.ts#L14">src/api.ts:14</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/synw/locallm/blob/b92d7cc/packages/api/src/api.ts#L14">src/api.ts:14</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -81,7 +81,7 @@
 <h4>Throws</h4><p>Throws an error if an unknown provider type is specified or if required parameters for a provider are missing.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/synw/locallm/blob/f7d071d/packages/api/src/api.ts#L38">src/api.ts:38</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/synw/locallm/blob/b92d7cc/packages/api/src/api.ts#L38">src/api.ts:38</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Properties</h2>
 <section class="tsd-panel tsd-member"><a id="abort" class="tsd-anchor"></a>
@@ -97,7 +97,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Implementation of LmProvider.abort</p>
 <ul>
-<li>Defined in <a href="https://github.com/synw/locallm/blob/f7d071d/packages/api/src/api.ts#L23">src/api.ts:23</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/synw/locallm/blob/b92d7cc/packages/api/src/api.ts#L23">src/api.ts:23</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="api" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>api</span><a href="#api" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">api</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">addHeader</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">key</span>, <span class="tsd-kind-parameter">val</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">csrfToken</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">del</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">T_4</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">uri</span>, <span class="tsd-kind-parameter">verbose</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">ApiResponse</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">T_4</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">get</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">uri</span>, <span class="tsd-kind-parameter">verbose</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">ApiResponse</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">hasCsrfCookie</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">onResponse</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">hook</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">patch</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">T_3</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">uri</span>, <span class="tsd-kind-parameter">payload</span>, <span class="tsd-kind-parameter">verbose</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">ApiResponse</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">T_3</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">post</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">T_1</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">uri</span>, <span class="tsd-kind-parameter">payload</span>, <span class="tsd-kind-parameter">multipart</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">verbose</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">ApiResponse</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">T_1</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">postSse</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">T_5</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">uri</span>, <span class="tsd-kind-parameter">payload</span>, <span class="tsd-kind-parameter">onChunk</span>, <span class="tsd-kind-parameter">abortController</span>, <span class="tsd-kind-parameter">multipart</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">verbose</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">put</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">T_2</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">uri</span>, <span class="tsd-kind-parameter">payload</span>, <span class="tsd-kind-parameter">verbose</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">ApiResponse</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">T_2</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">removeHeader</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">key</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">setCsrfToken</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">token</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">setCsrfTokenFromCookie</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">verbose</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></div>
@@ -336,19 +336,19 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4></li></ul></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Implementation of LmProvider.api</p>
 <ul>
-<li>Defined in <a href="https://github.com/synw/locallm/blob/f7d071d/packages/api/src/api.ts#L16">src/api.ts:16</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/synw/locallm/blob/b92d7cc/packages/api/src/api.ts#L16">src/api.ts:16</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="apiKey" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>api<wbr/>Key</span><a href="#apiKey" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">api<wbr/>Key</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div><aside class="tsd-sources">
 <p>Implementation of LmProvider.apiKey</p>
 <ul>
-<li>Defined in <a href="https://github.com/synw/locallm/blob/f7d071d/packages/api/src/api.ts#L28">src/api.ts:28</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/synw/locallm/blob/b92d7cc/packages/api/src/api.ts#L28">src/api.ts:28</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="defaults" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>defaults</span><a href="#defaults" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">defaults</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type ">LmDefaults</span></div><aside class="tsd-sources">
 <p>Implementation of LmProvider.defaults</p>
 <ul>
-<li>Defined in <a href="https://github.com/synw/locallm/blob/f7d071d/packages/api/src/api.ts#L30">src/api.ts:30</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/synw/locallm/blob/b92d7cc/packages/api/src/api.ts#L30">src/api.ts:30</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="infer" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>infer</span><a href="#infer" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">infer</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">prompt</span>, <span class="tsd-kind-parameter">params</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">InferenceResult</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span></div>
@@ -369,7 +369,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">InferenceResult</span><span class="tsd-signature-symbol">&gt;</span></h4></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Implementation of LmProvider.infer</p>
 <ul>
-<li>Defined in <a href="https://github.com/synw/locallm/blob/f7d071d/packages/api/src/api.ts#L22">src/api.ts:22</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/synw/locallm/blob/b92d7cc/packages/api/src/api.ts#L22">src/api.ts:22</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="loadModel" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>load<wbr/>Model</span><a href="#loadModel" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">load<wbr/>Model</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">name</span>, <span class="tsd-kind-parameter">ctx</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">template</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">gpu_layers</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span></div>
@@ -394,19 +394,19 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Implementation of LmProvider.loadModel</p>
 <ul>
-<li>Defined in <a href="https://github.com/synw/locallm/blob/f7d071d/packages/api/src/api.ts#L21">src/api.ts:21</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/synw/locallm/blob/b92d7cc/packages/api/src/api.ts#L21">src/api.ts:21</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="model" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>model</span><a href="#model" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">model</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">ModelConf</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <p>Implementation of LmProvider.model</p>
 <ul>
-<li>Defined in <a href="https://github.com/synw/locallm/blob/f7d071d/packages/api/src/api.ts#L25">src/api.ts:25</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/synw/locallm/blob/b92d7cc/packages/api/src/api.ts#L25">src/api.ts:25</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="models" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>models</span><a href="#models" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">models</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">ModelConf</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <p>Implementation of LmProvider.models</p>
 <ul>
-<li>Defined in <a href="https://github.com/synw/locallm/blob/f7d071d/packages/api/src/api.ts#L24">src/api.ts:24</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/synw/locallm/blob/b92d7cc/packages/api/src/api.ts#L24">src/api.ts:24</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="modelsInfo" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>models<wbr/>Info</span><a href="#modelsInfo" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">models<wbr/>Info</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span></div>
@@ -420,13 +420,13 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Implementation of LmProvider.modelsInfo</p>
 <ul>
-<li>Defined in <a href="https://github.com/synw/locallm/blob/f7d071d/packages/api/src/api.ts#L20">src/api.ts:20</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/synw/locallm/blob/b92d7cc/packages/api/src/api.ts#L20">src/api.ts:20</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="name" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>name</span><a href="#name" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">name</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div><aside class="tsd-sources">
 <p>Implementation of LmProvider.name</p>
 <ul>
-<li>Defined in <a href="https://github.com/synw/locallm/blob/f7d071d/packages/api/src/api.ts#L15">src/api.ts:15</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/synw/locallm/blob/b92d7cc/packages/api/src/api.ts#L15">src/api.ts:15</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="onError" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>on<wbr/>Error</span><a href="#onError" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">on<wbr/>Error</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">err</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span></div>
@@ -445,7 +445,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Implementation of LmProvider.onError</p>
 <ul>
-<li>Defined in <a href="https://github.com/synw/locallm/blob/f7d071d/packages/api/src/api.ts#L19">src/api.ts:19</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/synw/locallm/blob/b92d7cc/packages/api/src/api.ts#L19">src/api.ts:19</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="onStartEmit" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>on<wbr/>Start<wbr/>Emit</span><a href="#onStartEmit" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">on<wbr/>Start<wbr/>Emit</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">data</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span></div>
@@ -464,7 +464,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Implementation of LmProvider.onStartEmit</p>
 <ul>
-<li>Defined in <a href="https://github.com/synw/locallm/blob/f7d071d/packages/api/src/api.ts#L18">src/api.ts:18</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/synw/locallm/blob/b92d7cc/packages/api/src/api.ts#L18">src/api.ts:18</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="onToken" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>on<wbr/>Token</span><a href="#onToken" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">on<wbr/>Token</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">t</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span></div>
@@ -483,23 +483,23 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Implementation of LmProvider.onToken</p>
 <ul>
-<li>Defined in <a href="https://github.com/synw/locallm/blob/f7d071d/packages/api/src/api.ts#L17">src/api.ts:17</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/synw/locallm/blob/b92d7cc/packages/api/src/api.ts#L17">src/api.ts:17</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="provider" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>provider</span><a href="#provider" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">provider</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">LmProvider</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/synw/locallm/blob/f7d071d/packages/api/src/api.ts#L26">src/api.ts:26</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/synw/locallm/blob/b92d7cc/packages/api/src/api.ts#L26">src/api.ts:26</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="providerType" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>provider<wbr/>Type</span><a href="#providerType" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">provider<wbr/>Type</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">LmProviderType</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/synw/locallm/blob/f7d071d/packages/api/src/api.ts#L27">src/api.ts:27</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/synw/locallm/blob/b92d7cc/packages/api/src/api.ts#L27">src/api.ts:27</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="serverUrl" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>server<wbr/>Url</span><a href="#serverUrl" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">server<wbr/>Url</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div><aside class="tsd-sources">
 <p>Implementation of LmProvider.serverUrl</p>
 <ul>
-<li>Defined in <a href="https://github.com/synw/locallm/blob/f7d071d/packages/api/src/api.ts#L29">src/api.ts:29</a></li></ul></aside></section></section></div>
+<li>Defined in <a href="https://github.com/synw/locallm/blob/b92d7cc/packages/api/src/api.ts#L29">src/api.ts:29</a></li></ul></aside></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">

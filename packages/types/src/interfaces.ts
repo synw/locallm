@@ -17,14 +17,14 @@ interface ModelConf {
 }
 
 /**
- * _description_
+ * Image data
  *
  * @interface ImgData
  * @typedef {ImgData}
  */
 interface ImgData {
-  id: string;
-  data: number;
+  id: number;
+  data: string;
 }
 
 /**
