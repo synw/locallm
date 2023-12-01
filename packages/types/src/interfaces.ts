@@ -17,6 +17,17 @@ interface ModelConf {
 }
 
 /**
+ * _description_
+ *
+ * @interface ImgData
+ * @typedef {ImgData}
+ */
+interface ImgData {
+  id: string;
+  data: string;
+}
+
+/**
  * Describes the parameters for making an inference request.
  *
  * @interface InferenceParams
@@ -36,7 +47,7 @@ interface ModelConf {
  * @property {number | undefined} tfs - Set the tail free sampling value.
  * @property {Array<string> | undefined} stop - List of stop words or phrases to halt predictions.
  * @property {string | undefined} grammar - The gnbf grammar to use for grammar-based sampling.
- * @property {Array<{ data: string, id: number }> | undefined} image_data - The base64 images data (for multimodal models).
+ * @property {Array<ImgData>} image_data - The base64 images data (for multimodal models).
  * @property {Record<string, any> | undefined} extra - Extra parameters to include in the payload
  */
 interface InferenceParams {
@@ -56,7 +67,7 @@ interface InferenceParams {
   tfs?: number;
   stop?: Array<string>;
   grammar?: string;
-  image_data?: Array<{ data: string, id: number }>;
+  image_data?: Array<ImgData>;
   extra?: Record<string, any>;
 }
 
@@ -210,4 +221,5 @@ export {
   LmDefaults,
   ModelTemplate,
   ModelState,
+  ImgData,
 }
