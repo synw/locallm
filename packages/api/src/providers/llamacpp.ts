@@ -72,6 +72,7 @@ class LlamacppProvider implements LmProvider {
     this.abortController = new AbortController();
     if (params?.template) {
       prompt = params.template.replace("{prompt}", prompt);
+      delete params.template;
     }
     let inferenceParams: Record<string, any> = params;
     inferenceParams.prompt = prompt;

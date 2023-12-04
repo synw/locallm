@@ -89,8 +89,10 @@ class KoboldcppProvider implements LmProvider {
     this.abortController = new AbortController();
     if (params?.template) {
       prompt = params.template.replace("{prompt}", prompt);
+      delete params.template;
     }
     let inferenceParams: Record<string, any> = params;
+    inferenceParams.prompt = prompt;
     inferenceParams.max_context_length = this.model.ctx;
     if ("max_tokens" in params) {
       inferenceParams.max_length = params.max_tokens;
