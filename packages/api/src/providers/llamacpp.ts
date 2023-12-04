@@ -73,14 +73,23 @@ class LlamacppProvider implements LmProvider {
     if (params?.template) {
       prompt = params.template.replace("{prompt}", prompt);
     }
-    const inferenceParams: Record<string, any> = params;
+    let inferenceParams: Record<string, any> = params;
     inferenceParams.prompt = prompt;
     if ("max_tokens" in params) {
       inferenceParams.n_predict = params.max_tokens;
+      delete inferenceParams.max_tokens;
     }
     if ("tfs" in params) {
       inferenceParams.tfs_z = params.tfs;
+      delete inferenceParams.tfs;
     }
+    if ("extra" in params) {
+      inferenceParams = { ...inferenceParams, ...params.extra };
+      delete inferenceParams.extra;
+    }
+    inferenceParams.template = undefined;
+    inferenceParams.gpu_layers = undefined;
+    inferenceParams.threads = undefined;
 
     let respData: InferenceResult = { text: "", stats: {} };
     let i = 0;

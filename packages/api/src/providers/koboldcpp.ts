@@ -90,19 +90,28 @@ class KoboldcppProvider implements LmProvider {
     if (params?.template) {
       prompt = params.template.replace("{prompt}", prompt);
     }
-    const inferParams = {
-      prompt: prompt,
-      max_context_length: this.model.ctx,
-      max_length: params.max_tokens,
-      rep_pen: params.repeat_penalty,
-      stop_sequence: params.stop,
-      temperature: params.temperature,
-      tfs: params.tfs,
-      top_k: params.top_k,
-      top_p: params.top_p,
-      ...params.extra,
-    };
-    const body = JSON.stringify(inferParams);
+    let inferenceParams: Record<string, any> = params;
+    inferenceParams.max_context_length = this.model.ctx;
+    if ("max_tokens" in params) {
+      inferenceParams.max_length = params.max_tokens;
+      delete inferenceParams.max_tokens;
+    }
+    if ("repeat_penalty" in params) {
+      inferenceParams.rep_pen = params.repeat_penalty;
+      delete inferenceParams.repeat_penalty;
+    }
+    if ("stop" in params) {
+      inferenceParams.stop_sequence = params.stop;
+      delete inferenceParams.stop;
+    }
+    if ("extra" in params) {
+      inferenceParams = { ...inferenceParams, ...params.extra };
+      delete inferenceParams.extra;
+    }
+    inferenceParams.template = undefined;
+    inferenceParams.gpu_layers = undefined;
+    inferenceParams.threads = undefined;
+    const body = JSON.stringify(inferenceParams);
     const url = `${this.serverUrl}/api/extra/generate/stream`;
     const response = await fetch(url, {
       method: 'POST',
