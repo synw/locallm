@@ -46,13 +46,13 @@ class LlamacppProvider implements LmProvider {
   }
 
   /**
-   * Not implemented for this provider
+   * Load model info
    *
    * @async
    * @returns {Promise<void>}
    */
   async loadModel(name: string, ctx?: number, template?: string, gpu_layers?: number): Promise<void> {
-    const res = await this.api.post<Record<string, any>>("/completion", {});
+    const res = await this.api.post<Record<string, any>>("/completion", { prompt: "" });
     if (res.ok) {
       //console.log("RES", res.data)
       this.model.ctx = res.data.generation_settings.n_ctx;
@@ -101,14 +101,25 @@ class LlamacppProvider implements LmProvider {
             this.onStartEmit()
           }
         }
-        if (!payload.stop) {
-          if (this.onToken) {
-            const token = `${payload.content}`;
-            this.onToken(token);
-            respData.text += token
-          }
+        //console.log("OT", typeof payload);
+        //console.log(">>>>", payload, "<<<<")
+        const pt = typeof payload;
+        if (pt == "string") {
+          // Fix for last 2 json payload
+          const txt = payload.split('"stop":false}')[1];
+          const data = JSON.parse(txt);
+          respData.stats = data;
         } else {
-          respData.stats = payload;
+          if (!payload.stop) {
+            if (this.onToken) {
+              const token = payload.content;
+              this.onToken(token);
+              respData.text += token
+            }
+          } else {
+            //console.log("END", payload);
+            respData.stats = payload;
+          }
         }
         ++i
       }
@@ -132,7 +143,7 @@ class LlamacppProvider implements LmProvider {
         throw new Error(`${res.statusText} ${msg.content}`);
       }
     }
-
+    //console.log("STATS", respData)
     return respData
   }
 
