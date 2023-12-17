@@ -1,7 +1,6 @@
 import { useApi } from 'restmix';
 import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
 
-
 class KoboldcppProvider implements LmProvider {
   name: string;
   api: ReturnType<typeof useApi>;
@@ -9,7 +8,7 @@ class KoboldcppProvider implements LmProvider {
   onStartEmit?: (data?: any) => void;
   onError?: (err: string) => void;
   // state
-  model: ModelConf = { name: "" };
+  model: ModelConf = { name: "", ctx: 2048 };
   models = new Array<ModelConf>();
   abortController = new AbortController();
   apiKey: string;
@@ -30,6 +29,9 @@ class KoboldcppProvider implements LmProvider {
       credentials: "omit",
 
     });
+    if (params.apiKey.length > 0) {
+      this.api.addHeader("Authorization", `Bearer ${params.apiKey}`);
+    }
     this.apiKey = params.apiKey;
     this.serverUrl = params.serverUrl;
     //this.api.addHeader("Authorization", `Bearer ${apiKey}`);
@@ -47,18 +49,16 @@ class KoboldcppProvider implements LmProvider {
 
   /**
    * Loads a specified model for inferences. Note: it will query the server
-   * and retrieve current model info (name and ctx). It is not needed as it
-   * will be automatically managed when running inference because this provider
-   * does not support multiple models
+   * and retrieve current model info (name and ctx).
    *
    * @async
    * @param {string} name - The name of the model to load.
-   * @param {number} [ctx] - The optional context window length.
-   * @param {string} [template] - The name of the template to use with the model.
-   * @param {gpu_layers} [gpu_layers] - The number of layers to offload to the GPU
+   * @param {number | undefined} [ctx] - The optional context window length, defaults to the model ctx.
+   * @param {string | undefined} [threads] - The number of threads to use for inference.
+   * @param {gpu_layers | undefined} [gpu_layers] - The number of layers to offload to the GPU
    * @returns {Promise<void>}
    */
-  async loadModel(name: string, ctx?: number, template?: string, gpu_layers?: number): Promise<void> {
+  async loadModel(name: string, ctx?: number, threads?: number, gpu_layers?: number): Promise<void> {
     // load ctx
     const res = await this.api.get<{ value: number }>("/api/extra/true_max_context_length");
     if (res.ok) {
@@ -117,60 +117,68 @@ class KoboldcppProvider implements LmProvider {
     const url = `${this.serverUrl}/api/extra/generate/stream`;
     const response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'text/event-stream',
+      },
       body: body,
     });
 
     if (!response.body) {
       throw new Error("No response body")
     }
-    const reader = response.body.getReader();
-    let text = '';
     let i = 1;
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      const raw = new TextDecoder().decode(value);
-      //console.log("|begin|", `'${raw}'`, '|end|');
-      if (raw.startsWith('{"results":')) {
-        const data = JSON.parse(raw);
-        text = data["results"][0]["text"];
-        break
-      } else {
-        let data = "";
-        if (raw.startsWith("event: message")) {
-          if (raw.includes("data:")) {
-            data = raw.replace("event: message\n", "");
-          } else {
-            continue
-          }
-        } else {
-          data = raw
-        }
-        const t = data.replace("data: ", "")
-          .slice(0, -2)
-          .replace('{"token": "', "")
-          .slice(0, -2)
-          .replace('\\"', '"')
-          .replace("\\n", "\n");
+    let text = '';
+    if (inferenceParams?.stream == true) {
+
+      const buf = new Array<string>();
+      const reader = response.body.getReader();
+      while (true) {
         if (i == 1) {
           if (this.onStartEmit) {
             this.onStartEmit();
           }
         }
-        //console.log(t + "|end|")
+        const { done, value } = await reader.read();
+        if (done) break;
+        const decoder = new TextDecoder();
+        const data = decoder.decode(value);
+        //console.log("DATA", data);
+
+        const raw = data.replace("event: message\n", "").replace(/data: /, "");
+        //console.log("RAW", raw);
+        let t = "";
+        try {
+          t = JSON.parse(raw).token;
+        } catch (e) {
+          throw new Error(`Parsing error: ${e}`)
+        }
+        //const regex = /"token"\s*:\s*"([^"]*)"/;
+        //const regex = /"token"\s*:\s*"((?:[^"\n]|\\n)*?)"/;
+        //const match = data.match(regex);
+
+        /*if (match === null) {
+          throw new Error("null token")
+        }
+        const t = match[1].replace("\\n", "\n").replace("\\t", "\t");*/
+        buf.push(t);
         if (this.onToken) {
+          //console.log("T", t);
           this.onToken(t);
         }
-        ++i
+      }
+      text = buf.join("")
+    } else {
+      const res = await this.api.post<Record<string, any>>("/v1/generate", inferenceParams);
+      if (res.ok) {
+        text = res.data.results[0].text
+      } else {
+        throw new Error(`Error ${res.status} posting inference query ${res.data}`)
       }
     }
-
     return {
       text: text,
-      stats: {
-        totalTokens: i,
-      }
+      stats: {}
     } as InferenceResult
   }
 

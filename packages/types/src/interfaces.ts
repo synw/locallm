@@ -6,13 +6,13 @@ import { useApi } from "restmix";
  * @interface ModelConf
  * @property {string} name - The unique name of the model.
  * @property {number | undefined} ctx - The context window length, typically used to define how much of the previous data to consider.
- * @property {string | undefined} template - The name of the template to use with the model.
+ * @property {string | undefined} threads - The number of threads to use to run inference.
  * @property {number | undefined} gpu_layers - The number of layers to offload to the GPU.
  */
 interface ModelConf {
   name: string;
-  ctx?: number;
-  template?: string;
+  ctx: number;
+  threads?: number;
   gpu_layers?: number;
 }
 
@@ -41,8 +41,6 @@ interface ImgData {
  * @property {number | undefined} top_p - Filters results based on cumulative probability.
  * @property {number | undefined} min_p - The minimum probability for a token to be considered, relative to the probability of the most likely token.s
  * @property {number | undefined} temperature - Adjusts randomness in sampling; higher values mean more randomness.
- * @property {number | undefined} frequency_penalty - Adjusts penalty for frequency of tokens.
- * @property {number | undefined} presence_penalty - Adjusts penalty for presence of tokens.
  * @property {number | undefined} repeat_penalty - Adjusts penalty for repeated tokens.
  * @property {number | undefined} tfs - Set the tail free sampling value.
  * @property {Array<string> | undefined} stop - List of stop words or phrases to halt predictions.
@@ -61,8 +59,6 @@ interface InferenceParams {
   top_p?: number;
   min_p?: number;
   temperature?: number;
-  frequency_penalty?: number;
-  presence_penalty?: number;
   repeat_penalty?: number;
   tfs?: number;
   stop?: Array<string>;
@@ -110,7 +106,7 @@ interface LmProvider {
   model: ModelConf;
   models: Array<ModelConf>;
   modelsInfo: () => Promise<void>;
-  loadModel: (name: string, ctx?: number, template?: string) => Promise<void>;
+  loadModel: (name: string, ctx?: number, threads?: number, gpu_layers?: number) => Promise<void>;
   infer: (prompt: string, params: InferenceParams) => Promise<InferenceResult>;
   abort: () => Promise<void>;
   onToken?: (t: string) => void;
@@ -206,9 +202,9 @@ interface ModelState {
  * Represents the type of LM provider.
  *
  * @typedef LmProviderType
- * @type {"llamacpp" | "koboldcpp" | "ollama" | "goinfer"}
+ * @type {"llamacpp" | "koboldcpp" | "ollama"}
  */
-type LmProviderType = "llamacpp" | "koboldcpp" | "ollama" | "goinfer";
+type LmProviderType = "llamacpp" | "koboldcpp" | "ollama";
 
 export {
   ModelConf,

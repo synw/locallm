@@ -1,7 +1,6 @@
 import { useApi } from 'restmix';
 import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
 
-
 class LlamacppProvider implements LmProvider {
   name: string;
   api: ReturnType<typeof useApi>;
@@ -9,7 +8,7 @@ class LlamacppProvider implements LmProvider {
   onStartEmit?: (data?: any) => void;
   onError?: (err: string) => void;
   // state
-  model: ModelConf = { name: "" };
+  model: ModelConf = { name: "", ctx: 2048 };
   models = new Array<ModelConf>();
   abortController = new AbortController();
   apiKey: string;
@@ -30,6 +29,9 @@ class LlamacppProvider implements LmProvider {
       credentials: "omit",
 
     });
+    if (params.apiKey.length > 0) {
+      this.api.addHeader("Authorization", `Bearer ${params.apiKey}`);
+    }
     this.apiKey = params.apiKey;
     this.serverUrl = params.serverUrl;
     //this.api.addHeader("Authorization", `Bearer ${apiKey}`);
@@ -46,12 +48,17 @@ class LlamacppProvider implements LmProvider {
   }
 
   /**
-   * Load model info
+   * Loads a specified model for inferences. Note: it will query the server
+   * and retrieve current model info (name and ctx).
    *
    * @async
+   * @param {string} name - The name of the model to load.
+   * @param {number | undefined} [ctx] - The optional context window length, defaults to the model ctx.
+   * @param {string | undefined} [threads] - The number of threads to use for inference.
+   * @param {gpu_layers | undefined} [gpu_layers] - The number of layers to offload to the GPU
    * @returns {Promise<void>}
    */
-  async loadModel(name: string, ctx?: number, template?: string, gpu_layers?: number): Promise<void> {
+  async loadModel(name: string, ctx?: number, threads?: number, gpu_layers?: number): Promise<void> {
     const res = await this.api.post<Record<string, any>>("/completion", { prompt: "" });
     if (res.ok) {
       //console.log("RES", res.data)

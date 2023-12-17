@@ -1,7 +1,6 @@
 import { useApi } from "restmix";
 import { InferenceParams, InferenceResult, LmDefaults, LmParams, LmProvider, LmProviderType, ModelConf } from "@locallm/types";
 import { KoboldcppProvider } from './providers/koboldcpp.js';
-import { GoinferProvider } from "./providers/goinfer/provider.js";
 import { OllamaProvider } from "./providers/ollama.js";
 import { LlamacppProvider } from "./providers/llamacpp.js";
 
@@ -18,7 +17,7 @@ class Lm implements LmProvider {
   onStartEmit?: (data?: any) => void;
   onError?: (err: string) => void;
   modelsInfo: () => Promise<void>;
-  loadModel: (name: string, ctx?: number, template?: string, gpu_layers?: number) => Promise<void>;
+  loadModel: (name: string, ctx?: number, threads?: number, gpu_layers?: number) => Promise<void>;
   infer: (prompt: string, params: InferenceParams) => Promise<InferenceResult>;
   abort: () => Promise<void>;
   models = new Array<ModelConf>();
@@ -43,7 +42,7 @@ class Lm implements LmProvider {
         this.provider = new LlamacppProvider({
           name: "Llamacpp",
           serverUrl: params.serverUrl,
-          apiKey: "",
+          apiKey: params.apiKey ?? "",
           onToken: params.onToken,
           onStartEmit: params.onStartEmit,
           onError: params.onError,
@@ -54,21 +53,7 @@ class Lm implements LmProvider {
         this.provider = new KoboldcppProvider({
           name: "Koboldcpp",
           serverUrl: params.serverUrl,
-          apiKey: "",
-          onToken: params.onToken,
-          onStartEmit: params.onStartEmit,
-          onError: params.onError,
-        });
-        break;
-      case "goinfer":
-        this.name = "Goinfer";
-        if (!params.apiKey) {
-          throw new Error("Provide an api key")
-        }
-        this.provider = new GoinferProvider({
-          name: "Goinfer",
-          serverUrl: params.serverUrl,
-          apiKey: params.apiKey,
+          apiKey: params.apiKey ?? "",
           onToken: params.onToken,
           onStartEmit: params.onStartEmit,
           onError: params.onError,
@@ -79,7 +64,7 @@ class Lm implements LmProvider {
         this.provider = new OllamaProvider({
           name: "Ollama",
           serverUrl: params.serverUrl,
-          apiKey: "",
+          apiKey: params.apiKey ?? "",
           onToken: params.onToken,
           onStartEmit: params.onStartEmit,
           onError: params.onError,

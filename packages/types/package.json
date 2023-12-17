@@ -1,6 +1,6 @@
 {
   "name": "@locallm/types",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "Shared data types for the LocalLm api",
   "repository": "https://github.com/synw/locallm",
   "scripts": {

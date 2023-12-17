@@ -22,22 +22,14 @@ import { ModelConf } from "@locallm/types";
  */
 function loadModelFromConf(name: string, models: Array<ModelConf>, ctx?: number, template?: string, gpu_layers?: number): ModelConf {
   const modelConf = models.find(item => item.name == name);
-  let t: string | undefined = template;
-  let c: number | undefined = ctx;
-  let g: number | undefined = gpu_layers;
+  let c: number = ctx ?? 2048;
   if (modelConf) {
     // found a model conf
     if (!ctx) {
       c = modelConf.ctx;
     }
-    if (!template) {
-      t = modelConf.template;
-    }
-    if (!gpu_layers) {
-      g = modelConf.gpu_layers;
-    }
   }
-  return { name: name, ctx: c, template: t, gpu_layers: g }
+  return { name: name, ctx: c }
 }
 
 export { loadModelFromConf }

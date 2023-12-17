@@ -5,7 +5,6 @@ An api to query local language models using different backends. Supported backen
 - [Llama.cpp](https://github.com/ggerganov/llama.cpp/tree/master/examples/server)
 - [Koboldcpp](https://github.com/LostRuins/koboldcpp)
 - [Ollama](https://github.com/jmorganca/ollama)
-- [Goinfer](https://github.com/synw/goinfer)
 
 :books: [Api doc](https://synw.github.io/locallm/)
 
@@ -13,8 +12,6 @@ An api to query local language models using different backends. Supported backen
 
 ```bash
 npm install @locallm/api
-# or
-yarn add @locallm/api
 ```
 
 ## Usage
@@ -34,7 +31,7 @@ const _prompt = template.replace("{prompt}", "list the planets in the solar syst
 // run the inference query
 await lm.infer(_prompt, {
   stream: true,
-  temperature: 0,
+  temperature: 0.2,
   n_predict: 200,
 });
 ```

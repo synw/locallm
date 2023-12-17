@@ -8,8 +8,6 @@ Shared data types for the LocalLm api
 
 ```bash
 npm install @locallm/types
-# or
-yarn add @locallm/types
 ```
 
 ## Types
@@ -19,9 +17,7 @@ yarn add @locallm/types
 Represents the configuration of a model.
 
 - **name**: `string` - The unique name of the model.
-- **ctx**: `number | undefined` - The context window length, typically used to define how much of the previous data to consider.
-- **template**: `string | undefined` - The name of the template to use with the model.
-- **gpu_layers**: `number | undefined` - The number of layers to offload to the GPU.
+- **ctx**: `number` - The context window length, typically used to define how much of the previous data to consider.
 
 ---
 
@@ -38,8 +34,6 @@ Describes the parameters for making an inference request.
 - **top_k**: `number | undefined` - Limits the result set to the top K results.
 - **top_p**: `number | undefined` - Filters results based on cumulative probability.
 - **min_p**: `number | undefined` - The minimum probability for a token to be considered, relative to the probability of the most likely token.
-- **frequency_penalty**: `number | undefined` - Adjusts penalty for frequency of tokens.
-- **presence_penalty**: `number | undefined` - Adjusts penalty for presence of tokens.
 - **repeat_penalty**: `number | undefined` - Adjusts penalty for repeated tokens.
 - **tfs**: `number | undefined` - Used for custom tuning.
 - **stop**: `Array<string> | undefined` - List of stop words or phrases to halt predictions.
@@ -120,7 +114,7 @@ Parameters for initializing a Language Model.
 
 Represents the type of LM provider.
 
-- Type: `"koboldcpp" | "ollama" | "goinfer"`
+- Type: `"llamacpp" | "koboldcpp" | "ollama"`
 
 :books: [Api doc](https://synw.github.io/locallm/)
 
