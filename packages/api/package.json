@@ -1,11 +1,10 @@
 {
   "name": "@locallm/api",
-  "version": "0.0.19",
+  "version": "0.0.21",
   "description": "An api to query local language models using different backends",
   "repository": "https://github.com/synw/locallm",
   "scripts": {
     "build": "rm -rf dist/* && rollup -c",
-    "build2": "rm -rf dist/* && tsc",
     "docs": "typedoc --entryPointStrategy expand"
   },
   "dependencies": {

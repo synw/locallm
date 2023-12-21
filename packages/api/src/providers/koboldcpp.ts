@@ -24,17 +24,20 @@ class KoboldcppProvider implements LmProvider {
     this.onToken = params.onToken;
     this.onStartEmit = params.onStartEmit;
     this.onError = params.onError;
-    this.api = useApi({
-      serverUrl: params.serverUrl,
-      credentials: "omit",
-
-    });
     if (params.apiKey.length > 0) {
+      this.api = useApi({
+        serverUrl: params.serverUrl,
+        credentials: "include",
+      });
       this.api.addHeader("Authorization", `Bearer ${params.apiKey}`);
+    } else {
+      this.api = useApi({
+        serverUrl: params.serverUrl,
+        credentials: "omit",
+      });
     }
     this.apiKey = params.apiKey;
     this.serverUrl = params.serverUrl;
-    //this.api.addHeader("Authorization", `Bearer ${apiKey}`);
   }
 
   /**
