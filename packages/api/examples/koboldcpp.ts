@@ -14,7 +14,9 @@ async function main() {
   process.on('SIGINT', () => {
     lm.abort().then(() => process.exit());
   });
+  //await lm.loadModel("");
   const _prompt = template.replace("{prompt}", "list the planet of the solar system");
+  console.log('Prompt:', _prompt);
   const res = await lm.infer(_prompt, {
     temperature: 0.5,
     top_p: 0.55,

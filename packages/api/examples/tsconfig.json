@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es2015",
-    "module": "es2015",
+    "target": "ESNext",
+    "module": "ESNext",
     "moduleResolution": "node",
     "strict": true,
     "sourceMap": false,
@@ -17,8 +17,7 @@
       "node"
     ],
     "lib": [
-      "es2015",
-      "dom"
+      "ESNext"
     ],
     "baseUrl": ".",
     "paths": {
@@ -38,5 +37,9 @@
     "node_modules",
     "dist",
     "test"
-  ]
+  ],
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node",
+  }
 }

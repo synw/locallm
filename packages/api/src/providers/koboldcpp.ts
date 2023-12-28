@@ -65,13 +65,13 @@ class KoboldcppProvider implements LmProvider {
     // load ctx
     const res = await this.api.get<{ value: number }>("/api/extra/true_max_context_length");
     if (res.ok) {
-      //console.log("Setting model ctx to", res.data.value)
+      console.log("Setting model ctx to", res.data.value)
       this.model.ctx = res.data.value
     }
     // load model name
     const res2 = await this.api.get<{ result: string }>("/api/v1/model");
     if (res2.ok) {
-      //console.log("R:", res.data)
+      console.log("R:", res.data)
       this.model.name = res2.data.result
     }
   }
@@ -109,6 +109,11 @@ class KoboldcppProvider implements LmProvider {
       inferenceParams.stop_sequence = params.stop;
       delete inferenceParams.stop;
     }
+    if ("stream" in params) {
+      if (!params.stream) {
+        delete inferenceParams.stream;
+      }
+    }
     if ("extra" in params) {
       inferenceParams = { ...inferenceParams, ...params.extra };
       delete inferenceParams.extra;
@@ -133,7 +138,6 @@ class KoboldcppProvider implements LmProvider {
     let i = 1;
     let text = '';
     if (inferenceParams?.stream == true) {
-
       const buf = new Array<string>();
       const reader = response.body.getReader();
       while (true) {
@@ -143,13 +147,18 @@ class KoboldcppProvider implements LmProvider {
           }
         }
         const { done, value } = await reader.read();
-        if (done) break;
+        //console.log(done, value?.length);
+        if (done) {
+          //console.log("DONE")
+          break;
+        }
         const decoder = new TextDecoder();
         const data = decoder.decode(value);
-        //console.log("DATA", data);
+        //console.log("DATA", `|${data}|`);
 
         const raw = data.replace("event: message\n", "").replace(/data: /, "");
         //console.log("RAW", raw);
+        if (!raw) { continue };
         let t = "";
         try {
           t = JSON.parse(raw).token;
@@ -172,7 +181,8 @@ class KoboldcppProvider implements LmProvider {
       }
       text = buf.join("")
     } else {
-      const res = await this.api.post<Record<string, any>>("/v1/generate", inferenceParams);
+      const res = await this.api.post<Record<string, any>>("/api/v1/generate", inferenceParams, false, true);
+      console.log("RES", res)
       if (res.ok) {
         text = res.data.results[0].text
       } else {
