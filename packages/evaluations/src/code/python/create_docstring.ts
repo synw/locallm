@@ -46,8 +46,8 @@ Example:
 \`\`\``;
 
 const template = new PromptTemplate("alpaca")
-  .replacePrompt(baseprompt)
-  .addShot(shotUser, shotAssistant);
+    .replacePrompt(baseprompt)
+    .addShot(shotUser, shotAssistant);
 const prompt = `def throw_dice(dice_sides: List[int], num_throws=1) -> List[int]:
     try:
         return random.choices(dice_sides, k=num_throws)"
@@ -57,20 +57,19 @@ const prompt = `def throw_dice(dice_sides: List[int], num_throws=1) -> List[int]
         raise(f"Error running throw dice: {e}")`;
 
 const evaluator = new Evaluator()
-  .containsText(50, ['Args:', 'Raises:', 'Returns:', 'Example:'])
-  .containsText(50, ['Exception:', 'ValueError:', 'dice_sides (List[int])', 'num_throws (int, optional)', 'List[int]'])
+    .containsText(50, ['Args:', 'Raises:', 'Returns:', 'Example:'])
+    .containsText(50, ['Exception:', 'ValueError:', 'dice_sides (List[int])', 'num_throws (int, optional)', 'List[int]'])
 
 const inferParams: InferenceParams = {
-  temperature: 0,
-  top_p: 0.35,
-  n_predict: 512,
+    temperature: 0,
+    max_tokens: 512,
 };
 const createDocstringTest = new LmTestCase({
-  name: "create_docstring",
-  prompt: prompt,
-  template: template,
-  evaluator: evaluator,
-  inferParams: inferParams,
+    name: "create_docstring",
+    prompt: prompt,
+    template: template,
+    evaluator: evaluator,
+    inferParams: inferParams,
 });
 
 export { createDocstringTest }

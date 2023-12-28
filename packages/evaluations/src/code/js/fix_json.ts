@@ -31,8 +31,7 @@ const evaluator = new Evaluator()
 
 const inferParams: InferenceParams = {
   temperature: 0,
-  top_p: 0.35,
-  n_predict: 120,
+  max_tokens: 120,
 };
 const fixJsonTest = new LmTestCase({
   name: "fix json",

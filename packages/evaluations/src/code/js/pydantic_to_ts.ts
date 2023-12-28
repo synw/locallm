@@ -67,8 +67,7 @@ const evaluator = new Evaluator()
 
 const inferParams: InferenceParams = {
   temperature: 0,
-  top_p: 0.35,
-  n_predict: 150,
+  max_tokens: 150,
 };
 const pydantic2TsTest = new LmTestCase({
   name: "pydantic_to_ts",

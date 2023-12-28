@@ -27,8 +27,7 @@ const evaluator = new Evaluator()
 
 const inferParams: InferenceParams = {
   temperature: 0,
-  top_p: 0.35,
-  n_predict: 250,
+  max_tokens: 250,
 };
 const generateJs = new LmTestCase({
   name: "generate js code",

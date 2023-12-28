@@ -5,8 +5,9 @@ import { Evaluator } from "./evaluate";
 
 type EvalFunction = (text: string) => TestResult;
 
-// { test: { model: { template: [TestResult]}}}
-type TestResultsForModels = Record<string, Record<string, Record<string, Array<TestResult>>>>;
+// { test: { template: [TestResult]}}
+//type TestResultsForModels = Record<string, Record<string, Array<TestResult>>>;
+type TestResults = Record<string, Array<TestResult>>;
 
 interface LmTestParams {
   name: string;
@@ -31,20 +32,6 @@ interface TestResult {
   error?: string;
 }
 
-/**
- * Represents the configuration of a model.
- *
- * @interface ModelConf
- * @property {string} name - The name of the model.
- * @property {number} ctx - The context window length.
- * @property {string} template - The name of the template to use with the model.
- */
-interface SafeModelConf {
-  name: string,
-  ctx: number,
-  template: string,
-}
-
 type EvaluationFunction = (name: string, response: string, param: any, error: string | null) => EvaluationResult;
 
-export { LmTestParams, EvalFunction, TestResult, TestResultsForModels, EvaluationResult, EvaluationFunction, SafeModelConf }
+export { LmTestParams, EvalFunction, TestResult, TestResults, EvaluationResult, EvaluationFunction }

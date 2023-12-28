@@ -1,17 +1,20 @@
 import { Lm } from "@locallm/api";
-import { SafeModelConf, TestResult, TestResultsForModels } from "./interfaces.js";
+import { TestResult, TestResults } from "./interfaces.js";
 import { LmTestCase } from "./testcase.js";
-import { InferenceParams } from "@locallm/types";
+import { InferenceParams, ModelConf } from "@locallm/types";
 
 
 class LmTestRunner {
   lm: Lm;
-  modelsConf: Array<SafeModelConf> = [];
+  modelConf: ModelConf = {
+    name: "No model",
+    ctx: 2048,
+  };
   testCases = new Array<LmTestCase>();
   isVerbose = true;
   showErrors = true;
   // runtime state
-  results: TestResultsForModels = {};
+  results: TestResults = {};
 
   constructor(lm: Lm, isVerbose?: boolean, showErrors?: boolean) {
     this.lm = lm;
@@ -21,54 +24,28 @@ class LmTestRunner {
 
   static async init(lm: Lm, testCases: Array<LmTestCase>, isVerbose?: boolean, showErrors?: boolean): Promise<LmTestRunner> {
     const runner = new LmTestRunner(lm, isVerbose, showErrors);
-    await runner.lm.modelsInfo();
-    //console.log("MODELS", runner.lm.models)
-    runner.lm.models.forEach((mc) => {
-      let ctx = mc.ctx ?? 2048;
-      let template = mc.template ?? "none";
-      if (mc.ctx === undefined) {
-        console.warn(`The model conf ${mc.name} does not have a ctx value, using 2048`)
-      }
-      if (mc.template === undefined) {
-        console.warn(`The model conf ${mc.name} does not have a template value, using "none"`)
-      }
-      runner.modelsConf.push({
-        name: mc.name,
-        ctx: ctx,
-        template: template,
-      })
-    });
+    await runner.lm.loadModel("");
+    let ctx = runner.lm.model.ctx ?? 2048;
+    if (runner.lm.model.ctx === undefined) {
+      console.warn(`The model conf ${runner.lm.model.name} does not have a ctx value, using 2048`)
+    }
+    runner.modelConf = {
+      name: runner.lm.model.name,
+      ctx: ctx,
+    };
     //console.log("Available models:", runner.modelsConf);
     runner.testCases = [...testCases];
     return runner
   }
 
-  async run(models?: Array<string>, inferenceParams?: InferenceParams, extraTemplateRuns: Record<string, Array<string>> = {}) {
-    const modelNames = this.modelsConf.map(item => item.name);
-    const _models = models ?? modelNames;
+  async run(templateName?: string, inferenceParams?: InferenceParams) {
     this.results = {};
-    for (const model of _models) {
-      const modelConf = this._getModelFromConf(model);
-      if (this.isVerbose) {
-        console.log("----------------------------------");
-        console.log("🎬", model, "...");
-        console.log("----------------------------------");
-      }
-      if (!modelNames.includes(model)) {
-        throw new Error(`No template and context info found for model ${model}`)
-      }
-      await this.runTestCases(model, modelConf.template, inferenceParams);
-      if (model in extraTemplateRuns) {
-        const modelTemplatesNames = extraTemplateRuns[model];
-        for (const modelTemplateName of modelTemplatesNames) {
-          if (this.isVerbose) {
-            console.log("----------------------------------");
-            console.log(`➕ Extra run with template ${modelTemplateName}:`)
-          }
-          await this.runTestCases(model, modelTemplateName, inferenceParams);
-        }
-      }
+    if (this.isVerbose) {
+      console.log("----------------------------------");
+      console.log("🎬", this.modelConf.name, "...");
+      console.log("----------------------------------");
     }
+    await this.runTestCases(templateName, inferenceParams);
   }
 
   printTestResult(testname: string, result: TestResult, _showErrors = true) {
@@ -102,47 +79,29 @@ class LmTestRunner {
 
   printReport() {
     //console.log(JSON.stringify(this.results, null, "  "));
-    for (const [testname, modelRuns] of Object.entries(this.results)) {
+    for (const [testname, runs] of Object.entries(this.results)) {
       console.log(`------- ${testname} -------`);
-      for (const [modelname, templateRuns] of Object.entries(modelRuns)) {
-        //console.log(`- ${modelname}:`);
-        for (const [templatename, runs] of Object.entries(templateRuns)) {
-          if (runs.length == 1) {
-            this.printTestResult(`${modelname} (${templatename})`, runs[0], false)
-          } else {
-            let i = 1;
-            runs.forEach((run) => {
-              this.printTestResult(`${modelname} run ${i} (${templatename})`, run, false)
-              ++i
-            })
-          }
-        }
+      //console.log(`- ${modelname}:`);
+      let i = 0;
+      for (const run of runs) {
+        this.printTestResult(`${this.lm.model.name} run ${i}`, run, false);
+        ++i
       }
     }
   }
 
-  async runTestCases(model: string, templateName: string, inferenceParams?: InferenceParams) {
+  async runTestCases(templateName?: string, inferenceParams?: InferenceParams) {
     let n = 0;
     for (const testCase of this.testCases) {
       let res: TestResult;
-      if (n == 0) {
-        const m = this._getModelFromConf(model);
-        //console.log("RUN", testCase, m, templateName)
-        res = await this.runTestCase(testCase, m, templateName, inferenceParams);
-      } else {
-        res = await this.runTestCase(testCase, undefined, templateName, inferenceParams);
-      }
+      //console.log("RUN", testCase, m, templateName)
+      res = await testCase.run(this.lm, templateName, inferenceParams);
+
       // update results
       if (!(testCase.name in this.results)) {
-        this.results[testCase.name] = {}
+        this.results[testCase.name] = []
       }
-      if (!(model in this.results[testCase.name])) {
-        this.results[testCase.name][model] = {}
-      }
-      if (!(templateName in this.results[testCase.name][model])) {
-        this.results[testCase.name][model][templateName] = [];
-      }
-      this.results[testCase.name][model][templateName].push(res);
+      this.results[testCase.name].push(res);
       // print
       //console.log(JSON.stringify(this.results, null, "  "));
       if (this.isVerbose) {
@@ -150,25 +109,6 @@ class LmTestRunner {
       }
       ++n
     }
-  }
-
-  async runTestCase(testCase: LmTestCase, modelConf?: SafeModelConf, templateName?: string, inferenceParams?: InferenceParams): Promise<TestResult> {
-    //console.log("RUNTC", modelConf, modelName)
-    if (modelConf) {
-      testCase.setModel(modelConf);
-    }
-    if (templateName) {
-      testCase.setTemplate(templateName)
-    }
-    return await testCase.run(this.lm, inferenceParams);
-  }
-
-  _getModelFromConf(name: string): SafeModelConf {
-    const modelConf = this.modelsConf.find(item => item.name == name);
-    if (!modelConf) {
-      throw new Error(`No model conf found for model ${name}`)
-    }
-    return modelConf
   }
 }
 
