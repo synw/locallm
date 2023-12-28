@@ -181,8 +181,8 @@ class KoboldcppProvider implements LmProvider {
       }
       text = buf.join("")
     } else {
-      const res = await this.api.post<Record<string, any>>("/api/v1/generate", inferenceParams, false, true);
-      console.log("RES", res)
+      const res = await this.api.post<Record<string, any>>("/api/v1/generate", inferenceParams);
+      //console.log("RES", res)
       if (res.ok) {
         text = res.data.results[0].text
       } else {
