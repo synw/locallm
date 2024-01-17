@@ -1,4 +1,7 @@
 import { useApi } from 'restmix';
+import { createParser, type ParsedEvent, type ReconnectInterval } from 'eventsource-parser'
+// @ts-ignore
+import { EventSourceParserStream } from 'eventsource-parser/stream';
 import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
 
 class KoboldcppProvider implements LmProvider {
@@ -140,38 +143,32 @@ class KoboldcppProvider implements LmProvider {
     if (!response.body) {
       throw new Error("No response body")
     }
-    let i = 1;
     let text = '';
-
-    const decoder = new TextDecoder();
-    const reader = response.body.getReader();
     if (inferenceParams?.stream == true) {
-      const buf = new Array<string>();
-      //console.log("READER", reader);
+      let i = 1;
+      let buf = new Array<string>();
+      const eventStream = response.body
+        .pipeThrough(new TextDecoderStream())
+        .pipeThrough(new EventSourceParserStream())
+        .getReader()
+
       while (true) {
-        if (i == 1) {
-          if (this.onStartEmit) {
-            this.onStartEmit();
+        const { done, value } = await eventStream.read()
+        if (!done) {
+          if (this.onToken) {
+            const t = JSON.parse((value as ParsedEvent).data)["token"];
+            this.onToken(t);
+            buf.push(t);
           }
-        }
-        const { done, value } = await reader.read();
-        if (done) {
-          break;
-        }
-        const data = decoder.decode(value);
-        const raw = data.replace("event: message\n", "").replace(/data: /, "");
-        //console.log("RAW", `|${raw}|`);
-        if (!raw) { continue };
-        let t = "";
-        try {
-          t = JSON.parse(raw).token;
-        } catch (e) {
-          throw new Error(`Parsing error trying to parse ${raw} : ${e}`)
-        }
-        buf.push(t);
-        if (this.onToken) {
-          //console.log("T", t);
-          this.onToken(t);
+          if (i == 1) {
+            if (this.onStartEmit) {
+              this.onStartEmit()
+            }
+          }
+          ++i
+          continue
+        } else {
+          break
         }
       }
       text = buf.join("")
