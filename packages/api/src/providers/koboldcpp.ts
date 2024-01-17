@@ -65,13 +65,12 @@ class KoboldcppProvider implements LmProvider {
     // load ctx
     const res = await this.api.get<{ value: number }>("/api/extra/true_max_context_length");
     if (res.ok) {
-      console.log("Setting model ctx to", res.data.value)
+      // console.log("Setting model ctx to", res.data.value)
       this.model.ctx = res.data.value
     }
     // load model name
     const res2 = await this.api.get<{ result: string }>("/api/v1/model");
     if (res2.ok) {
-      console.log("R:", res.data)
       this.model.name = res2.data.result
     }
   }
@@ -85,6 +84,7 @@ class KoboldcppProvider implements LmProvider {
    * @returns {Promise<InferenceResult>} - The result of the inference.
    */
   async infer(prompt: string, params: InferenceParams): Promise<InferenceResult> {
+    //console.log("INFER");
     // autoload model
     if (this.model.name.length > 0) {
       await this.loadModel("")
@@ -122,13 +122,18 @@ class KoboldcppProvider implements LmProvider {
     inferenceParams.gpu_layers = undefined;
     inferenceParams.threads = undefined;
     const body = JSON.stringify(inferenceParams);
+    //console.log("BPARAMS", body);
     const url = `${this.serverUrl}/api/extra/generate/stream`;
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      'Accept': 'text/event-stream',
+    };
+    if (this.apiKey.length > 0) {
+      headers["Authorization"] = `Bearer ${this.apiKey}`
+    }
     const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'text/event-stream',
-      },
+      headers: headers,
       body: body,
     });
 
@@ -140,6 +145,7 @@ class KoboldcppProvider implements LmProvider {
     if (inferenceParams?.stream == true) {
       const buf = new Array<string>();
       const reader = response.body.getReader();
+      //console.log("READER", reader);
       while (true) {
         if (i == 1) {
           if (this.onStartEmit) {
@@ -149,9 +155,14 @@ class KoboldcppProvider implements LmProvider {
         const { done, value } = await reader.read();
         //console.log(done, value?.length);
         if (done) {
-          //console.log("DONE")
+          /*if (await reader.closed) {
+            console.log('Stream was closed prematurely.');
+          } else {
+            console.log('Stream has ended.');
+          }*/
           break;
         }
+
         const decoder = new TextDecoder();
         const data = decoder.decode(value);
         //console.log("DATA", `|${data}|`);
