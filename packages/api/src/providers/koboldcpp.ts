@@ -142,9 +142,11 @@ class KoboldcppProvider implements LmProvider {
     }
     let i = 1;
     let text = '';
+
+    const decoder = new TextDecoder();
+    const reader = response.body.getReader();
     if (inferenceParams?.stream == true) {
       const buf = new Array<string>();
-      const reader = response.body.getReader();
       //console.log("READER", reader);
       while (true) {
         if (i == 1) {
@@ -153,37 +155,19 @@ class KoboldcppProvider implements LmProvider {
           }
         }
         const { done, value } = await reader.read();
-        //console.log(done, value?.length);
         if (done) {
-          /*if (await reader.closed) {
-            console.log('Stream was closed prematurely.');
-          } else {
-            console.log('Stream has ended.');
-          }*/
           break;
         }
-
-        const decoder = new TextDecoder();
         const data = decoder.decode(value);
-        //console.log("DATA", `|${data}|`);
-
         const raw = data.replace("event: message\n", "").replace(/data: /, "");
-        //console.log("RAW", raw);
+        //console.log("RAW", `|${raw}|`);
         if (!raw) { continue };
         let t = "";
         try {
           t = JSON.parse(raw).token;
         } catch (e) {
-          throw new Error(`Parsing error: ${e}`)
+          throw new Error(`Parsing error trying to parse ${raw} : ${e}`)
         }
-        //const regex = /"token"\s*:\s*"([^"]*)"/;
-        //const regex = /"token"\s*:\s*"((?:[^"\n]|\\n)*?)"/;
-        //const match = data.match(regex);
-
-        /*if (match === null) {
-          throw new Error("null token")
-        }
-        const t = match[1].replace("\\n", "\n").replace("\\t", "\t");*/
         buf.push(t);
         if (this.onToken) {
           //console.log("T", t);
