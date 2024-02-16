@@ -69,13 +69,15 @@ class OllamaProvider implements LmProvider {
     //this.model = loadModelFromConf(name, this.models, ctx, template)
     const res = await this.api.post<Record<string, any>>("/api/show", { name: name });
     if (res.ok) {
-      //console.log("RES", res.data);
       let _ctx = ctx ?? 0;
-      if (!ctx) {
-        for (const line of res.data["parameters"].split("\n")) {
-          //console.log("LINE", line);
-          if (line.startsWith("num_ctx")) {
-            _ctx = parseInt(line.replace(/\D/g, ""));
+      //console.log("RES", res.data);
+      if ("parameters" in res.data) {
+        if (!ctx) {
+          for (const line of res.data["parameters"].split("\n")) {
+            //console.log("LINE", line);
+            if (line.startsWith("num_ctx")) {
+              _ctx = parseInt(line.replace(/\D/g, ""));
+            }
           }
         }
       }
@@ -109,42 +111,60 @@ class OllamaProvider implements LmProvider {
       throw new Error("Load a model first, using the loadModel method");
     }
     this.abortController = new AbortController();
-    let raw = true;
-    let format = undefined;
+    let raw = false;
     if (params.extra?.raw) {
       raw = params.extra.raw;
       delete params.extra.raw;
     }
-    if (params.extra?.format) {
-      format = "json";
-    }
-    const inferParams: Record<string, any> = {
+    let inferParams: Record<string, any> = {
       model: this.model.name,
       prompt: prompt,
-      stream: true,
+      stream: params.stream,
       raw: raw,
       options: {
         num_ctx: this.model.ctx,
-        num_thread: params.threads,
-        gpu_layers: params.gpu_layers,
-        repeat_penalty: params.repeat_penalty,
-        stop: params.stop ? params.stop.join(",") : undefined,
-        temperature: params.temperature,
-        tfs_z: params.tfs,
-        top_k: params.top_k,
-        top_p: params.top_p,
-        num_predict: params.max_tokens,
       },
-      ...params.extra,
-    };
-    if (format) {
-      inferParams["format"] = format
+      ...params.extra
     }
-
+    if (params.threads) {
+      inferParams.options.num_thread = params.threads;
+    }
+    if (params.gpu_layers) {
+      inferParams.options.gpu_layers = params.gpu_layers;
+    }
+    if (params.repeat_penalty) {
+      inferParams.options.repeat_penalty = params.repeat_penalty;
+    }
+    if (params.stop && params.stop.length > 0) {
+      inferParams.options.stop = params.stop.join(",");
+    }
+    if (params.temperature) {
+      inferParams.options.temperature = params.temperature;
+    }
+    if (params.tfs) {
+      inferParams.options.tfs_z = params.tfs;
+    }
+    if (params.top_k) {
+      inferParams.options.top_k = params.top_k;
+    }
+    if (params.top_p) {
+      inferParams.options.top_p = params.top_p;
+    }
+    if (params.max_tokens) {
+      inferParams.options.num_predict = params.max_tokens;
+    }
+    if (params.extra?.format) {
+      inferParams["format"] = params.extra.format;
+      delete params.extra.format
+    }
+    // Spread any additional properties from params.extra if it exists and is not empty
+    if (params.extra && Object.keys(params.extra).length > 0) {
+      inferParams = { ...inferParams, ...params.extra };
+    }
+    //console.log("Params", inferParams);
     let text = "";
     if (inferParams?.stream == true) {
       const body = JSON.stringify(inferParams);
-      console.log("Params", body);
       const buf = new Array<string>();
       const response = await fetch(`${this.serverUrl}/api/generate`, {
         method: 'POST',

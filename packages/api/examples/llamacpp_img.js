@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { Lm } from "../src/api.js";
+import { Lm } from "../dist/main.es.js";
 import fs from "fs";
 
 /**
@@ -14,7 +14,7 @@ import fs from "fs";
 
 const prompt = "USER:[img-1] Describe the image in detail.\nASSISTANT:";
 
-function toBase64(filePath: string): string {
+function toBase64(filePath) {
   const img = fs.readFileSync(filePath);
   return Buffer.from(img).toString('base64');
 }

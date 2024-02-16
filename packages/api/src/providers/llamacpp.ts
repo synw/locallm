@@ -63,11 +63,11 @@ class LlamacppProvider implements LmProvider {
    * @returns {Promise<void>}
    */
   async loadModel(name: string, ctx?: number, threads?: number, gpu_layers?: number): Promise<void> {
-    const res = await this.api.post<Record<string, any>>("/completion", { prompt: "" });
+    const res = await this.api.get<Record<string, any>>("/props");
     if (res.ok) {
       //console.log("RES", res.data)
-      this.model.ctx = res.data.generation_settings.n_ctx;
-      this.model.name = res.data.model.split("/").pop();
+      this.model.ctx = res.data.default_generation_settings.n_ctx;
+      this.model.name = res.data.default_generation_settings.model.split("/").pop();
     }
   }
 

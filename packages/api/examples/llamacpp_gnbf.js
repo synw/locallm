@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { compile, serializeGrammar } from "@intrinsicai/gbnfgen";
-import { Lm } from "../src/api.js";
+import { Lm } from "../dist/main.es.js";
 
 const rawInfo = `Nom commercial
 ENEDIS
@@ -37,7 +37,7 @@ async function main() {
   const lm = new Lm({
     providerType: "llamacpp",
     serverUrl: "http://localhost:8080",
-    onToken: (t: string) => process.stdout.write(t),
+    onToken: (t) => process.stdout.write(t),
   });
   process.on('SIGINT', () => {
     lm.abort().then(() => process.exit());

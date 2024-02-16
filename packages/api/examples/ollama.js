@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-import { Lm } from "../src/api.js";
+import { Lm } from "../dist/main.es.js";
 
-const template = "<|im_start|>user\n{prompt}<|im_end|>\n<|im_start|>assistant\n";
+const model = "mistral:instruct";
+const template = "[INST] {prompt} [/INST]";
 
 async function main() {
   const lm = new Lm({
@@ -14,16 +15,17 @@ async function main() {
   });
 
   await lm.modelsInfo();
-  //console.log("Models", lm.models);
-  await lm.loadModel(lm.models[0].name);
-  //console.log("Model", lm.model);
-  const _prompt = template.replace("{prompt}", "list the planets in the solar system");
+  console.log("Models", lm.models);
+  await lm.loadModel(model, 8192);
+  console.log("Loaded model", lm.model);
+  const _prompt = template.replace("{prompt}", "list the planets in the solar system. Answer in json");
   const res = await lm.infer(_prompt, {
+    stream: true,
     temperature: 0.1,
-    top_p: 0.55,
-    top_k: 20,
-    max_tokens: 200,
-    stop: ["<|im_end|>"],
+    max_tokens: 2000,
+    extra: {
+      format: "json"
+    }
   });
   console.log("\n\nResult:\n", res)
 }
