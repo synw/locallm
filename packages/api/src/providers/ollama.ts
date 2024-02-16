@@ -30,6 +30,7 @@ class OllamaProvider implements LmProvider {
     this.serverUrl = params.serverUrl;
     this.api = useApi({
       serverUrl: params.serverUrl,
+      credentials: "omit",
     });
     if (params.apiKey.length > 0) {
       this.api.addHeader("Authorization", `Bearer ${params.apiKey}`);
@@ -70,13 +71,25 @@ class OllamaProvider implements LmProvider {
     const res = await this.api.post<Record<string, any>>("/api/show", { name: name });
     if (res.ok) {
       let _ctx = ctx ?? 0;
+      let _gpu_layers = gpu_layers;
+      let _num_thread = threads;
       //console.log("RES", res.data);
       if ("parameters" in res.data) {
-        if (!ctx) {
-          for (const line of res.data["parameters"].split("\n")) {
-            //console.log("LINE", line);
-            if (line.startsWith("num_ctx")) {
+        for (const line of res.data["parameters"].split("\n")) {
+          //console.log("LINE", line);
+          if (line.startsWith("num_ctx")) {
+            if (!ctx) {
               _ctx = parseInt(line.replace(/\D/g, ""));
+            }
+          }
+          if (line.startsWith("num_gpu")) {
+            if (!gpu_layers) {
+              _gpu_layers = parseInt(line.replace(/\D/g, ""));
+            }
+          }
+          if (line.startsWith("num_thread")) {
+            if (!threads) {
+              _num_thread = parseInt(line.replace(/\D/g, ""));
             }
           }
         }
@@ -86,12 +99,13 @@ class OllamaProvider implements LmProvider {
         _ctx = 2048;
       }
       const model: ModelConf = { name: name, ctx: _ctx };
-      if (gpu_layers) {
-        model.gpu_layers = gpu_layers
+      if (_gpu_layers) {
+        model.gpu_layers = _gpu_layers
       }
-      if (threads) {
-        model.threads = threads
+      if (_num_thread) {
+        model.threads = _num_thread
       }
+      //console.log("MOD", model);
       this.model = model;
     } else {
       throw new Error(`Error ${res.status} loading models ${res.text}`);
@@ -136,7 +150,7 @@ class OllamaProvider implements LmProvider {
       inferParams.options.repeat_penalty = params.repeat_penalty;
     }
     if (params.stop && params.stop.length > 0) {
-      inferParams.options.stop = params.stop.join(",");
+      inferParams.options.stop = params.stop;
     }
     if (params.temperature) {
       inferParams.options.temperature = params.temperature;
