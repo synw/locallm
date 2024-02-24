@@ -1,8 +1,10 @@
 import { useApi } from 'restmix';
-import { createParser, type ParsedEvent, type ReconnectInterval } from 'eventsource-parser'
+import { type ParsedEvent } from 'eventsource-parser'
 // @ts-ignore
 import { EventSourceParserStream } from 'eventsource-parser/stream';
 import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
+//import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@/packages/types/interfaces.js";
+import { parseJson as parseJsonUtil } from './utils';
 
 class KoboldcppProvider implements LmProvider {
   name: string;
@@ -53,6 +55,21 @@ class KoboldcppProvider implements LmProvider {
     console.warn("Not implemented for this provider")
   }
 
+  async info(): Promise<Record<string, any>> {
+    // load ctx
+    const res = await this.api.get<{ value: number }>("/api/extra/true_max_context_length");
+    if (res.ok) {
+      // console.log("Setting model ctx to", res.data.value)
+      this.model.ctx = res.data.value
+    }
+    // load model name
+    const res2 = await this.api.get<{ result: string }>("/api/v1/model");
+    if (res2.ok) {
+      this.model.name = res2.data.result
+    }
+    return this.model
+  }
+
   /**
    * Loads a specified model for inferences. Note: it will query the server
    * and retrieve current model info (name and ctx).
@@ -65,17 +82,7 @@ class KoboldcppProvider implements LmProvider {
    * @returns {Promise<void>}
    */
   async loadModel(name: string, ctx?: number, threads?: number, gpu_layers?: number): Promise<void> {
-    // load ctx
-    const res = await this.api.get<{ value: number }>("/api/extra/true_max_context_length");
-    if (res.ok) {
-      // console.log("Setting model ctx to", res.data.value)
-      this.model.ctx = res.data.value
-    }
-    // load model name
-    const res2 = await this.api.get<{ result: string }>("/api/v1/model");
-    if (res2.ok) {
-      this.model.name = res2.data.result
-    }
+    throw new Error("Not implemented for this provider");
   }
 
   /**
@@ -86,11 +93,16 @@ class KoboldcppProvider implements LmProvider {
    * @param {InferenceParams} params - Parameters for customizing the inference behavior.
    * @returns {Promise<InferenceResult>} - The result of the inference.
    */
-  async infer(prompt: string, params: InferenceParams): Promise<InferenceResult> {
+  async infer(
+    prompt: string,
+    params: InferenceParams,
+    parseJson = false,
+    parseJsonFunc?: (data: string) => Record<string, any>
+  ): Promise<InferenceResult> {
     //console.log("INFER");
     // autoload model
     if (this.model.name.length > 0) {
-      await this.loadModel("")
+      await this.info()
     }
     this.abortController = new AbortController();
     if (params?.template) {
@@ -143,7 +155,8 @@ class KoboldcppProvider implements LmProvider {
     if (!response.body) {
       throw new Error("No response body")
     }
-    let text = '';
+    let text = "";
+    let data = {};
     if (inferenceParams?.stream == true) {
       let i = 1;
       let buf = new Array<string>();
@@ -171,7 +184,7 @@ class KoboldcppProvider implements LmProvider {
           break
         }
       }
-      text = buf.join("")
+      text = buf.join("");
     } else {
       const res = await this.api.post<Record<string, any>>("/api/v1/generate", inferenceParams);
       //console.log("RES", res)
@@ -181,10 +194,15 @@ class KoboldcppProvider implements LmProvider {
         throw new Error(`Error ${res.status} posting inference query ${res.data}`)
       }
     }
-    return {
+    if (parseJson) {
+      data = parseJsonUtil(text, parseJsonFunc);
+    }
+    const ir: InferenceResult = {
       text: text,
-      stats: {}
-    } as InferenceResult
+      data: data,
+      stats: {},
+    };
+    return ir
   }
 
   /**

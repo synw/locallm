@@ -1,5 +1,6 @@
 import { useApi } from "restmix";
 import { InferenceParams, InferenceResult, LmDefaults, LmParams, LmProvider, LmProviderType, ModelConf } from "@locallm/types";
+//import { InferenceParams, InferenceResult, LmDefaults, LmParams, LmProvider, LmProviderType, ModelConf } from "@/packages/types/interfaces.js";
 import { KoboldcppProvider } from './providers/koboldcpp.js';
 import { OllamaProvider } from "./providers/ollama.js";
 import { LlamacppProvider } from "./providers/llamacpp.js";
@@ -17,8 +18,9 @@ class Lm implements LmProvider {
   onStartEmit?: (data?: any) => void;
   onError?: (err: string) => void;
   modelsInfo: () => Promise<void>;
+  info: () => Promise<Record<string, any>>;
   loadModel: (name: string, ctx?: number, threads?: number, gpu_layers?: number) => Promise<void>;
-  infer: (prompt: string, params: InferenceParams) => Promise<InferenceResult>;
+  infer: (prompt: string, params: InferenceParams, parseJson?: boolean, parseJsonFunc?: (data: string) => Record<string, any>) => Promise<InferenceResult>;
   abort: () => Promise<void>;
   models = new Array<ModelConf>();
   model: ModelConf = { name: "", ctx: 2048 };
@@ -78,6 +80,7 @@ class Lm implements LmProvider {
     this.onStartEmit = this.provider.onStartEmit;
     this.onError = this.provider.onError;
     this.modelsInfo = this.provider.modelsInfo;
+    this.info = this.provider.info;
     this.loadModel = this.provider.loadModel;
     this.infer = this.provider.infer;
     this.abort = this.provider.abort;

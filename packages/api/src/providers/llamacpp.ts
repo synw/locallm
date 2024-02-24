@@ -1,5 +1,7 @@
 import { useApi } from 'restmix';
 import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
+//import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@/packages/types/interfaces.js";
+import { parseJson as parseJsonUtil } from './utils';
 
 class LlamacppProvider implements LmProvider {
   name: string;
@@ -51,6 +53,16 @@ class LlamacppProvider implements LmProvider {
     console.warn("Not implemented for this provider")
   }
 
+  async info(): Promise<Record<string, any>> {
+    const res = await this.api.get<Record<string, any>>("/props");
+    if (res.ok) {
+      //console.log("RES", res.data)
+      this.model.ctx = res.data.default_generation_settings.n_ctx;
+      this.model.name = res.data.default_generation_settings.model.split("/").pop();
+    }
+    return this.model
+  }
+
   /**
    * Loads a specified model for inferences. Note: it will query the server
    * and retrieve current model info (name and ctx).
@@ -63,12 +75,7 @@ class LlamacppProvider implements LmProvider {
    * @returns {Promise<void>}
    */
   async loadModel(name: string, ctx?: number, threads?: number, gpu_layers?: number): Promise<void> {
-    const res = await this.api.get<Record<string, any>>("/props");
-    if (res.ok) {
-      //console.log("RES", res.data)
-      this.model.ctx = res.data.default_generation_settings.n_ctx;
-      this.model.name = res.data.default_generation_settings.model.split("/").pop();
-    }
+    throw new Error("Not implemented for this provider");
   }
 
   /**
@@ -79,7 +86,12 @@ class LlamacppProvider implements LmProvider {
    * @param {InferenceParams} params - Parameters for customizing the inference behavior.
    * @returns {Promise<InferenceResult>} - The result of the inference.
    */
-  async infer(prompt: string, params: InferenceParams): Promise<InferenceResult> {
+  async infer(
+    prompt: string,
+    params: InferenceParams,
+    parseJson = false,
+    parseJsonFunc?: (data: string) => Record<string, any>
+  ): Promise<InferenceResult> {
     this.abortController = new AbortController();
     if (params?.template) {
       prompt = params.template.replace("{prompt}", prompt);
@@ -103,7 +115,9 @@ class LlamacppProvider implements LmProvider {
     inferenceParams.gpu_layers = undefined;
     inferenceParams.threads = undefined;
 
-    let respData: InferenceResult = { text: "", stats: {} };
+    let text = "";
+    let data = {};
+    let stats = {};
     let i = 0;
     if (inferenceParams?.stream == true) {
       const _onChunk = (payload: Record<string, any>) => {
@@ -119,17 +133,16 @@ class LlamacppProvider implements LmProvider {
           // Fix for last 2 json payload
           const txt = payload.split('"stop":false}')[1];
           const data = JSON.parse(txt);
-          respData.stats = data;
         } else {
           if (!payload.stop) {
             if (this.onToken) {
               const token = payload.content;
               this.onToken(token);
-              respData.text += token
+              text += token
             }
           } else {
             //console.log("END", payload);
-            respData.stats = payload;
+            stats = payload;
           }
         }
         ++i
@@ -146,16 +159,23 @@ class LlamacppProvider implements LmProvider {
       //console.log("RES", res)
       if (res.ok) {
         const raw = res.data as Record<string, any>;
-        respData.text = raw.content;
+        text = raw.content;
         delete raw.content;
-        respData.stats = raw;
+        stats = raw;
       } else {
         const msg = res.data;
         throw new Error(`${res.statusText} ${msg.content}`);
       }
     }
-    //console.log("STATS", respData)
-    return respData
+    if (parseJson) {
+      data = parseJsonUtil(text, parseJsonFunc);
+    }
+    const ir: InferenceResult = {
+      text: text,
+      data: data,
+      stats: {},
+    };
+    return ir
   }
 
   /**

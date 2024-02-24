@@ -76,7 +76,8 @@ interface InferenceParams {
  */
 interface InferenceResult {
   text: string;
-  stats?: Record<string, any>;
+  data: Record<string, any>;
+  stats: Record<string, any>;
 }
 
 /**
@@ -89,6 +90,7 @@ interface InferenceResult {
  * @property {string} apiKey - The key used for authentication with the provider's API.
  * @property {ModelConf} model - Active model configuration.
  * @property {Array<ModelConf>} models - List of available model configurations.
+ * @property {Function} info - Retrieves information about available server config.
  * @property {Function} modelsInfo - Retrieves information about available models.
  * @property {Function} loadModel - Loads a model by name, with optional context and template.
  * @property {Function} infer - Makes an inference based on provided prompt and parameters.
@@ -105,9 +107,10 @@ interface LmProvider {
   apiKey: string;
   model: ModelConf;
   models: Array<ModelConf>;
+  info: () => Promise<Record<string, any>>;
   modelsInfo: () => Promise<void>;
   loadModel: (name: string, ctx?: number, threads?: number, gpu_layers?: number) => Promise<void>;
-  infer: (prompt: string, params: InferenceParams) => Promise<InferenceResult>;
+  infer: (prompt: string, params: InferenceParams, parseJson?: boolean, parseJsonFunc?: (data: string) => Record<string, any>) => Promise<InferenceResult>;
   abort: () => Promise<void>;
   onToken?: (t: string) => void;
   onStartEmit?: (data?: any) => void;

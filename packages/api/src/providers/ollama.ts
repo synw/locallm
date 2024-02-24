@@ -1,6 +1,7 @@
 import { useApi } from "restmix";
 import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
-
+//import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@/packages/types/interfaces.js";
+import { parseJson as parseJsonUtil } from './utils';
 
 class OllamaProvider implements LmProvider {
   name: string;
@@ -11,7 +12,7 @@ class OllamaProvider implements LmProvider {
   // state
   model: ModelConf = { name: "", ctx: 2048 };
   models = new Array<ModelConf>();
-  modelTemplates: Record<string, string> = {};
+  //modelTemplates: Record<string, string> = {};
   abortController = new AbortController();
   apiKey: string;
   serverUrl: string;
@@ -53,6 +54,10 @@ class OllamaProvider implements LmProvider {
     } else {
       throw new Error(`Error ${res.status} loading models ${res.text}`);
     }
+  }
+
+  async info(): Promise<Record<string, any>> {
+    throw new Error("Not implemented for this provider");
   }
 
   /**
@@ -120,7 +125,12 @@ class OllamaProvider implements LmProvider {
    * @param {InferenceParams} params - Parameters for customizing the inference behavior.
    * @returns {Promise<InferenceResult>} - The result of the inference.
    */
-  async infer(prompt: string, params: InferenceParams): Promise<InferenceResult> {
+  async infer(
+    prompt: string,
+    params: InferenceParams,
+    parseJson = false,
+    parseJsonFunc?: (data: string) => Record<string, any>
+  ): Promise<InferenceResult> {
     if (this.model.name == "") {
       throw new Error("Load a model first, using the loadModel method");
     }
@@ -177,6 +187,7 @@ class OllamaProvider implements LmProvider {
     }
     //console.log("Params", inferParams);
     let text = "";
+    let data = {};
     if (inferParams?.stream == true) {
       const body = JSON.stringify(inferParams);
       const buf = new Array<string>();
@@ -213,11 +224,15 @@ class OllamaProvider implements LmProvider {
         throw new Error(`Error ${res.status} posting inference query ${res.data}`)
       }
     }
-
-    return {
+    if (parseJson) {
+      data = parseJsonUtil(text, parseJsonFunc);
+    }
+    const ir: InferenceResult = {
       text: text,
-      stats: {}
-    } as InferenceResult
+      data: data,
+      stats: {},
+    };
+    return ir
   }
 
   /**
