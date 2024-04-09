@@ -50,40 +50,46 @@ class LmTestCase {
     return this
   }*/
 
-  async run(lm: Lm, templateName?: string, overrideInferenceParams?: InferenceParams): Promise<TestResult> {
-    if (lm.model.name.length == 0) {
-      await lm.loadModel("");
-    }
-    // call api
-    let inferParams: InferenceParams;
-    if (overrideInferenceParams) {
-      //console.log("Override params", overrideInferenceParams)
-      const _tmp = overrideInferenceParams as Record<string, any>;
-      const _newp = this.inferParams as Record<string, any>;
-      for (const [k, v] of Object.entries(_tmp)) {
-        _newp[k] = v
+  async run(
+    lm: Lm,
+    templateName?: string,
+    overrideInferenceParams?: InferenceParams,
+    onRunTestcase: () => void = () => null
+  ): Promise<TestResult> {
+    if (lm.providerType != "ollama") {
+      if (lm.model.name.length == 0) {
+        await lm.modelsInfo()
       }
-      inferParams = _newp as InferenceParams;
-    } else {
-      //console.log("Test params")
-      inferParams = this.inferParams;
     }
+    onRunTestcase();
+    // params
+    const ip = this.inferParams as Record<string, any>;
+    const oip = overrideInferenceParams as Record<string, any> ?? {};
+    Object.keys(oip).forEach((k) => ip[k] = oip[k]);
+    const inferParams = ip as InferenceParams;
     if (this._modelName) {
       inferParams.model = {
         name: this._modelName,
         ctx: this._ctx,
       }
     }
+    /*console.log("IP", this.inferParams);
+    console.log("OIP", overrideInferenceParams);
+    console.log("FIP", inferParams);*/
+    // template
     let tpl = this.template;
     if (templateName) {
-      tpl = this.template.cloneTo(templateName)
+      tpl = this.template.cloneTo(templateName);
     }
-    //console.log("PARAMS", inferParams)
+    if (tpl.stop) {
+      inferParams.stop = [...(inferParams.stop ?? []), ...tpl.stop];
+    }
+    //console.log("TPL", tpl.name, "/", tpl.stop);
     //console.log("Running inference with prompt:");
     //console.log(this.template.render());
-    const res = await lm.infer(tpl.prompt(this.prompt), inferParams);
-    const result = this.evaluator.run(res.text);
-    //console.log(result);
+    const p = tpl.prompt(this.prompt);
+    const res = await lm.infer(p, inferParams);
+    const result = this.evaluator.run(this.name, this.prompt, res.text, inferParams, res.stats);
     return result
   }
 }

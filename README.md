@@ -12,7 +12,6 @@ An api to query local language models using different backends
 - [Llama.cpp](https://github.com/ggerganov/llama.cpp/tree/master/examples/server)
 - [Koboldcpp](https://github.com/LostRuins/koboldcpp)
 - [Ollama](https://github.com/jmorganca/ollama)
-- [Goinfer](https://github.com/synw/goinfer)
 
 ## Quickstart
 

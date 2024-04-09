@@ -146,18 +146,18 @@ class KoboldcppProvider implements LmProvider {
     if (this.apiKey.length > 0) {
       headers["Authorization"] = `Bearer ${this.apiKey}`
     }
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: headers,
-      body: body,
-    });
 
-    if (!response.body) {
-      throw new Error("No response body")
-    }
     let text = "";
     let data = {};
     if (inferenceParams?.stream == true) {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: headers,
+        body: body,
+      });
+      if (!response.body) {
+        throw new Error("No response body")
+      }
       let i = 1;
       let buf = new Array<string>();
       const eventStream = response.body

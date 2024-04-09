@@ -10,6 +10,8 @@ function containsValidJson(response: string, name: string, param: any, error: st
   let code: string | null = null;
   if (response.includes("```")) {
     code = extractCodeBetweenTags(response);
+  } else {
+    code = response;
   }
   if (!code) {
     res.error = "The output does not contain a code block"

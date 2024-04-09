@@ -13,7 +13,7 @@ function containsCodeBlock(response: string, name: string, param: any, error: st
       if (error) {
         res.error = error
       } else {
-        res.error = "The output is not valid code"
+        res.error = "The output does not contain a code block"
       }
     } else {
       res.pass = true

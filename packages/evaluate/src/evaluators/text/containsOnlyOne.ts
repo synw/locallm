@@ -1,6 +1,7 @@
+import { containsOneOccurrence } from "../../utils.js";
 import { EvaluationResult } from "../../interfaces.js";
 
-function containsText(response: string, name: string, strs: string | Array<string>, error: string | null = null): EvaluationResult {
+function containsOnlyOne(response: string, name: string, strs: string | Array<string>, error: string | null = null): EvaluationResult {
   let conditions = new Array<string>();
   if (typeof strs == "string") {
     conditions.push(strs)
@@ -15,16 +16,19 @@ function containsText(response: string, name: string, strs: string | Array<strin
   const errs = new Array<string>();
   let passN = conditions.length;
   for (const condition of conditions) {
-    if (response.includes(condition)) {
-      passN--
-    } else {
-      const defaultError = `The response does not contain the "${condition}" string`
+    const occ = containsOneOccurrence(response, condition);
+    if (occ == null || occ == false) {
+      let defaultError = `The response does not contain the "${condition}" string`;
+      if (occ == false) {
+        defaultError = `The response contains more than one occurence of the "${condition}" string`;
+      }
       if (error) {
         errs.push(error);
       } else {
         errs.push(defaultError)
       }
-      //break
+    } else {
+      passN--
     }
   }
   if (passN == 0) {
@@ -36,4 +40,4 @@ function containsText(response: string, name: string, strs: string | Array<strin
   return res
 }
 
-export { containsText }
+export { containsOnlyOne }

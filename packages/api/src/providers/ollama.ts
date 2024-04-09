@@ -1,4 +1,7 @@
 import { useApi } from "restmix";
+import { type ParsedEvent } from 'eventsource-parser'
+// @ts-ignore
+import { EventSourceParserStream } from 'eventsource-parser/stream';
 import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
 //import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@/packages/types/interfaces.js";
 import { parseJson as parseJsonUtil } from './utils';
@@ -49,7 +52,11 @@ class OllamaProvider implements LmProvider {
     if (res.ok) {
       //console.log("RES", res.data);
       for (const m of res.data["models"]) {
-        this.models.push({ name: m.name, ctx: 2048 });
+        const info = {
+          size: m.details.parameter_size,
+          quant: m.details.quantization_level,
+        }
+        this.models.push({ name: m.name, ctx: -1, info: info });
       }
     } else {
       throw new Error(`Error ${res.status} loading models ${res.text}`);
@@ -140,6 +147,7 @@ class OllamaProvider implements LmProvider {
       raw = params.extra.raw;
       delete params.extra.raw;
     }
+    console.log("PARAMS", params);
     let inferParams: Record<string, any> = {
       model: this.model.name,
       prompt: prompt,
@@ -150,34 +158,34 @@ class OllamaProvider implements LmProvider {
       },
       ...params.extra
     }
-    if (params.threads) {
+    if (params.threads !== undefined) {
       inferParams.options.num_thread = params.threads;
     }
-    if (params.gpu_layers) {
+    if (params.gpu_layers !== undefined) {
       inferParams.options.gpu_layers = params.gpu_layers;
     }
-    if (params.repeat_penalty) {
+    if (params.repeat_penalty !== undefined) {
       inferParams.options.repeat_penalty = params.repeat_penalty;
     }
-    if (params.stop && params.stop.length > 0) {
+    if (params.stop !== undefined && params.stop?.length > 0) {
       inferParams.options.stop = params.stop;
     }
-    if (params.temperature) {
+    if (params.temperature !== undefined) {
       inferParams.options.temperature = params.temperature;
     }
-    if (params.tfs) {
+    if (params.tfs !== undefined) {
       inferParams.options.tfs_z = params.tfs;
     }
-    if (params.top_k) {
+    if (params.top_k !== undefined) {
       inferParams.options.top_k = params.top_k;
     }
-    if (params.top_p) {
+    if (params.top_p !== undefined) {
       inferParams.options.top_p = params.top_p;
     }
-    if (params.max_tokens) {
+    if (params.max_tokens !== undefined) {
       inferParams.options.num_predict = params.max_tokens;
     }
-    if (params.extra?.format) {
+    if (params.extra?.format !== undefined) {
       inferParams["format"] = params.extra.format;
       delete params.extra.format
     }
@@ -185,9 +193,10 @@ class OllamaProvider implements LmProvider {
     if (params.extra && Object.keys(params.extra).length > 0) {
       inferParams = { ...inferParams, ...params.extra };
     }
-    //console.log("Params", inferParams);
+    //console.log("INFER PARAMS", inferParams);
     let text = "";
     let data = {};
+    let stats: Record<string, any> = {};
     if (inferParams?.stream == true) {
       const body = JSON.stringify(inferParams);
       const buf = new Array<string>();
@@ -196,30 +205,42 @@ class OllamaProvider implements LmProvider {
         headers: { 'Content-Type': 'application/json' },
         body: body,
       });
-
       if (!response.body) {
         throw new Error("No response body")
       }
       const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let lastBatch: Record<string, any> = {};
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        const raw = new TextDecoder().decode(value);
-        const d = JSON.parse(raw);
-        if (d["done"]) {
-          break
+        let raw = decoder.decode(value);
+        //console.log("RAW", raw);
+        const parts = raw.split('\n');
+        let pbuf = new Array();
+        for (const part of parts) {
+          try {
+            //console.log(part);
+            const p = JSON.parse(part);
+            lastBatch = p;
+            pbuf.push(p["response"]);
+          } catch (error) {
+            console.warn('invalid json: ', part)
+          }
         }
-        const t = d["response"];
+        const t = pbuf.join("");
         buf.push(t);
         if (this.onToken) {
           this.onToken(t);
         }
       }
-      text = buf.join("")
+      text = buf.join("");
+      stats = lastBatch;
     } else {
       const res = await this.api.post<Record<string, any>>("/api/generate", inferParams);
       if (res.ok) {
-        text = res.data.response
+        text = res.data.response;
+        stats = res.data;
       } else {
         throw new Error(`Error ${res.status} posting inference query ${res.data}`)
       }
@@ -227,10 +248,14 @@ class OllamaProvider implements LmProvider {
     if (parseJson) {
       data = parseJsonUtil(text, parseJsonFunc);
     }
+    delete stats.response;
+    delete stats.context;
+    delete stats.done;
+    //console.log("STATS", stats);
     const ir: InferenceResult = {
       text: text,
       data: data,
-      stats: {},
+      stats: stats,
     };
     return ir
   }

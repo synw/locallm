@@ -1,7 +1,7 @@
 import { InferenceParams } from "@locallm/types";
 import { PromptTemplate } from "modprompt";
 import { Evaluator } from "../../../../../packages/evaluate/src/evaluate.js";
-import { LmTestCase } from "../../../../../packages/evaluate/src/main.js";
+import { LmTestCase } from "../../../../../packages/evaluate/src/testcase.js";
 
 
 const template = new PromptTemplate("alpaca")
@@ -27,7 +27,7 @@ const evaluator = new Evaluator()
 
 const inferParams: InferenceParams = {
   temperature: 0,
-  max_tokens: 250,
+  max_tokens: 512,
 };
 const generateJs = new LmTestCase({
   name: "generate js code",

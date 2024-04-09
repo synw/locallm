@@ -5,8 +5,6 @@ import { Evaluator } from "./evaluate";
 
 type EvalFunction = (text: string) => TestResult;
 
-// { test: { template: [TestResult]}}
-//type TestResultsForModels = Record<string, Record<string, Array<TestResult>>>;
 type TestResults = Record<string, Array<TestResult>>;
 
 interface LmTestParams {
@@ -24,14 +22,22 @@ interface EvaluationResult {
   error: string | null;
 }
 
+interface FinalEvaluationResult extends EvaluationResult {
+  points: number;
+}
+
 interface TestResult {
+  name: string;
   pass: boolean;
   score: number;
+  thresold: number;
   output: string;
-  evaluations: Array<EvaluationResult>;
-  error?: string;
+  prompt: string;
+  evaluations: Array<FinalEvaluationResult>;
+  inferParams: InferenceParams;
+  stats: Record<string, any>;
 }
 
 type EvaluationFunction = (name: string, response: string, param: any, error: string | null) => EvaluationResult;
 
-export { LmTestParams, EvalFunction, TestResult, TestResults, EvaluationResult, EvaluationFunction }
+export { LmTestParams, EvalFunction, TestResult, TestResults, FinalEvaluationResult, EvaluationResult, EvaluationFunction }

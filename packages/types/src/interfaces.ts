@@ -8,12 +8,14 @@ import { useApi } from "restmix";
  * @property {number | undefined} ctx - The context window length, typically used to define how much of the previous data to consider.
  * @property {string | undefined} threads - The number of threads to use to run inference.
  * @property {number | undefined} gpu_layers - The number of layers to offload to the GPU.
+ * @property {number | undefined} info - Some meta info about the model: parameter size and quantization level
  */
 interface ModelConf {
   name: string;
   ctx: number;
   threads?: number;
   gpu_layers?: number;
+  info?: { size: string, quant: string };
 }
 
 /**

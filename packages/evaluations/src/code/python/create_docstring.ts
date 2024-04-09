@@ -1,7 +1,7 @@
 import { InferenceParams } from "@locallm/types";
 import { PromptTemplate } from "modprompt";
 import { Evaluator } from "../../../../../packages/evaluate/src/evaluate.js";
-import { LmTestCase } from "../../../../../packages/evaluate/src/main.js";
+import { LmTestCase } from "../../../../../packages/evaluate/src/testcase.js";
 
 const baseprompt = `in Python create a detailed and helpful Google style docstring for this code:
 
