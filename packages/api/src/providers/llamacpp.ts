@@ -4,7 +4,7 @@ import { type ParsedEvent } from 'eventsource-parser'
 import { EventSourceParserStream } from 'eventsource-parser/stream';
 import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
 //import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@/packages/types/interfaces.js";
-import { parseJson as parseJsonUtil } from './utils';
+import { parseJson as parseJsonUtil } from './utils.js';
 
 class LlamacppProvider implements LmProvider {
   name: string;

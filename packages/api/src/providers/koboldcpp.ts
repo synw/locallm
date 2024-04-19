@@ -4,7 +4,7 @@ import { type ParsedEvent } from 'eventsource-parser'
 import { EventSourceParserStream } from 'eventsource-parser/stream';
 import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
 //import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@/packages/types/interfaces.js";
-import { parseJson as parseJsonUtil } from './utils';
+import { parseJson as parseJsonUtil } from './utils.js';
 
 class KoboldcppProvider implements LmProvider {
   name: string;
@@ -137,7 +137,7 @@ class KoboldcppProvider implements LmProvider {
     inferenceParams.gpu_layers = undefined;
     inferenceParams.threads = undefined;
     const body = JSON.stringify(inferenceParams);
-    //console.log("BPARAMS", body);
+    //console.log("KBPARAMS", body);
     const url = `${this.serverUrl}/api/extra/generate/stream`;
     const headers: HeadersInit = {
       'Content-Type': 'application/json',

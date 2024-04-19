@@ -4,7 +4,7 @@ import { type ParsedEvent } from 'eventsource-parser'
 import { EventSourceParserStream } from 'eventsource-parser/stream';
 import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
 //import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@/packages/types/interfaces.js";
-import { parseJson as parseJsonUtil } from './utils';
+import { parseJson as parseJsonUtil } from './utils.js';
 
 class OllamaProvider implements LmProvider {
   name: string;
@@ -147,7 +147,7 @@ class OllamaProvider implements LmProvider {
       raw = params.extra.raw;
       delete params.extra.raw;
     }
-    console.log("PARAMS", params);
+    //console.log("PARAMS", params);
     let inferParams: Record<string, any> = {
       model: this.model.name,
       prompt: prompt,
