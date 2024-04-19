@@ -1,4 +1,7 @@
 import { useApi } from 'restmix';
+import { type ParsedEvent } from 'eventsource-parser'
+// @ts-ignore
+import { EventSourceParserStream } from 'eventsource-parser/stream';
 import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
 //import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@/packages/types/interfaces.js";
 import { parseJson as parseJsonUtil } from './utils';
@@ -115,45 +118,58 @@ class LlamacppProvider implements LmProvider {
     inferenceParams.gpu_layers = undefined;
     inferenceParams.threads = undefined;
 
+    const body = JSON.stringify(inferenceParams);
+    //console.log("KBPARAMS", body);
+    const url = `${this.serverUrl}/completion`;
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      'Accept': 'text/event-stream',
+    };
+    if (this.apiKey.length > 0) {
+      headers["Authorization"] = `Bearer ${this.apiKey}`
+    }
+
     let text = "";
     let data = {};
     let stats = {};
     let i = 0;
     if (inferenceParams?.stream == true) {
-      const _onChunk = (payload: Record<string, any>) => {
-        if (i == 0) {
-          if (this.onStartEmit) {
-            this.onStartEmit()
-          }
-        }
-        //console.log("OT", typeof payload);
-        //console.log(">>>>", payload, "<<<<")
-        const pt = typeof payload;
-        if (pt == "string") {
-          // Fix for last 2 json payload
-          const txt = payload.split('"stop":false}')[1];
-          const data = JSON.parse(txt);
-        } else {
-          if (!payload.stop) {
-            if (this.onToken) {
-              const token = payload.content;
-              this.onToken(token);
-              text += token
-            }
-          } else {
-            //console.log("END", payload);
-            stats = payload;
-          }
-        }
-        ++i
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: headers,
+        body: body,
+        signal: this.abortController.signal,
+      });
+      if (!response.body) {
+        throw new Error("No response body")
       }
+      let i = 1;
+      let buf = new Array<string>();
+      const eventStream = response.body
+        .pipeThrough(new TextDecoderStream())
+        .pipeThrough(new EventSourceParserStream())
+        .getReader()
 
-      await this.api.postSse<Record<string, any>>(
-        "/completion",
-        inferenceParams,
-        _onChunk,
-        this.abortController,
-      )
+      while (true) {
+        const { done, value } = await eventStream.read()
+        if (!done) {
+          if (this.onToken) {
+            const t = JSON.parse((value as ParsedEvent).data)["content"];
+            this.onToken(t);
+            buf.push(t);
+          }
+          if (i == 1) {
+            if (this.onStartEmit) {
+              this.onStartEmit()
+            }
+          }
+          ++i
+          continue
+        } else {
+          break
+        }
+      }
+      text = buf.join("");
     } else {
       const res = await this.api.post<Record<string, any>>("/completion", inferenceParams);
       //console.log("RES", res)
@@ -186,8 +202,8 @@ class LlamacppProvider implements LmProvider {
    */
   async abort(): Promise<void> {
     this.abortController.abort();
-    const res = await this.api.post("/api/extra/abort", { genKey: "" });
-    console.log(res)
+    //const res = await this.api.post("/api/extra/abort", { genKey: "" });
+    //console.log(res)
   }
 }
 
