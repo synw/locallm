@@ -7,7 +7,7 @@ export default {
   output: [
     {
       file: 'dist/main.es.js',
-      format: 'esm'
+      format: 'esm',
     },
     {
       file: 'dist/main.min.js',
@@ -20,7 +20,7 @@ export default {
     resolve({
       jsnext: true,
       main: true,
-      browser: true,
+      //browser: true,
     }),
   ],
 };
