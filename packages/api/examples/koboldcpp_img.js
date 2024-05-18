@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { Lm } from "../src/api.js";
+import { Lm } from "../dist/main.es.js";
 import fs from "fs";
 
 /**

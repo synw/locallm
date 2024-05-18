@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { Lm } from "../dist/main.es.js";
 
-const model = "mistral:instruct";
+const model = "phi3";
 const template = "[INST] {prompt} [/INST]";
 
 async function main() {
