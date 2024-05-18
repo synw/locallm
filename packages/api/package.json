@@ -1,6 +1,6 @@
 {
   "name": "@locallm/api",
-  "version": "0.0.30",
+  "version": "0.0.31",
   "description": "An api to query local language models using different backends",
   "repository": "https://github.com/synw/locallm",
   "scripts": {
@@ -8,23 +8,23 @@
     "docs": "typedoc --entryPointStrategy expand"
   },
   "dependencies": {
-    "eventsource-parser": "^1.1.1",
-    "restmix": "^0.4.0"
+    "eventsource-parser": "^1.1.2",
+    "restmix": "^0.5.0"
   },
   "devDependencies": {
     "@locallm/types": "^0.0.16",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^11.1.5",
+    "@rollup/plugin-typescript": "^11.1.6",
     "@types/js-cookie": "^3.0.6",
-    "@types/node": "^20.10.3",
-    "rollup": "^4.6.1",
-    "ts-node": "^10.9.1",
+    "@types/node": "^20.12.12",
+    "rollup": "^4.17.2",
+    "ts-node": "^10.9.2",
     "tslib": "^2.6.2",
-    "typedoc": "^0.25.4",
-    "typedoc-plugin-markdown": "^3.17.1",
+    "typedoc": "^0.25.13",
+    "typedoc-plugin-markdown": "^4.0.2",
     "typedoc-plugin-rename-defaults": "^0.7.0",
-    "typescript": "^5.3.2"
+    "typescript": "^5.4.5"
   },
   "type": "module",
   "files": [

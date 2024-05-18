@@ -199,6 +199,62 @@ class OllamaProvider implements LmProvider {
     let stats: Record<string, any> = {};
     if (inferParams?.stream == true) {
       const body = JSON.stringify(inferParams);
+      //console.log("STREAM");
+      /*
+      const url = `${this.serverUrl}/api/generate`;
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+        'Accept': 'text/event-stream',
+      };
+      if (this.apiKey.length > 0) {
+        headers["Authorization"] = `Bearer ${this.apiKey}`
+      }
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: headers,
+        body: body,
+        signal: this.abortController.signal,
+      });
+      if (!response.body) {
+        throw new Error("No response body")
+      }
+      console.log("RESP", response.body);
+      let i = 1;
+      let buf = new Array<string>();
+      const eventStream = response.body
+        .pipeThrough(new TextDecoderStream())
+        .pipeThrough(new EventSourceParserStream())
+        .getReader()
+
+
+      while (true) {
+        console.log("ES", eventStream);
+        const { done, value } = await eventStream.read()
+        console.log("VAL", value);
+        if (!done) {
+          if (this.onToken) {
+            const payload = JSON.parse((value as ParsedEvent).data);
+            console.log("PAY", payload);
+            const t = payload["content"];
+            this.onToken(t);
+            buf.push(t);
+            if (payload.stop) {
+              //console.log(JSON.stringify(payload, null, "  "));
+            }
+          }
+          if (i == 1) {
+            if (this.onStartEmit) {
+              this.onStartEmit()
+            }
+          }
+          ++i
+          continue
+        } else {
+          break
+        }
+      }
+      text = buf.join("");*/
+
       const buf = new Array<string>();
       const response = await fetch(`${this.serverUrl}/api/generate`, {
         method: 'POST',
@@ -214,7 +270,7 @@ class OllamaProvider implements LmProvider {
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        let raw = decoder.decode(value);
+        let raw = decoder.decode(value).trim();
         //console.log("RAW", raw);
         const parts = raw.split('\n');
         let pbuf = new Array();

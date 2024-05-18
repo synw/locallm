@@ -1,6 +1,5 @@
 import { useApi } from 'restmix';
 import { type ParsedEvent } from 'eventsource-parser'
-// @ts-ignore
 import { EventSourceParserStream } from 'eventsource-parser/stream';
 import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
 //import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@/packages/types/interfaces.js";
@@ -139,7 +138,7 @@ class KoboldcppProvider implements LmProvider {
     const body = JSON.stringify(inferenceParams);
     //console.log("KBPARAMS", body);
     const url = `${this.serverUrl}/api/extra/generate/stream`;
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'Accept': 'text/event-stream',
     };
@@ -160,8 +159,8 @@ class KoboldcppProvider implements LmProvider {
       }
       let i = 1;
       let buf = new Array<string>();
-      const eventStream = response.body
-        .pipeThrough(new TextDecoderStream())
+      const eventStream = response.body // @ts-ignore
+        .pipeThrough(new TextDecoderStream()) // @ts-ignore
         .pipeThrough(new EventSourceParserStream())
         .getReader()
 
