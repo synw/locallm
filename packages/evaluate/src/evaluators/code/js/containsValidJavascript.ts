@@ -7,16 +7,12 @@ function containsValidJavascript(response: string, name: string, param: any, err
     pass: false,
     error: null,
   };
+  let code = response;
+  if (response.includes("```")) {
+    code = extractCodeBetweenTags(response) ?? response;
+  }
   try {
-    let code: string | null = null;
-    if (response.includes("```")) {
-      code = extractCodeBetweenTags(response);
-    }
-    if (!code) {
-      error = "The output does not contain a code block"
-    } else {
-      new Function(code);
-    }
+    new Function(code);
   } catch (e) {
     if (error) {
       res.error = error

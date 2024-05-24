@@ -5,8 +5,8 @@ import { LmTestCase } from "../../../../../packages/evaluate/src/testcase.js";
 
 
 const template = new PromptTemplate("alpaca")
-  .afterSystem("You are a javascript expert")
-  .replacePrompt("fix this invalid json and respond with a markdown code block only:\n\n```json\n{prompt}\n```")
+  .afterSystem("You are a javascript AI assistant")
+  .replacePrompt("fix this invalid json:\n\n```json\n{prompt}\n```\n\nOutput only a code block, nothing else")
   .addShot(
     `{"a":2, "b": text 585,} // a comment`,
     `\n\n\`\`\`json
@@ -22,8 +22,9 @@ const prompt = `{
 }`;
 
 const evaluator = new Evaluator()
-  .containsValidJson(50)
-  .containsText(50, [
+  .isOnlyCodeBlock(30)
+  .containsValidJson(30)
+  .containsText(40, [
     '"Date": "2019-08-01T00:00:00-07:00",',
     '"TemperatureCelsius": 25,',
     '"Summary": "hello"',

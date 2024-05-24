@@ -7,26 +7,20 @@ function containsValidJson(response: string, name: string, param: any, error: st
     pass: false,
     error: null,
   };
-  let code: string | null = null;
+  let code = response;
   if (response.includes("```")) {
-    code = extractCodeBetweenTags(response);
-  } else {
-    code = response;
-  }
-  if (!code) {
-    res.error = "The output does not contain a code block"
-    return res
+    code = extractCodeBetweenTags(response) ?? response;
   }
   try {
     JSON.parse(code);
+    res.pass = true;
   } catch (e) {
     if (error) {
       res.error = error
     } else {
-      res.error = "The output is not valid json"
+      res.error = "The output does not contain valid json"
     }
   }
-  res.pass = true;
   return res
 }
 

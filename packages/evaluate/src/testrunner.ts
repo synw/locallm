@@ -1,5 +1,5 @@
-//import { Lm } from "@locallm/api";
-import { Lm } from "./packages/locallm/api.js";
+import { Lm } from "@locallm/api";
+//import { Lm } from "./packages/locallm/api.js";
 import { TestResult, TestResults } from "./interfaces.js";
 import { LmTestCase } from "./testcase.js";
 import { InferenceParams, ModelConf } from "@locallm/types";

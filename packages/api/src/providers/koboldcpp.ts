@@ -153,6 +153,7 @@ class KoboldcppProvider implements LmProvider {
         method: 'POST',
         headers: headers,
         body: body,
+        signal: this.abortController.signal,
       });
       if (!response.body) {
         throw new Error("No response body")

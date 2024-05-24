@@ -1,5 +1,5 @@
 import { InferenceParams } from "@locallm/types";
-import { EvaluationFunction, EvaluationResult, FinalEvaluationResult, TestResult } from "./interfaces.js";
+import { EvaluationFunction, FinalEvaluationResult, TestResult } from "./interfaces.js";
 import { containsCodeBlock, isOnlyCodeBlock } from "./evaluators/code/main.js";
 import { containsValidJavascript, containsValidJson } from "./evaluators/code/js/main.js";
 import { containsText } from "./evaluators/text/containsText.js";

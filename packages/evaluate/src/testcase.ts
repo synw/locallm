@@ -1,7 +1,7 @@
 import { PromptTemplate } from "modprompt";
 import { InferenceParams, ModelConf } from "@locallm/types";
-//import { Lm } from "@locallm/api";
-import { Lm } from "./packages/locallm/api.js";
+import { Lm } from "@locallm/api";
+//import { Lm } from "./packages/locallm/api.js";
 import { LmTestParams, TestResult } from "./interfaces.js";
 import { Evaluator } from "./evaluate.js";
 
