@@ -2,9 +2,10 @@ import { useApi } from "restmix";
 import { type ParsedEvent } from 'eventsource-parser'
 // @ts-ignore
 import { EventSourceParserStream } from 'eventsource-parser/stream';
-import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
+import { InferenceParams, InferenceResult, InferenceStats, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
 //import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@/packages/types/interfaces.js";
 import { parseJson as parseJsonUtil } from './utils.js';
+import { useStats } from "@/stats.js";
 
 class OllamaProvider implements LmProvider {
   name: string;
@@ -196,7 +197,10 @@ class OllamaProvider implements LmProvider {
     //console.log("INFER PARAMS", inferParams);
     let text = "";
     let data = {};
-    let stats: Record<string, any> = {};
+    const stats = useStats();
+    stats.start();
+    let finalStats = {} as InferenceStats;
+    let serverStats: Record<string, any> = {};
     if (inferParams?.stream == true) {
       const body = JSON.stringify(inferParams);
       const buf = new Array<string>();
@@ -212,7 +216,14 @@ class OllamaProvider implements LmProvider {
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let lastBatch: Record<string, any> = {};
+      let i = 1;
       while (true) {
+        if (i == 1) {
+          stats.inferenceStarts();
+          if (this.onStartEmit) {
+            this.onStartEmit()
+          }
+        }
         const { done, value } = await reader.read();
         if (done) break;
         let raw = decoder.decode(value).trim();
@@ -225,6 +236,7 @@ class OllamaProvider implements LmProvider {
             const p = JSON.parse(part);
             lastBatch = p;
             pbuf.push(p["response"]);
+            ++i
           } catch (error) {
             console.warn('invalid json: ', part)
           }
@@ -236,12 +248,16 @@ class OllamaProvider implements LmProvider {
         }
       }
       text = buf.join("");
-      stats = lastBatch;
+      finalStats = stats.inferenceEnds(i);
+      serverStats = lastBatch;
     } else {
       const res = await this.api.post<Record<string, any>>("/api/generate", inferParams);
       if (res.ok) {
         text = res.data.response;
-        stats = res.data;
+        const serverStats = res.data;
+        delete serverStats.response;
+        delete serverStats.context;
+        delete serverStats.done;
       } else {
         throw new Error(`Error ${res.status} posting inference query ${res.data}`)
       }
@@ -249,14 +265,12 @@ class OllamaProvider implements LmProvider {
     if (parseJson) {
       data = parseJsonUtil(text, parseJsonFunc);
     }
-    delete stats.response;
-    delete stats.context;
-    delete stats.done;
     //console.log("STATS", stats);
     const ir: InferenceResult = {
       text: text,
       data: data,
-      stats: stats,
+      stats: finalStats,
+      serverStats: serverStats,
     };
     return ir
   }

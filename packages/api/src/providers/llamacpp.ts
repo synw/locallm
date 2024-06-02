@@ -1,9 +1,10 @@
 import { useApi } from 'restmix';
 import { type ParsedEvent } from 'eventsource-parser';
 import { EventSourceParserStream } from 'eventsource-parser/stream';
-import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
+import { InferenceParams, InferenceResult, InferenceStats, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
 //import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@/packages/types/interfaces.js";
 import { parseJson as parseJsonUtil } from './utils.js';
+import { useStats } from '../stats.js';
 
 class LlamacppProvider implements LmProvider {
   name: string;
@@ -130,8 +131,10 @@ class LlamacppProvider implements LmProvider {
 
     let text = "";
     let data = {};
-    let stats = {};
-    let i = 0;
+    const stats = useStats();
+    stats.start();
+    let finalStats = {} as InferenceStats;
+    let serverStats: Record<string, any> = {};
     if (inferenceParams?.stream == true) {
       const response = await fetch(url, {
         method: 'POST',
@@ -142,29 +145,29 @@ class LlamacppProvider implements LmProvider {
       if (!response.body) {
         throw new Error("No response body")
       }
-      let i = 1;
       let buf = new Array<string>();
       const eventStream = response.body // @ts-ignore
         .pipeThrough(new TextDecoderStream()) // @ts-ignore
         .pipeThrough(new EventSourceParserStream())
         .getReader()
-
+      let i = 1;
       while (true) {
         const { done, value } = await eventStream.read()
         if (!done) {
+          if (i == 1) {
+            stats.inferenceStarts();
+            if (this.onStartEmit) {
+              this.onStartEmit()
+            }
+          }
           if (this.onToken) {
             const payload = JSON.parse((value as ParsedEvent).data);
             const t = payload["content"];
             this.onToken(t);
             buf.push(t);
-            if (payload.stop) {
+            /*if (payload.stop) {
               //console.log(JSON.stringify(payload, null, "  "));
-            }
-          }
-          if (i == 1) {
-            if (this.onStartEmit) {
-              this.onStartEmit()
-            }
+            }*/
           }
           ++i
           continue
@@ -173,6 +176,7 @@ class LlamacppProvider implements LmProvider {
         }
       }
       text = buf.join("");
+      finalStats = stats.inferenceEnds(i);
     } else {
       const res = await this.api.post<Record<string, any>>("/completion", inferenceParams);
       //console.log("RES", res)
@@ -180,7 +184,7 @@ class LlamacppProvider implements LmProvider {
         const raw = res.data as Record<string, any>;
         text = raw.content;
         delete raw.content;
-        stats = raw;
+        serverStats = raw;
       } else {
         const msg = res.data;
         throw new Error(`${res.statusText} ${msg.content}`);
@@ -192,7 +196,8 @@ class LlamacppProvider implements LmProvider {
     const ir: InferenceResult = {
       text: text,
       data: data,
-      stats: {},
+      stats: finalStats,
+      serverStats: serverStats,
     };
     return ir
   }
