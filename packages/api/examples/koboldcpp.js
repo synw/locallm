@@ -20,7 +20,7 @@ async function main() {
     temperature: 0.5,
     max_tokens: 300,
   });
-  //console.log("\n", res)
+  console.log("\n", res)
 }
 
 (async () => {

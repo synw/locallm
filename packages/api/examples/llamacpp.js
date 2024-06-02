@@ -19,7 +19,7 @@ async function main() {
     max_tokens: 200,
     stop: ["</s>"],
   });
-  //console.log("\n\n", res)
+  console.log("\n\n", res)
 }
 
 (async () => {

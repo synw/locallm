@@ -4,6 +4,7 @@
     "@types/node": "^20.8.2"
   },
   "dependencies": {
-    "@intrinsicai/gbnfgen": "^0.10.0"
+    "@intrinsicai/gbnfgen": "^0.10.0",
+    "ervy": "^1.0.7"
   }
 }
