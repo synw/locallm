@@ -59,16 +59,43 @@ interface InferenceParams {
 }
 
 /**
+ * Represents the statistics of an inference.
+ *
+ * @interface InferenceStats
+ * @property {number} ingestionTime - The time taken to ingest the input data in milliseconds.
+ * @property {number} inferenceTime - The time taken to perform the inference in milliseconds.
+ * @property {number} totalTime - The total time taken to perform the inference in milliseconds.
+ * @property {number} ingestionTimeSeconds - The time taken to ingest the input data in seconds.
+ * @property {number} inferenceTimeSeconds - The time taken to perform the inference in seconds.
+ * @property {number} totalTimeSeconds - The total time taken to perform the inference in seconds.
+ * @property {number} totalTokens - The total number of tokens processed.
+ * @property {number} tokensPerSecond - The number of tokens processed per second.
+ */
+interface InferenceStats {
+  ingestionTime: number;
+  inferenceTime: number;
+  totalTime: number;
+  ingestionTimeSeconds: number;
+  inferenceTimeSeconds: number;
+  totalTimeSeconds: number;
+  totalTokens: number;
+  tokensPerSecond: number;
+}
+
+/**
  * Represents the result returned after an inference request.
  *
  * @interface InferenceResult
  * @property {string} text - The textual representation of the generated inference.
- * @property {Record<string, any> | undefined} stats - Additional statistics or metadata related to the inference.
+ * @property {Record<string, any> | undefined} data - Additional data related to the inference.
+ * @property {InferenceStats} stats - Additional statistics or metadata related to the inference.
+ * @property {Record<string, any>} serverStats - Additional server-related statistics.
  */
 interface InferenceResult {
   text: string;
   data: Record<string, any>;
-  stats: Record<string, any>;
+  stats: InferenceStats;
+  serverStats: Record<string, any>;
 }
 
 /**
@@ -204,6 +231,7 @@ export {
   ModelConf,
   InferenceParams,
   InferenceResult,
+  InferenceStats,
   LmProvider,
   LmProviderType,
   LmParams,
