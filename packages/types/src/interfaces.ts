@@ -6,15 +6,11 @@ import { useApi } from "restmix";
  * @interface ModelConf
  * @property {string} name - The unique name of the model.
  * @property {number | undefined} ctx - The context window length, typically used to define how much of the previous data to consider.
- * @property {string | undefined} threads - The number of threads to use to run inference.
- * @property {number | undefined} gpu_layers - The number of layers to offload to the GPU.
  * @property {number | undefined} info - Some meta info about the model: parameter size and quantization level
  */
 interface ModelConf {
   name: string;
   ctx: number;
-  threads?: number;
-  gpu_layers?: number;
   info?: { size: string, quant: string };
 }
 
@@ -25,8 +21,6 @@ interface ModelConf {
  * @property {boolean | undefined} stream - Indicates if results should be streamed progressively.
  * @property {ModelConf | undefined} model - The model configuration details for inference.
  * @property {template | undefined} template - The template to use, for the backends that support it.
- * @property {number | undefined} threads - The number of threads to use for parallel processing.
- * @property {number | undefined} gpu_layers - The number of layers to offload to the GPU.
  * @property {number | undefined} max_tokens - The number of predictions to return.
  * @property {number | undefined} top_k - Limits the result set to the top K results.
  * @property {number | undefined} top_p - Filters results based on cumulative probability.
@@ -43,8 +37,6 @@ interface InferenceParams {
   stream?: boolean;
   model?: ModelConf;
   template?: string;
-  threads?: number;
-  gpu_layers?: number;
   max_tokens?: number;
   top_k?: number;
   top_p?: number;
@@ -56,6 +48,18 @@ interface InferenceParams {
   grammar?: string;
   images?: Array<string>;
   extra?: Record<string, any>;
+}
+
+/**
+ * Represents the statistics of an inference prompt ingestion time.
+ *
+ * @interface IngestionStats
+ * @property {number} ingestionTime - The time taken to ingest the input data in milliseconds.
+ * @property {number} ingestionTimeSeconds - The time taken to ingest the input data in seconds.
+ */
+interface IngestionStats {
+  ingestionTime: number;
+  ingestionTimeSeconds: number;
 }
 
 /**
@@ -71,11 +75,9 @@ interface InferenceParams {
  * @property {number} totalTokens - The total number of tokens processed.
  * @property {number} tokensPerSecond - The number of tokens processed per second.
  */
-interface InferenceStats {
-  ingestionTime: number;
-  inferenceTime: number;
+interface InferenceStats extends IngestionStats {
   totalTime: number;
-  ingestionTimeSeconds: number;
+  inferenceTime: number;
   inferenceTimeSeconds: number;
   totalTimeSeconds: number;
   totalTokens: number;
@@ -115,6 +117,7 @@ interface InferenceResult {
  * @property {Function} abort - Aborts a currently running inference task.
  * @property {Function} onToken - Callback when a new token is received (typically for authentication).
  * @property {Function | undefined} onStartEmit - Callback triggered when inference starts.
+ * @property {Function | undefined} onEndEmit - Callback triggered when inference ends.
  * @property {Function | undefined} onError - Callback triggered on errors during inference.
  * @property {LmDefaults | undefined} defaults - Default settings for this provider.
  */
@@ -127,11 +130,12 @@ interface LmProvider {
   models: Array<ModelConf>;
   info: () => Promise<Record<string, any>>;
   modelsInfo: () => Promise<void>;
-  loadModel: (name: string, ctx?: number, threads?: number, gpu_layers?: number) => Promise<void>;
+  loadModel: (name: string, ctx?: number) => Promise<void>;
   infer: (prompt: string, params: InferenceParams, parseJson?: boolean, parseJsonFunc?: (data: string) => Record<string, any>) => Promise<InferenceResult>;
   abort: () => Promise<void>;
   onToken?: (t: string) => void;
-  onStartEmit?: (data?: any) => void;
+  onStartEmit?: (data: IngestionStats) => void;
+  onEndEmit?: (result: InferenceResult) => void;
   onError?: (err: string) => void;
   defaults?: LmDefaults;
 }
@@ -154,18 +158,20 @@ interface LmDefaults {
  * @interface LmProviderParams
  * @property {string} name - Identifier for the LM provider.
  * @property {string} serverUrl - The URL endpoint for the provider's server.
- * @property {string} apiKey - The key used for authentication.
- * @property {Function} onToken - Callback when a new token is received.
+ * @property {string | undefined} apiKey - The key used for authentication.
+ * @property {Function | undefined} onToken - Callback when a new token is received.
  * @property {Function | undefined} onStartEmit - Callback triggered when inference starts.
+ * @property {Function | undefined} onEndEmit - Callback triggered when inference ends.
  * @property {Function | undefined} onError - Callback triggered on errors.
  * @property {LmDefaults | undefined} defaults - Default settings.
  */
 interface LmProviderParams {
   name: string;
   serverUrl: string;
-  apiKey: string;
+  apiKey?: string;
   onToken?: (t: string) => void;
-  onStartEmit?: (data?: any) => void;
+  onStartEmit?: (data: IngestionStats) => void;
+  onEndEmit?: (result: InferenceResult) => void;
   onError?: (err: string) => void;
   defaults?: LmDefaults;
 }
@@ -176,18 +182,20 @@ interface LmProviderParams {
  * @interface LmParams
  * @property {LmProviderType} providerType - Type of provider ("koboldcpp", "ollama", "goinfer").
  * @property {string} serverUrl - The URL endpoint for the LM service.
- * @property {Function} onToken - Callback when a new token is received.
+ * @property {Function | undefined} onToken - Callback when a new token is received.
  * @property {string | undefined} apiKey - Optional API key for authentication.
  * @property {Function | undefined} onStartEmit - Callback triggered when inference starts.
+ * @property {Function | undefined} onEndEmit - Callback triggered when inference ends.
  * @property {Function | undefined} onError - Callback triggered on errors.
  * @property {LmDefaults | undefined} defaults - Default settings.
  */
 interface LmParams {
   providerType: LmProviderType;
   serverUrl: string;
-  onToken: (t: string) => void;
   apiKey?: string;
-  onStartEmit?: (data?: any) => void;
+  onToken?: (t: string) => void;
+  onStartEmit?: (data: IngestionStats) => void;
+  onEndEmit?: (result: InferenceResult) => void;
   onError?: (err: string) => void;
   defaults?: LmDefaults;
 }
@@ -232,6 +240,7 @@ export {
   InferenceParams,
   InferenceResult,
   InferenceStats,
+  IngestionStats,
   LmProvider,
   LmProviderType,
   LmParams,
