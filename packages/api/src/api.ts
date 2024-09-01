@@ -1,5 +1,5 @@
 import { useApi } from "restmix";
-import { InferenceParams, InferenceResult, LmDefaults, LmParams, LmProvider, LmProviderType, ModelConf } from "@locallm/types";
+import { InferenceParams, InferenceResult, IngestionStats, LmDefaults, LmParams, LmProvider, LmProviderType, ModelConf } from "@locallm/types";
 import { KoboldcppProvider } from './providers/koboldcpp.js';
 import { OllamaProvider } from "./providers/ollama.js";
 import { LlamacppProvider } from "./providers/llamacpp.js";
@@ -14,7 +14,8 @@ class Lm implements LmProvider {
   name: string;
   api: ReturnType<typeof useApi>;
   onToken?: (t: string) => void;
-  onStartEmit?: (data?: any) => void;
+  onStartEmit?: (data: IngestionStats) => void;
+  onEndEmit?: (result: InferenceResult) => void;
   onError?: (err: string) => void;
   modelsInfo: () => Promise<void>;
   info: () => Promise<Record<string, any>>;

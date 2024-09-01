@@ -1,4 +1,4 @@
-import { InferenceStats } from "@locallm/types";
+import { InferenceStats, IngestionStats } from "@locallm/types";
 
 const useStats = () => {
     let _start = Date.now();
@@ -17,7 +17,14 @@ const useStats = () => {
         _start = Date.now();
     }
 
-    const inferenceStarts = () => stats.ingestionTime = Date.now() - _start;
+    const inferenceStarts = (): IngestionStats => {
+        stats.ingestionTime = Date.now() - _start;
+        stats.ingestionTimeSeconds = parseFloat((stats.ingestionTime / 1000).toFixed(1));
+        return {
+            ingestionTime: stats.ingestionTime,
+            ingestionTimeSeconds: stats.inferenceTimeSeconds,
+        }
+    };
 
     const inferenceEnds = (totalTokens: number): InferenceStats => {
         const n = Date.now();

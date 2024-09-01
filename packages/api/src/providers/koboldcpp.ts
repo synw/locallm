@@ -1,7 +1,7 @@
 import { useApi } from 'restmix';
 import { type ParsedEvent } from 'eventsource-parser'
 import { EventSourceParserStream } from 'eventsource-parser/stream';
-import { InferenceParams, InferenceResult, InferenceStats, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
+import { InferenceParams, InferenceResult, InferenceStats, IngestionStats, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
 import { parseJson as parseJsonUtil } from './utils.js';
 import { useStats } from '../stats.js';
 
@@ -9,7 +9,8 @@ class KoboldcppProvider implements LmProvider {
   name: string;
   api: ReturnType<typeof useApi>;
   onToken?: (t: string) => void;
-  onStartEmit?: (data?: any) => void;
+  onStartEmit?: (data: IngestionStats) => void;
+  onEndEmit?: (result: InferenceResult) => void;
   onError?: (err: string) => void;
   // state
   model: ModelConf = { name: "", ctx: 2048 };
@@ -27,8 +28,9 @@ class KoboldcppProvider implements LmProvider {
     this.name = params.name;
     this.onToken = params.onToken;
     this.onStartEmit = params.onStartEmit;
+    this.onEndEmit = params.onEndEmit;
     this.onError = params.onError;
-    if (params.apiKey.length > 0) {
+    if (params?.apiKey) {
       this.api = useApi({
         serverUrl: params.serverUrl,
         credentials: "include",
@@ -40,7 +42,7 @@ class KoboldcppProvider implements LmProvider {
         credentials: "omit",
       });
     }
-    this.apiKey = params.apiKey;
+    this.apiKey = params.apiKey ?? "";
     this.serverUrl = params.serverUrl;
   }
 
@@ -172,9 +174,9 @@ class KoboldcppProvider implements LmProvider {
         const { done, value } = await eventStream.read()
         if (!done) {
           if (i == 1) {
-            stats.inferenceStarts();
+            const ins = stats.inferenceStarts();
             if (this.onStartEmit) {
-              this.onStartEmit()
+              this.onStartEmit(ins)
             }
           }
           if (this.onToken) {
@@ -209,6 +211,9 @@ class KoboldcppProvider implements LmProvider {
       stats: finalStats,
       serverStats: serverStats,
     };
+    if (this.onEndEmit) {
+      this.onEndEmit(ir)
+    }
     return ir
   }
 

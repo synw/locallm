@@ -1,5 +1,5 @@
 import { useApi } from "restmix";
-import { InferenceParams, InferenceResult, InferenceStats, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
+import { InferenceParams, InferenceResult, InferenceStats, IngestionStats, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
 import { parseJson as parseJsonUtil } from './utils.js';
 import { useStats } from "../stats.js";
 
@@ -7,7 +7,8 @@ class OllamaProvider implements LmProvider {
   name: string;
   api: ReturnType<typeof useApi>;
   onToken?: (t: string) => void;
-  onStartEmit?: (data?: any) => void;
+  onStartEmit?: (data: IngestionStats) => void;
+  onEndEmit?: (result: InferenceResult) => void;
   onError?: (err: string) => void;
   // state
   model: ModelConf = { name: "", ctx: 2048 };
@@ -26,14 +27,15 @@ class OllamaProvider implements LmProvider {
     this.name = params.name;
     this.onToken = params.onToken;
     this.onStartEmit = params.onStartEmit;
+    this.onEndEmit = params.onEndEmit;
     this.onError = params.onError;
-    this.apiKey = params.apiKey;
+    this.apiKey = params.apiKey ?? "";
     this.serverUrl = params.serverUrl;
     this.api = useApi({
       serverUrl: params.serverUrl,
       credentials: "omit",
     });
-    if (params.apiKey.length > 0) {
+    if (params?.apiKey) {
       this.api.addHeader("Authorization", `Bearer ${params.apiKey}`);
     }
   }
@@ -108,12 +110,6 @@ class OllamaProvider implements LmProvider {
         _ctx = 2048;
       }
       const model: ModelConf = { name: name, ctx: _ctx };
-      if (_gpu_layers) {
-        model.gpu_layers = _gpu_layers
-      }
-      if (_num_thread) {
-        model.threads = _num_thread
-      }
       //console.log("MOD", model);
       this.model = model;
     } else {
@@ -154,12 +150,6 @@ class OllamaProvider implements LmProvider {
         num_ctx: this.model.ctx,
       },
       ...params.extra
-    }
-    if (params.threads !== undefined) {
-      inferParams.options.num_thread = params.threads;
-    }
-    if (params.gpu_layers !== undefined) {
-      inferParams.options.gpu_layers = params.gpu_layers;
     }
     if (params.repeat_penalty !== undefined) {
       inferParams.options.repeat_penalty = params.repeat_penalty;
@@ -215,9 +205,9 @@ class OllamaProvider implements LmProvider {
       let i = 1;
       while (true) {
         if (i == 1) {
-          stats.inferenceStarts();
+          const ins = stats.inferenceStarts();
           if (this.onStartEmit) {
-            this.onStartEmit()
+            this.onStartEmit(ins)
           }
         }
         const { done, value } = await reader.read();
@@ -268,6 +258,9 @@ class OllamaProvider implements LmProvider {
       stats: finalStats,
       serverStats: serverStats,
     };
+    if (this.onEndEmit) {
+      this.onEndEmit(ir)
+    }
     return ir
   }
 
