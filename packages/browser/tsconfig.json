@@ -1,0 +1,51 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ES2020",
+    "moduleResolution": "node",
+    "strict": true,
+    "sourceMap": false,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "declaration": true,
+    "allowSyntheticDefaultImports": true,
+    "outDir": "./dist",
+    "allowJs": true,
+    "removeComments": true,
+    "strictFunctionTypes": true,
+    "types": [
+      "node"
+    ],
+    "lib": [
+      "ES2020",
+      "dom"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ],
+      "*": [
+        "src/*",
+        "node_modules/*"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "test"
+  ],
+  "typedocOptions": {
+    "name": "LocalLm types documentation",
+    "readme": "none",
+    "entryPoints": [
+      "src/**/*.ts",
+    ],
+    "out": "../../docs/types",
+  }
+}

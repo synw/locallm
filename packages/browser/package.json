@@ -1,0 +1,41 @@
+{
+  "name": "@locallm/browser",
+  "version": "0.0.1",
+  "description": "Run language models in the browser",
+  "repository": "https://github.com/synw/locallm",
+  "scripts": {
+    "build": "rm -rf dist/* && tsc",
+    "docs": "typedoc --entryPointStrategy expand"
+  },
+  "devDependencies": {
+    "@locallm/types": "^0.1.2",
+    "@types/node": "^22.5.2",
+    "ts-node": "^10.9.2",
+    "tslib": "^2.7.0",
+    "typedoc": "^0.26.6",
+    "typedoc-plugin-markdown": "^4.2.6",
+    "typedoc-plugin-rename-defaults": "^0.7.1",
+    "typescript": "^5.5.4"
+  },
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "module": "./dist/main.js",
+  "types": "./dist/main.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/main.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@locallm/api": "^0.1.1",
+    "@wllama/wllama": "^1.16.0",
+    "restmix": "^0.5.0"
+  }
+}
