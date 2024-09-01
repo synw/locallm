@@ -1,6 +1,5 @@
 import { useApi } from "restmix";
 import { InferenceParams, InferenceResult, LmDefaults, LmParams, LmProvider, LmProviderType, ModelConf } from "@locallm/types";
-//import { InferenceParams, InferenceResult, LmDefaults, LmParams, LmProvider, LmProviderType, ModelConf } from "@/packages/types/interfaces.js";
 import { KoboldcppProvider } from './providers/koboldcpp.js';
 import { OllamaProvider } from "./providers/ollama.js";
 import { LlamacppProvider } from "./providers/llamacpp.js";

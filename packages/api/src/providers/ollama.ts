@@ -1,11 +1,7 @@
 import { useApi } from "restmix";
-import { type ParsedEvent } from 'eventsource-parser'
-// @ts-ignore
-import { EventSourceParserStream } from 'eventsource-parser/stream';
 import { InferenceParams, InferenceResult, InferenceStats, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
-//import { InferenceParams, InferenceResult, LmProvider, LmProviderParams, ModelConf } from "@/packages/types/interfaces.js";
 import { parseJson as parseJsonUtil } from './utils.js';
-import { useStats } from "@/stats.js";
+import { useStats } from "../stats.js";
 
 class OllamaProvider implements LmProvider {
   name: string;
