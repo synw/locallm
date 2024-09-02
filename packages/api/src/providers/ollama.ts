@@ -43,7 +43,6 @@ class OllamaProvider implements LmProvider {
   /**
    * Load the models list
    *
-   * @async
    * @returns {Promise<void>}
    */
   async modelsInfo(): Promise<void> {
@@ -70,7 +69,6 @@ class OllamaProvider implements LmProvider {
    * Loads a specified model for inferences. Note: it will query the server
    * and retrieve current model info (name and ctx).
    *
-   * @async
    * @param {string} name - The name of the model to load.
    * @param {number | undefined} [ctx] - The optional context window length, defaults to the model ctx.
    * @param {string | undefined} [threads] - The number of threads to use for inference.
@@ -120,7 +118,6 @@ class OllamaProvider implements LmProvider {
   /**
    * Makes an inference based on the provided prompt and parameters.
    *
-   * @async
    * @param {string} prompt - The input text to base the inference on.
    * @param {InferenceParams} params - Parameters for customizing the inference behavior.
    * @returns {Promise<InferenceResult>} - The result of the inference.
@@ -267,7 +264,6 @@ class OllamaProvider implements LmProvider {
   /**
    * Aborts a currently running inference task.
    *
-   * @async
    * @returns {Promise<void>}
    */
   async abort(): Promise<void> {

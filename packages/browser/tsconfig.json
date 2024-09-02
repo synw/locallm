@@ -41,11 +41,11 @@
     "test"
   ],
   "typedocOptions": {
-    "name": "LocalLm types documentation",
+    "name": "LocalLm browser module documentation",
     "readme": "none",
     "entryPoints": [
       "src/**/*.ts",
     ],
-    "out": "../../docs/types",
+    "out": "../../docs/browser",
   }
 }

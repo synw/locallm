@@ -50,7 +50,6 @@ class WllamaProvider implements LmProvider {
     /**
    * Not implemented for this provider
    *
-   * @async
    * @returns {Promise<void>}
    */
     async modelsInfo(): Promise<void> {
@@ -85,7 +84,6 @@ class WllamaProvider implements LmProvider {
     /**
  * Makes an inference based on the provided prompt and parameters.
  *
- * @async
  * @param {string} prompt - The input text to base the inference on.
  * @param {InferenceParams} params - Parameters for customizing the inference behavior.
  * @returns {Promise<InferenceResult>} - The result of the inference.
@@ -180,7 +178,6 @@ class WllamaProvider implements LmProvider {
     /**
  * Aborts a currently running inference task.
  *
- * @async
  * @returns {Promise<void>}
  */
     async abort(): Promise<void> {
