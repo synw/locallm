@@ -1,10 +1,10 @@
 {
   "name": "@locallm/browser",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Run language models in the browser",
   "repository": "https://github.com/synw/locallm",
   "scripts": {
-    "build": "rm -rf dist/* && tsc",
+    "build": "rm -rf dist/* && rollup -c",
     "docs": "typedoc --entryPointStrategy expand"
   },
   "devDependencies": {
@@ -15,6 +15,10 @@
     "typedoc": "^0.26.6",
     "typedoc-plugin-markdown": "^4.2.6",
     "typedoc-plugin-rename-defaults": "^0.7.1",
+    "rollup": "^4.21.2",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.6",
     "typescript": "^5.5.4"
   },
   "type": "module",
