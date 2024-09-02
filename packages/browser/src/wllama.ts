@@ -1,7 +1,7 @@
 import { useApi } from 'restmix';
-import { InferenceParams, InferenceResult, IngestionStats, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
+import { InferenceParams, InferenceResult, IngestionStats, LmProvider, LmProviderParams, LmProviderType, ModelConf } from "@locallm/types";
 import { parseJson as parseJsonUtil, useStats } from '@locallm/api';
-import { ChatCompletionOptions, SamplingConfig, Wllama } from '@wllama/wllama';
+import { ChatCompletionOptions, SamplingConfig, Wllama } from '@wllama/wllama/esm/wllama';
 import { BasicOnLoadProgress, LmBrowserProviderParams, OnLoadProgress } from './interfaces';
 
 const CONFIG_PATHS = {
@@ -20,6 +20,7 @@ class WllamaProvider implements LmProvider {
     onStartEmit?: (data: IngestionStats) => void;
     onEndEmit?: (result: InferenceResult) => void;
     onError?: (err: string) => void;
+    providerType: LmProviderType = "browser";
     // state
     model: ModelConf = { name: "", ctx: 2048 };
     models = new Array<ModelConf>();

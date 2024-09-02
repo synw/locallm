@@ -231,9 +231,9 @@ interface ModelState {
  * Represents the type of LM provider.
  *
  * @typedef LmProviderType
- * @type {"llamacpp" | "koboldcpp" | "ollama"}
+ * @type {"llamacpp" | "koboldcpp" | "ollama" | "browser"}
  */
-type LmProviderType = "llamacpp" | "koboldcpp" | "ollama";
+type LmProviderType = "llamacpp" | "koboldcpp" | "ollama" | "browser";
 
 export {
   ModelConf,
