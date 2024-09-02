@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import pkg from 'ervy';
-import { Lm } from "../dist/main.es.js";
+import { Lm } from "../packages/api/dist/main.es.js";
 const { bar, bg } = pkg;
 
 const model = "mistral:instruct";

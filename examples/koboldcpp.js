@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { Lm } from "../dist/main.es.js";
+import { Lm } from "../packages/api/dist/main.es.js";
 
 const template = "[INST] {prompt} [/INST]";
 

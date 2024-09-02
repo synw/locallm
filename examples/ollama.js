@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { Lm } from "../dist/main.es.js";
+import { Lm } from "../packages/api/dist/main.es.js";
 
 const model = "mistral:instruct";
 const template = "[INST] {prompt} [/INST]";
@@ -22,7 +22,7 @@ async function main() {
   const res = await lm.infer(_prompt, {
     stream: true,
     temperature: 0.1,
-    max_tokens: 2000,
+    max_tokens: 1024,
     extra: {
       format: "json"
     }
