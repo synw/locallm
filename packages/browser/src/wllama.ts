@@ -58,10 +58,10 @@ class WllamaProvider implements LmProvider {
     }
 
     async info(): Promise<Record<string, any>> {
-        if (wllama.isModelLoaded()) {
-            console.log(wllama.getModelMetadata())
+        if (!wllama.isModelLoaded()) {
+            throw new Error("The model is not loaded");
         }
-        return {}
+        return wllama.getModelMetadata()
     }
 
     async loadModel(name: string, ctx?: number, threads?: number, gpu_layers?: number): Promise<void> {
@@ -71,7 +71,7 @@ class WllamaProvider implements LmProvider {
     async loadBrowsermodel(name: string, urls: string | string[], ctx: number, onLoadProgress: OnLoadProgress) {
         const progressCallback: BasicOnLoadProgress = (p) => {
             const progressPercentage = Math.round((p.loaded / p.total) * 100);
-            const data = { ...p, percent: progressPercentage }
+            const data = { ...p, percent: progressPercentage };
             onLoadProgress(data);
         };
         await wllama.loadModelFromUrl(urls, {
