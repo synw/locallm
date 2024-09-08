@@ -54,7 +54,10 @@ class OllamaProvider implements LmProvider {
           size: m.details.parameter_size,
           quant: m.details.quantization_level,
         }
-        this.models.push({ name: m.name, ctx: -1, info: info });
+        const exists = this.models.find(x => x.name === m.name) !== undefined;
+        if (!exists) {
+          this.models.push({ name: m.name, ctx: -1, info: info });
+        }
       }
     } else {
       throw new Error(`Error ${res.status} loading models ${res.text}`);
