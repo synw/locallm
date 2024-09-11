@@ -74,17 +74,12 @@ class OllamaProvider implements LmProvider {
    *
    * @param {string} name - The name of the model to load.
    * @param {number | undefined} [ctx] - The optional context window length, defaults to the model ctx.
-   * @param {string | undefined} [threads] - The number of threads to use for inference.
-   * @param {gpu_layers | undefined} [gpu_layers] - The number of layers to offload to the GPU
    * @returns {Promise<void>}
    */
-  async loadModel(name: string, ctx?: number, threads?: number, gpu_layers?: number): Promise<void> {
-    //this.model = loadModelFromConf(name, this.models, ctx, template)
+  async loadModel(name: string, ctx?: number): Promise<void> {
     const res = await this.api.post<Record<string, any>>("/api/show", { name: name });
     if (res.ok) {
-      let _ctx = ctx ?? 0;
-      let _gpu_layers = gpu_layers;
-      let _num_thread = threads;
+      let _ctx = ctx ?? -1;
       //console.log("RES", res.data);
       if ("parameters" in res.data) {
         for (const line of res.data["parameters"].split("\n")) {
@@ -94,24 +89,9 @@ class OllamaProvider implements LmProvider {
               _ctx = parseInt(line.replace(/\D/g, ""));
             }
           }
-          if (line.startsWith("num_gpu")) {
-            if (!gpu_layers) {
-              _gpu_layers = parseInt(line.replace(/\D/g, ""));
-            }
-          }
-          if (line.startsWith("num_thread")) {
-            if (!threads) {
-              _num_thread = parseInt(line.replace(/\D/g, ""));
-            }
-          }
         }
       }
-      if (_ctx == 0) {
-        console.log("Context window size not available from Modelfile, using 2048");
-        _ctx = 2048;
-      }
       const model: ModelConf = { name: name, ctx: _ctx };
-      //console.log("MOD", model);
       this.model = model;
     } else {
       throw new Error(`Error ${res.status} loading models ${res.text}`);
