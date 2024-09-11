@@ -53,14 +53,12 @@ Example of in browser inference with Qween 2 0.5b:
 ```html
 <div id="output"></div>
 <script src="https://unpkg.com/modprompt@0.7.7/dist/mod.min.js"></script>
-<script src="https://unpkg.com/@locallm/browser@0.0.5/dist/main.min.js"></script>
-<script>
-    const out = document.getElementById('output');
-    const lm = $lm.WllamaProvider.init({
-        onToken: (t) => { out.innerText = t },
-        onStartEmit: () => {
+<script type="module">
+    import { WllamaProvider } from "https://unpkg.com/@locallm/browser@0.0.6/dist/main.js";
 
-        }
+    const out = document.getElementById('output');
+    const lm = WllamaProvider.init({
+        onToken: (t) => { out.innerText = t },
     });
     const model = {
         name: "Qween 0.5b",
