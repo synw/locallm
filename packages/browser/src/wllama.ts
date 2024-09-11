@@ -48,12 +48,28 @@ class WllamaProvider implements LmProvider {
     }
 
     /**
-   * Not implemented for this provider
-   *
-   * @returns {Promise<void>}
-   */
+    * Set the available models from the browser cache
+    *
+    * @returns {Promise<void>}
+    */
     async modelsInfo(): Promise<void> {
-        console.warn("Not implemented for this provider")
+        const cachedFiles = (await wllama.cacheManager.list()).filter((m) => {
+            return m.size === m.metadata.originalSize;
+        });
+        const cachedURLs = new Set(cachedFiles.map((e) => e.metadata.originalURL));
+        const models = new Set<ModelConf>();
+        cachedURLs.forEach((u) => {
+            const name = u
+                .split('/')
+                .pop()
+                ?.replace(/-\d{5}-of-\d{5}/, '')
+                .replace('.gguf', '') ?? '(unknown)';
+            models.add({
+                name: name,
+                ctx: -1
+            })
+        })
+        this.models = Array.from(models);
     }
 
     async info(): Promise<Record<string, any>> {
@@ -63,7 +79,7 @@ class WllamaProvider implements LmProvider {
         return wllama.getModelMetadata()
     }
 
-    async loadModel(name: string, ctx?: number, threads?: number, gpu_layers?: number): Promise<void> {
+    async loadModel(name: string, ctx?: number): Promise<void> {
         throw new Error("Not implemented for this provider: use loadBrowserModel");
     }
 
