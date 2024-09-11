@@ -1,17 +1,14 @@
 import { useApi } from 'restmix';
 import { InferenceParams, InferenceResult, IngestionStats, LmProvider, LmProviderParams, LmProviderType, ModelConf } from "@locallm/types";
 import { parseJson as parseJsonUtil, useStats } from '@locallm/api';
-import { ChatCompletionOptions, SamplingConfig, Wllama } from '@wllama/wllama/esm/wllama';
+import { AssetsPathConfig, ChatCompletionOptions, SamplingConfig, Wllama } from '@wllama/wllama';
 import { BasicOnLoadProgress, LmBrowserProviderParams, OnLoadProgress } from './interfaces';
 
-const CONFIG_PATHS = {
-    'single-thread/wllama.js': './esm/single-thread/wllama.js',
-    'single-thread/wllama.wasm': './esm/single-thread/wllama.wasm',
-    'multi-thread/wllama.js': './esm/multi-thread/wllama.js',
-    'multi-thread/wllama.wasm': './esm/multi-thread/wllama.wasm',
-    'multi-thread/wllama.worker.mjs': './esm/multi-thread/wllama.worker.mjs',
-};
-const wllama = new Wllama(CONFIG_PATHS);
+const wllamaSingleJS = 'single-thread/wllama.js';
+const wllamaSingle = 'single-thread/wllama.wasm';
+const wllamaMultiJS = 'multi-thread/wllama.js';
+const wllamaMulti = 'multi-thread/wllama.wasm';
+const wllamaMultiWorker = 'multi-thread/wllama.worker.mjs';
 
 class WllamaProvider implements LmProvider {
     name: string;
@@ -29,6 +26,13 @@ class WllamaProvider implements LmProvider {
     serverUrl: string;
     // state
     abortInference = false;
+    wllama = new Wllama({
+        'single-thread/wllama.js': "/esm/" + wllamaSingleJS,
+        'single-thread/wllama.wasm': "/esm/" + wllamaSingle,
+        'multi-thread/wllama.js': "/esm/" + wllamaMultiJS,
+        'multi-thread/wllama.wasm': "/esm/" + wllamaMulti,
+        'multi-thread/wllama.worker.mjs': "/esm/" + wllamaMultiWorker,
+    });
 
     constructor(params: LmProviderParams) {
         this.name = params.name;
@@ -39,12 +43,26 @@ class WllamaProvider implements LmProvider {
         this.serverUrl = params.serverUrl;
     }
 
-    static init(params: LmBrowserProviderParams): WllamaProvider {
-        return new WllamaProvider({
+    static init(params: LmBrowserProviderParams, config: string | AssetsPathConfig = "/esm/"): WllamaProvider {
+        let conf: AssetsPathConfig;
+        if (typeof config == "string") {
+            conf = {
+                'single-thread/wllama.js': config + wllamaSingleJS,
+                'single-thread/wllama.wasm': config + wllamaSingle,
+                'multi-thread/wllama.js': config + wllamaMultiJS,
+                'multi-thread/wllama.wasm': config + wllamaMulti,
+                'multi-thread/wllama.worker.mjs': config + wllamaMultiWorker,
+            };
+        } else {
+            conf = config
+        }
+        const provider = new WllamaProvider({
             serverUrl: "",
             apiKey: "",
             ...params,
-        })
+        });
+        provider.wllama = new Wllama(conf);
+        return provider
     }
 
     /**
@@ -53,7 +71,7 @@ class WllamaProvider implements LmProvider {
     * @returns {Promise<void>}
     */
     async modelsInfo(): Promise<void> {
-        const cachedFiles = (await wllama.cacheManager.list()).filter((m) => {
+        const cachedFiles = (await this.wllama.cacheManager.list()).filter((m) => {
             return m.size === m.metadata.originalSize;
         });
         const cachedURLs = new Set(cachedFiles.map((e) => e.metadata.originalURL));
@@ -73,10 +91,10 @@ class WllamaProvider implements LmProvider {
     }
 
     async info(): Promise<Record<string, any>> {
-        if (!wllama.isModelLoaded()) {
+        if (!this.wllama.isModelLoaded()) {
             throw new Error("The model is not loaded");
         }
-        return wllama.getModelMetadata()
+        return this.wllama.getModelMetadata()
     }
 
     async loadModel(name: string, ctx?: number): Promise<void> {
@@ -89,7 +107,7 @@ class WllamaProvider implements LmProvider {
             const data = { ...p, percent: progressPercentage };
             onLoadProgress(data);
         };
-        await wllama.loadModelFromUrl(urls, {
+        await this.wllama.loadModelFromUrl(urls, {
             progressCallback: progressCallback,
             n_ctx: ctx,
         });
@@ -110,7 +128,7 @@ class WllamaProvider implements LmProvider {
         parseJson = false,
         parseJsonFunc?: (data: string) => Record<string, any>
     ): Promise<InferenceResult> {
-        if (!wllama.isModelLoaded()) {
+        if (!this.wllama.isModelLoaded()) {
             throw new Error("No model loaded")
         }
         this.abortInference = false;
@@ -127,7 +145,7 @@ class WllamaProvider implements LmProvider {
         if ("stop" in params) {
             let st = new Array<number>();
             for (const t of (params?.stop ?? [])) {
-                st = [...st, ...(await wllama.tokenize(t))]
+                st = [...st, ...(await this.wllama.tokenize(t))]
             }
             options.stopTokens = st;
         }
@@ -174,7 +192,7 @@ class WllamaProvider implements LmProvider {
         const stats = useStats();
         stats.start();
         console.log(_prompt);
-        const txt = await wllama.createCompletion(_prompt, options);
+        const txt = await this.wllama.createCompletion(_prompt, options);
         const finalStats = stats.inferenceEnds(i);
         let data: Record<string, any> = {};
         if (parseJson) {
