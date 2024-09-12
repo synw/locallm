@@ -107,6 +107,7 @@ class WllamaProvider implements LmProvider {
             const data = { ...p, percent: progressPercentage };
             onLoadProgress(data);
         };
+        await this.wllama.exit();
         await this.wllama.loadModelFromUrl(urls, {
             progressCallback: progressCallback,
             n_ctx: ctx,
