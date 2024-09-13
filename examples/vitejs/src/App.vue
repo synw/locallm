@@ -25,7 +25,7 @@ const onModelLoading = (st) => {
 }
 
 async function init() {
-  await lm.loadBrowsermodel(model.name, model.url, model.ctx, onModelLoading);
+  await lm.loadModel(model.name, model.ctx, model.url, onModelLoading);
   const p = new PromptTemplate("chatml")
     .replaceSystem("You are an AI assistant. Important: always use json to respond")
     .prompt("List the planets of the solar system.")
