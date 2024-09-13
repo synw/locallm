@@ -46,50 +46,6 @@ const res = await lm.infer(_prompt, {
 console.log(res);
 ```
 
-## In browser inference
-
-Example of in browser inference with Qween 2 0.5b:
-
-```html
-<div id="output"></div>
-<script src="https://unpkg.com/modprompt@0.7.7/dist/mod.min.js"></script>
-<script type="module">
-    import { WllamaProvider } from "https://unpkg.com/@locallm/browser@0.0.6/dist/main.js";
-
-    const out = document.getElementById('output');
-    const lm = WllamaProvider.init({
-        onToken: (t) => { out.innerText = t },
-    });
-    const model = {
-        name: "Qween 0.5b",
-        url: "https://huggingface.co/Qwen/Qwen2-0.5B-Instruct-GGUF/resolve/main/qwen2-0_5b-instruct-q5_k_m.gguf",
-        ctx: 32768,
-    }
-
-    const onModelLoading = (st) => {
-        const msg = "Model downloading: " + st.percent + " %";
-        console.log(msg);
-        out.innerText = msg;
-        if (st.percent == 100) {
-            out.innerText = "Loading model into memory ..."
-        }
-    }
-
-    lm.loadBrowsermodel(model.name, model.url, model.ctx, onModelLoading).then(() => {
-        out.innerText = "Ingesting prompt ...";
-        const p = new $tpl.PromptTemplate("chatml")
-            .replaceSystem("You are an AI assistant")
-            .prompt("List the orbital periods of the planets of the solar system.")
-        lm.infer(
-            p,
-            { temperature: 0, min_p: 0.05 }
-        ).then((res) => {
-            console.log("Stats", res.stats)
-        });
-    });
-</script>
-```
-
 ## Examples
 
 Check the [examples](packages/api/examples) directory for more examples
