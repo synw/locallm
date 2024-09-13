@@ -100,6 +100,18 @@ interface InferenceResult {
   serverStats: Record<string, any>;
 }
 
+interface OnLoadProgressBasic {
+  total: number;
+  loaded: number;
+}
+
+interface OnLoadProgressFull extends OnLoadProgressBasic {
+  percent: number;
+}
+
+type OnLoadProgress = (data: OnLoadProgressFull) => void;
+type BasicOnLoadProgress = (data: OnLoadProgressBasic) => void;
+
 /**
  * Defines the structure and behavior of an LM Provider.
  *
@@ -130,7 +142,7 @@ interface LmProvider {
   models: Array<ModelConf>;
   info: () => Promise<Record<string, any>>;
   modelsInfo: () => Promise<void>;
-  loadModel: (name: string, ctx?: number) => Promise<void>;
+  loadModel: (name: string, ctx?: number, urls?: string | string[], onLoadProgress?: OnLoadProgress) => Promise<void>;
   infer: (prompt: string, params: InferenceParams, parseJson?: boolean, parseJsonFunc?: (data: string) => Record<string, any>) => Promise<InferenceResult>;
   abort: () => Promise<void>;
   onToken?: (t: string) => void;
@@ -236,6 +248,10 @@ interface ModelState {
 type LmProviderType = "llamacpp" | "koboldcpp" | "ollama" | "browser";
 
 export {
+  OnLoadProgress,
+  OnLoadProgressBasic,
+  OnLoadProgressFull,
+  BasicOnLoadProgress,
   ModelConf,
   InferenceParams,
   InferenceResult,

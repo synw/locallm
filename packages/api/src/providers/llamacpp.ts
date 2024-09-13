@@ -1,7 +1,7 @@
 import { useApi } from 'restmix';
 import { type ParsedEvent } from 'eventsource-parser';
 import { EventSourceParserStream } from 'eventsource-parser/stream';
-import { InferenceParams, InferenceResult, InferenceStats, IngestionStats, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
+import { InferenceParams, InferenceResult, InferenceStats, IngestionStats, LmProvider, LmProviderParams, ModelConf, OnLoadProgress } from "@locallm/types";
 import { parseJson as parseJsonUtil } from './utils.js';
 import { useStats } from '../stats.js';
 
@@ -71,11 +71,9 @@ class LlamacppProvider implements LmProvider {
    *
    * @param {string} name - The name of the model to load.
    * @param {number | undefined} [ctx] - The optional context window length, defaults to the model ctx.
-   * @param {string | undefined} [threads] - The number of threads to use for inference.
-   * @param {gpu_layers | undefined} [gpu_layers] - The number of layers to offload to the GPU
    * @returns {Promise<void>}
    */
-  async loadModel(name: string, ctx?: number, threads?: number, gpu_layers?: number): Promise<void> {
+  async loadModel(name: string, ctx?: number, urls?: string | string[], onLoadProgress?: OnLoadProgress): Promise<void> {
     throw new Error("Not implemented for this provider");
   }
 

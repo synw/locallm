@@ -1,5 +1,5 @@
 import { useApi } from "restmix";
-import { InferenceParams, InferenceResult, InferenceStats, IngestionStats, LmProvider, LmProviderParams, ModelConf } from "@locallm/types";
+import { InferenceParams, InferenceResult, InferenceStats, IngestionStats, LmProvider, LmProviderParams, ModelConf, OnLoadProgress } from "@locallm/types";
 import { parseJson as parseJsonUtil } from './utils.js';
 import { useStats } from "../stats.js";
 
@@ -76,7 +76,7 @@ class OllamaProvider implements LmProvider {
    * @param {number | undefined} [ctx] - The optional context window length, defaults to the model ctx.
    * @returns {Promise<void>}
    */
-  async loadModel(name: string, ctx?: number): Promise<void> {
+  async loadModel(name: string, ctx?: number, urls?: string | string[], onLoadProgress?: OnLoadProgress): Promise<void> {
     const res = await this.api.post<Record<string, any>>("/api/show", { name: name });
     if (res.ok) {
       let _ctx = ctx ?? -1;

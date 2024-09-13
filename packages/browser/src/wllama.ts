@@ -1,8 +1,8 @@
 import { useApi } from 'restmix';
-import { InferenceParams, InferenceResult, IngestionStats, LmProvider, LmProviderParams, LmProviderType, ModelConf } from "@locallm/types";
+import { InferenceParams, InferenceResult, IngestionStats, LmProvider, LmProviderParams, LmProviderType, ModelConf, OnLoadProgress, BasicOnLoadProgress, } from "@locallm/types";
 import { parseJson as parseJsonUtil, useStats } from '@locallm/api';
 import { AssetsPathConfig, ChatCompletionOptions, SamplingConfig, Wllama } from '@wllama/wllama/esm/wllama';
-import { BasicOnLoadProgress, LmBrowserProviderParams, OnLoadProgress } from './interfaces';
+import { LmBrowserProviderParams } from './interfaces';
 
 const wllamaSingleJS = 'single-thread/wllama.js';
 const wllamaSingle = 'single-thread/wllama.wasm';
@@ -97,23 +97,24 @@ class WllamaProvider implements LmProvider {
         return this.wllama.getModelMetadata()
     }
 
-    async loadModel(name: string, ctx?: number): Promise<void> {
-        throw new Error("Not implemented for this provider: use loadBrowserModel");
-    }
-
-    async loadBrowsermodel(name: string, urls: string | string[], ctx: number, onLoadProgress: OnLoadProgress) {
+    async loadModel(name: string, ctx?: number, urls?: string | string[], onLoadProgress?: OnLoadProgress) {
+        if (!urls) {
+            throw new Error("Provide urls to load a browser models")
+        }
         const progressCallback: BasicOnLoadProgress = (p) => {
             const progressPercentage = Math.round((p.loaded / p.total) * 100);
             const data = { ...p, percent: progressPercentage };
-            onLoadProgress(data);
+            if (onLoadProgress) {
+                onLoadProgress(data);
+            }
         };
-        await this.wllama.exit();
+        //await this.wllama.exit();
         await this.wllama.loadModelFromUrl(urls, {
             progressCallback: progressCallback,
             n_ctx: ctx,
         });
         this.model.name = name;
-        this.model.ctx = ctx;
+        this.model.ctx = ctx ?? -1;
     }
 
     /**
