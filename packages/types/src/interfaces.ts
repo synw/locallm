@@ -7,11 +7,13 @@ import { useApi } from "restmix";
  * @property {string} name - The unique name of the model.
  * @property {number | undefined} ctx - The context window length, typically used to define how much of the previous data to consider.
  * @property {number | undefined} info - Some meta info about the model: parameter size and quantization level
+ * @property {Record<string, any> | undefined} extra - Extra parameters like urls for browser models
  */
 interface ModelConf {
   name: string;
   ctx: number;
   info?: { size: string, quant: string };
+  extra?: Record<string, any>;
 }
 
 /**

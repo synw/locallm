@@ -1,6 +1,6 @@
 {
   "name": "@locallm/browser",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Run language models in the browser",
   "repository": "https://github.com/synw/locallm",
   "scripts": {
@@ -14,7 +14,7 @@
     "vite": "^5.4.4"
   },
   "devDependencies": {
-    "@locallm/types": "^0.1.4",
+    "@locallm/types": "^0.1.5",
     "@types/node": "^22.5.4",
     "tslib": "^2.7.0",
     "typedoc": "^0.26.7",

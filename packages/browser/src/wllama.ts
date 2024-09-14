@@ -108,13 +108,13 @@ class WllamaProvider implements LmProvider {
                 onLoadProgress(data);
             }
         };
-        //await this.wllama.exit();
         await this.wllama.loadModelFromUrl(urls, {
             progressCallback: progressCallback,
-            n_ctx: ctx,
+            n_ctx: ctx ?? -1,
         });
         this.model.name = name;
         this.model.ctx = ctx ?? -1;
+        this.model.extra = { urls: urls };
     }
 
     /**
