@@ -1,8 +1,8 @@
 import { useApi } from 'restmix';
 import { InferenceParams, InferenceResult, IngestionStats, LmProvider, LmProviderParams, LmProviderType, ModelConf, OnLoadProgress, BasicOnLoadProgress, } from "@locallm/types";
 import { parseJson as parseJsonUtil, useStats } from '@locallm/api';
-import { AssetsPathConfig, ChatCompletionOptions, SamplingConfig, Wllama } from '@wllama/wllama/esm/wllama';
-import { LmBrowserProviderParams } from './interfaces';
+import { AssetsPathConfig, ChatCompletionOptions, SamplingConfig, Wllama } from '@wllama/wllama/esm/wllama.js';
+import { LmBrowserProviderParams } from './interfaces.js';
 
 const wllamaSingleJS = 'single-thread/wllama.js';
 const wllamaSingle = 'single-thread/wllama.wasm';

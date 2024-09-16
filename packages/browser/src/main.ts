@@ -1,7 +1,7 @@
 import {
     LmBrowserProviderParams,
-} from "./interfaces";
-import { WllamaProvider } from "./wllama";
+} from "./interfaces.js";
+import { WllamaProvider } from "./wllama.js";
 
 export {
     WllamaProvider,
