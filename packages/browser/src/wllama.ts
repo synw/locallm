@@ -39,6 +39,7 @@ class WllamaProvider implements LmProvider {
         this.onToken = params.onToken;
         this.onStartEmit = params.onStartEmit;
         this.onError = params.onError;
+        this.onEndEmit = params.onEndEmit;
         this.apiKey = params.apiKey ?? "";
         this.serverUrl = params.serverUrl;
     }

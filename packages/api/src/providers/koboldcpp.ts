@@ -65,7 +65,7 @@ class KoboldcppProvider implements LmProvider {
     // load model name
     const res2 = await this.api.get<{ result: string }>("/api/v1/model");
     if (res2.ok) {
-      this.model.name = res2.data.result
+      this.model.name = res2.data.result.replace("koboldcpp/", "")
     }
     return this.model
   }

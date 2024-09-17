@@ -1,6 +1,6 @@
 {
   "name": "@locallm/browser",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Run language models in the browser",
   "repository": "https://github.com/synw/locallm",
   "scripts": {
@@ -8,14 +8,14 @@
     "docs": "typedoc --entryPointStrategy expand"
   },
   "dependencies": {
-    "@locallm/api": "^0.1.5",
+    "@locallm/api": "^0.1.6",
     "@wllama/wllama": "^1.16.1",
     "restmix": "^0.5.0",
-    "vite": "^5.4.4"
+    "vite": "^5.4.5"
   },
   "devDependencies": {
     "@locallm/types": "^0.1.5",
-    "@types/node": "^22.5.4",
+    "@types/node": "^22.5.5",
     "tslib": "^2.7.0",
     "typedoc": "^0.26.7",
     "typedoc-plugin-markdown": "^4.2.7",

@@ -6,10 +6,6 @@ export default {
   input: 'src/main.ts',
   output: [
     {
-      file: 'dist/main.es.js',
-      format: 'esm',
-    },
-    {
       file: 'dist/main.min.js',
       format: 'iife',
       name: '$lmq',
