@@ -177,6 +177,7 @@ class WllamaProvider implements LmProvider {
             samplingOptions = { ...samplingOptions, ...params.extra }
         }
         let i = 1;
+        const decoder = new TextDecoder('utf-8');
         options.onNewToken = (token, piece, currentText, { abortSignal }) => {
             if (i == 1) {
                 const ins = stats.inferenceStarts();
@@ -185,7 +186,8 @@ class WllamaProvider implements LmProvider {
                 }
             }
             if (this.onToken) {
-                this.onToken(currentText);
+                const t = decoder.decode(piece);
+                this.onToken(t);
             }
             if (this.abortInference) {
                 abortSignal()

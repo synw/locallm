@@ -1,6 +1,6 @@
 {
   "name": "@locallm/browser",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Run language models in the browser",
   "repository": "https://github.com/synw/locallm",
   "scripts": {
