@@ -11,7 +11,7 @@ import { PromptTemplate } from "modprompt";
 
 const output = ref("");
 const lm = WllamaProvider.init({
-  onToken: (t) => { output.value = t },
+  onToken: (t) => { output.value += t },
 } as LmBrowserProviderParams,
   wllamaConf);
 const model = {

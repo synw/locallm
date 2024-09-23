@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@locallm/api": "^0.1.7",
     "@wllama/wllama": "^1.16.1",
     "modprompt": "^0.7.7",
     "vue": "^3.4.37"
