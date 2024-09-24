@@ -176,6 +176,7 @@ class WllamaProvider implements LmProvider {
         if ("extra" in params) {
             samplingOptions = { ...samplingOptions, ...params.extra }
         }
+        options.sampling = samplingOptions;
         let i = 1;
         const decoder = new TextDecoder('utf-8');
         options.onNewToken = (token, piece, currentText, { abortSignal }) => {
@@ -196,7 +197,7 @@ class WllamaProvider implements LmProvider {
         };
         const stats = useStats();
         stats.start();
-        console.log(_prompt);
+        //console.log(_prompt);
         const txt = await this.wllama.createCompletion(_prompt, options);
         const finalStats = stats.inferenceEnds(i);
         let data: Record<string, any> = {};
