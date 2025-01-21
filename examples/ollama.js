@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { Lm } from "../packages/api/dist/main.es.js";
+import { Lm } from "../packages/api/dist/main.js";
 
 const model = "mistral:instruct";
 const template = "[INST] {prompt} [/INST]";

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { compile, serializeGrammar } from "@intrinsicai/gbnfgen";
-import { Lm } from "../packages/api/dist/main.es.js";
+import { Lm } from "../packages/api/dist/main.js";
 
 const rawInfo = `Nom commercial
 ENEDIS
