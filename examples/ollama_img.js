@@ -7,8 +7,47 @@ const template = new PromptTemplate("chatml");
 const _prompt = "Describe the image in details";
 const _imageUrl = "https://loremflickr.com/320/240?random=1"
 
-async function convertImagePathToBase64(imageUrl) {
-
+async function convertImagePathToBase64(imagePath) {
+  // Validate file path format
+  const pathRegex = /^\/?[^\s]+$/;
+  if (!pathRegex.test(imagePath)) {
+    throw new Error('Invalid image path provided');
+  }
+  let mimeType;
+  return new Promise((resolve, reject) => {
+    const fs = require('fs');
+    const path = require('path');
+    fs.readFile(imagePath, (err, data) => {
+      if (err) {
+        reject(new Error(`Failed to read image file: ${err.message}`));
+      } else {
+        // Determine MIME type based on file extension
+        const ext = path.extname(imagePath).toLowerCase();
+        switch (ext) {
+          case '.png':
+            mimeType = 'image/png';
+            break;
+          case '.jpg':
+          case '.jpeg':
+            mimeType = 'image/jpeg';
+            break;
+          case '.gif':
+            mimeType = 'image/gif';
+            break;
+          case '.bmp':
+            mimeType = 'image/bmp';
+            break;
+          case '.webp':
+            mimeType = 'image/webp';
+            break;
+          default:
+            mimeType = 'image/jpeg'; // Default to JPEG if unknown
+        }
+        const base64String = data.toString('base64');
+        resolve(`data:${mimeType};base64,${base64String}`);
+      }
+    });
+  });
 }
 
 async function convertImageUrlToBase64(imageUrl) {
