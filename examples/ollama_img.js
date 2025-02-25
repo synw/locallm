@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 import { Lm } from "../packages/api/dist/main.js";
 import { PromptTemplate } from "modprompt";
+import fs from 'fs';
+import path from 'path';
 
 const model = "minicpm-v:8b-2.6-q8_0";
 const template = new PromptTemplate("chatml");
@@ -15,8 +17,6 @@ async function convertImagePathToBase64(imagePath) {
   }
   let mimeType;
   return new Promise((resolve, reject) => {
-    const fs = require('fs');
-    const path = require('path');
     fs.readFile(imagePath, (err, data) => {
       if (err) {
         reject(new Error(`Failed to read image file: ${err.message}`));
