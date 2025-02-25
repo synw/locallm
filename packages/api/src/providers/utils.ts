@@ -12,30 +12,9 @@ function parseJson(data: string, parseFunc?: (data: string) => Record<string, an
   return res
 }
 
-async function convertImageDataToBase64(imageData: Buffer, extension: string): Promise<string> {
-  let mimeType: string;
-  switch (extension) {
-    case '.png':
-      mimeType = 'image/png';
-      break;
-    case '.jpg':
-    case '.jpeg':
-      mimeType = 'image/jpeg';
-      break;
-    case '.gif':
-      mimeType = 'image/gif';
-      break;
-    case '.bmp':
-      mimeType = 'image/bmp';
-      break;
-    case '.webp':
-      mimeType = 'image/webp';
-      break;
-    default:
-      mimeType = 'image/jpeg'; // Default to JPEG if unknown
-  }
+async function convertImageDataToBase64(imageData: Buffer): Promise<string> {
   const base64String = imageData.toString('base64');
-  return `data:${mimeType};base64,${base64String}`;
+  return base64String;
 }
 
 async function convertImageUrlToBase64(imageUrl: string): Promise<string> {
@@ -61,7 +40,7 @@ async function convertImageUrlToBase64(imageUrl: string): Promise<string> {
     })
     .then(buffer => {
       const base64String = Buffer.from(buffer).toString('base64');
-      return `data:${mimeType};base64,${base64String}`;
+      return base64String;
     })
     .catch(error => {
       throw new Error(`Failed to fetch image: ${error.message}`);
