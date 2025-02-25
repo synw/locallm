@@ -1,84 +1,13 @@
 #!/usr/bin/env node
-import { Lm } from "../packages/api/dist/main.js";
+import { Lm, convertImageUrlToBase64 } from "../packages/api/dist/main.js";
 import { PromptTemplate } from "modprompt";
-import fs from 'fs';
-import path from 'path';
+import terminalImage from 'terminal-image';
+import got from 'got';
 
 const model = "minicpm-v:8b-2.6-q8_0";
 const template = new PromptTemplate("chatml");
 const _prompt = "Describe the image in details";
-const _imageUrl = "https://loremflickr.com/320/240?random=1"
-
-async function convertImagePathToBase64(imagePath) {
-  // Validate file path format
-  const pathRegex = /^\/?[^\s]+$/;
-  if (!pathRegex.test(imagePath)) {
-    throw new Error('Invalid image path provided');
-  }
-  let mimeType;
-  return new Promise((resolve, reject) => {
-    fs.readFile(imagePath, (err, data) => {
-      if (err) {
-        reject(new Error(`Failed to read image file: ${err.message}`));
-      } else {
-        // Determine MIME type based on file extension
-        const ext = path.extname(imagePath).toLowerCase();
-        switch (ext) {
-          case '.png':
-            mimeType = 'image/png';
-            break;
-          case '.jpg':
-          case '.jpeg':
-            mimeType = 'image/jpeg';
-            break;
-          case '.gif':
-            mimeType = 'image/gif';
-            break;
-          case '.bmp':
-            mimeType = 'image/bmp';
-            break;
-          case '.webp':
-            mimeType = 'image/webp';
-            break;
-          default:
-            mimeType = 'image/jpeg'; // Default to JPEG if unknown
-        }
-        const base64String = data.toString('base64');
-        resolve(`data:${mimeType};base64,${base64String}`);
-      }
-    });
-  });
-}
-
-async function convertImageUrlToBase64(imageUrl) {
-  // Validate URL format
-  const urlRegex = /^(http|https):\/\/[^\s]+$/;
-  if (!urlRegex.test(imageUrl)) {
-    throw new Error('Invalid image URL provided');
-  }
-  let mimeType;
-  return fetch(imageUrl, {
-    method: 'GET',
-    headers: {
-      'Accept': 'image/*'
-    }
-  })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`Failed to fetch image: Status ${response.status}`);
-      }
-      // Store MIME type before processing data
-      mimeType = response.headers.get('content-type') || 'image/jpeg';
-      return response.arrayBuffer();
-    })
-    .then(buffer => {
-      const base64String = Buffer.from(buffer).toString('base64');
-      return `data:${mimeType};base64,${base64String}`;
-    })
-    .catch(error => {
-      throw new Error(`Failed to fetch image: ${error.message}`);
-    });
-}
+const _imageUrl = "https://loremflickr.com/cache/resized/defaultImage.small_320_240_nofilter.jpg"
 
 async function main() {
   const lm = new Lm({
@@ -90,20 +19,21 @@ async function main() {
     lm.abort().then(() => process.exit());
   });
 
-  const img = await convertImageUrlToBase64(_imageUrl);
+  const img = (await convertImageUrlToBase64(_imageUrl));
 
   await lm.loadModel(model, 8192);
   console.log("Loaded model", lm.model);
-  const res = await lm.infer(template.prompt(_prompt), {
+  const pr = template.prompt(_prompt);
+  console.log("Prompt:", pr);
+  const body = await got(_imageUrl).buffer();
+  console.log(await terminalImage.buffer(body));
+  const res = await lm.infer(pr, {
     stream: true,
     temperature: 0.1,
     max_tokens: 1024,
     images: [img],
-    extra: {
-      format: "json"
-    }
   });
-  console.log("\n\nResult:\n", res)
+  console.log("\n\Stats:\n", res.stats)
 }
 
 (async () => {

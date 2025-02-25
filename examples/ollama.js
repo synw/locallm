@@ -1,8 +1,9 @@
 #!/usr/bin/env node
+import { PromptTemplate } from "modprompt";
 import { Lm } from "../packages/api/dist/main.js";
 
-const model = "mistral:instruct";
-const template = "[INST] {prompt} [/INST]";
+const model = "gemma2:2b-instruct-q8_0";
+const template = new PromptTemplate("gemma");
 
 async function main() {
   const lm = new Lm({
@@ -15,10 +16,11 @@ async function main() {
   });
 
   await lm.modelsInfo();
-  console.log("Models", lm.models);
+  //console.log("Models", lm.models);
   await lm.loadModel(model, 8192);
   console.log("Loaded model", lm.model);
-  const _prompt = template.replace("{prompt}", "list the planets in the solar system. Answer in json");
+  const _prompt = template.prompt("list the planets in the solar system. Answer in json");
+  console.log("P", _prompt);
   const res = await lm.infer(_prompt, {
     stream: true,
     temperature: 0.1,

@@ -1,11 +1,13 @@
 {
   "type": "module",
   "devDependencies": {
-    "@types/node": "^22.5.2"
+    "@types/node": "^22.13.5"
   },
   "dependencies": {
     "@intrinsicai/gbnfgen": "^0.12.0",
     "ervy": "^1.0.7",
-    "modprompt": "^0.7.7"
+    "got": "^14.4.6",
+    "modprompt": "^0.9.5",
+    "terminal-image": "^3.1.1"
   }
 }
