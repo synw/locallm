@@ -9,13 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@locallm/api": "^0.1.7",
-    "@wllama/wllama": "^1.16.1",
-    "modprompt": "^0.7.7",
-    "vue": "^3.4.37"
+    "@locallm/api": "^0.2.0",
+    "@wllama/wllama": "^2.2.0",
+    "modprompt": "^0.9.6",
+    "vue": "^3.5.13"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.1.2",
-    "vite": "^5.4.1"
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^6.2.0"
   }
 }

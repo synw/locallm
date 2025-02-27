@@ -4,11 +4,8 @@ import { parseJson as parseJsonUtil, useStats } from '@locallm/api';
 import { AssetsPathConfig, ChatCompletionOptions, SamplingConfig, Wllama } from '@wllama/wllama/esm/wllama.js';
 import { LmBrowserProviderParams } from './interfaces.js';
 
-const wllamaSingleJS = 'single-thread/wllama.js';
 const wllamaSingle = 'single-thread/wllama.wasm';
-const wllamaMultiJS = 'multi-thread/wllama.js';
 const wllamaMulti = 'multi-thread/wllama.wasm';
-const wllamaMultiWorker = 'multi-thread/wllama.worker.mjs';
 
 class WllamaProvider implements LmProvider {
     name: string;
@@ -27,11 +24,8 @@ class WllamaProvider implements LmProvider {
     // state
     abortInference = false;
     wllama = new Wllama({
-        'single-thread/wllama.js': "/esm/" + wllamaSingleJS,
         'single-thread/wllama.wasm': "/esm/" + wllamaSingle,
-        'multi-thread/wllama.js': "/esm/" + wllamaMultiJS,
         'multi-thread/wllama.wasm': "/esm/" + wllamaMulti,
-        'multi-thread/wllama.worker.mjs': "/esm/" + wllamaMultiWorker,
     });
 
     constructor(params: LmProviderParams) {
@@ -48,11 +42,8 @@ class WllamaProvider implements LmProvider {
         let conf: AssetsPathConfig;
         if (typeof config == "string") {
             conf = {
-                'single-thread/wllama.js': config + wllamaSingleJS,
                 'single-thread/wllama.wasm': config + wllamaSingle,
-                'multi-thread/wllama.js': config + wllamaMultiJS,
                 'multi-thread/wllama.wasm': config + wllamaMulti,
-                'multi-thread/wllama.worker.mjs': config + wllamaMultiWorker,
             };
         } else {
             conf = config
@@ -163,9 +154,6 @@ class WllamaProvider implements LmProvider {
         }
         if ("min_p" in params) {
             samplingOptions.min_p = params.min_p;
-        }
-        if ("tfs" in params) {
-            samplingOptions.tfs_z = params.tfs;
         }
         if ("repeat_penalty" in params) {
             samplingOptions.penalty_repeat = params.repeat_penalty;
