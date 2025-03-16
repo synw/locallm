@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import { Lm, convertImageUrlToBase64 } from "../packages/api/dist/main.js";
-import { PromptTemplate } from "modprompt";
 import terminalImage from 'terminal-image';
 import got from 'got';
 

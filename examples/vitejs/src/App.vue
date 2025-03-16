@@ -17,7 +17,7 @@ const lm = WllamaProvider.init({
 const model = {
   name: "Qween 0.5b",
   url: "https://huggingface.co/Qwen/Qwen2-0.5B-Instruct-GGUF/resolve/main/qwen2-0_5b-instruct-q5_k_m.gguf",
-  ctx: 32768,
+  ctx: 8192,
 }
 
 const onModelLoading = (st) => {

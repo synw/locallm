@@ -26,7 +26,8 @@ async function main() {
     temperature: 0.1,
     max_tokens: 1024,
     extra: {
-      format: "json"
+      format: "json",
+      raw: true,
     }
   });
   console.log("\n\nResult:\n", res)
