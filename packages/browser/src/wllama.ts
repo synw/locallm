@@ -1,7 +1,7 @@
 import { useApi } from 'restmix';
 import { InferenceParams, InferenceResult, IngestionStats, LmProvider, LmProviderParams, LmProviderType, ModelConf, OnLoadProgress, BasicOnLoadProgress, } from "@locallm/types";
 import { parseJson as parseJsonUtil, useStats } from '@locallm/api';
-import { AssetsPathConfig, ChatCompletionOptions, SamplingConfig, Wllama } from '@wllama/wllama/esm/wllama.js';
+import { AssetsPathConfig, ChatCompletionOptions, SamplingConfig, Wllama } from '@wllama/wllama/esm/index.js';
 import { LmBrowserProviderParams } from './interfaces.js';
 
 const wllamaSingle = 'single-thread/wllama.wasm';
@@ -131,7 +131,7 @@ class WllamaProvider implements LmProvider {
             _prompt = params.template.replace("{prompt}", prompt);
             delete params.template;
         }
-        const options: ChatCompletionOptions = {};
+        const options: ChatCompletionOptions & { stream?: false | undefined; } = {};
         let samplingOptions: SamplingConfig = {};
         if ("max_tokens" in params) {
             options.nPredict = params.max_tokens;
