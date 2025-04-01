@@ -39,13 +39,5 @@
     "node_modules",
     "dist",
     "test"
-  ],
-  "typedocOptions": {
-    "name": "LocalLm types documentation",
-    "readme": "none",
-    "entryPoints": [
-      "src/**/*.ts",
-    ],
-    "out": "../../docs/types",
-  }
+  ]
 }

@@ -1,5 +1,5 @@
 
-import { useApi } from "restmix";
+import type { useApi } from "restmix";
 
 /**
  * Represents the configuration of a model.
@@ -40,6 +40,7 @@ interface ModelConf {
  * @property {number | undefined} tfs - Set the tail free sampling value.
  * @property {Array<string> | undefined} stop - List of stop words or phrases to halt predictions.
  * @property {string | undefined} grammar - The gnbf grammar to use for grammar-based sampling.
+ * @property {string | undefined} tsGrammar - A Typescript interface to be converted to a gnbf grammar to use for grammar-based sampling.
  * @property {Array<string>} images - The base64 images data (for multimodal models).
  * @property {Record<string, any> | undefined} extra - Extra parameters to include in the payload
  * @example
@@ -72,6 +73,7 @@ interface InferenceParams {
   tfs?: number;
   stop?: Array<string>;
   grammar?: string;
+  tsGrammar?: string;
   images?: Array<string>;
   extra?: Record<string, any>;
 }
