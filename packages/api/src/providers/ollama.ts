@@ -159,6 +159,9 @@ class OllamaProvider implements LmProvider {
     if (params.images !== undefined) {
       inferParams.images = params.images;
     }
+    if (params?.schema) {
+      inferParams["format"] = params.schema;
+    }
     // Spread any additional properties from params.extra if it exists and is not empty
     if (params.extra && Object.keys(params.extra).length > 0) {
       inferParams = { ...inferParams, ...params.extra };
