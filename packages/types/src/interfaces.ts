@@ -42,6 +42,7 @@ interface ModelConf {
  * @property {string | undefined} grammar - The gnbf grammar to use for grammar-based sampling.
  * @property {string | undefined} tsGrammar - A Typescript interface to be converted to a gnbf grammar to use for grammar-based sampling.
  * @property {Array<string>} images - The base64 images data (for multimodal models).
+ * @property {string | undefined} schema - A json schema to format the output.
  * @property {Record<string, any> | undefined} extra - Extra parameters to include in the payload
  * @example
  * const inferenceParams: InferenceParams = {
@@ -74,6 +75,7 @@ interface InferenceParams {
   stop?: Array<string>;
   grammar?: string;
   tsGrammar?: string;
+  schema?: Record<string, any>;
   images?: Array<string>;
   extra?: Record<string, any>;
 }
