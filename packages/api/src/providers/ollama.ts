@@ -1,7 +1,9 @@
 import { useApi } from "restmix";
+import { EventSourceParserStream } from 'eventsource-parser/stream';
 import { InferenceParams, InferenceResult, InferenceStats, IngestionStats, LmProvider, LmProviderParams, ModelConf, OnLoadProgress } from "@locallm/types";
 import { parseJson as parseJsonUtil } from './utils.js';
 import { useStats } from "../stats.js";
+import { ParsedEvent } from "eventsource-parser/dist/index.js";
 
 class OllamaProvider implements LmProvider {
   name: string;
@@ -187,7 +189,7 @@ class OllamaProvider implements LmProvider {
       }
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
-      let lastBatch: Record<string, any> = {};
+      //let lastBatch: Record<string, any> = {};
       let i = 1;
       while (true) {
         if (i == 1) {
@@ -200,7 +202,7 @@ class OllamaProvider implements LmProvider {
         if (done) break;
         let raw = decoder.decode(value).trim();
         //console.log("RAW", raw);
-        const parts = raw.split('\n');
+        /*const parts = raw.split('\n');
         let pbuf = new Array();
         for (const part of parts) {
           try {
@@ -210,10 +212,11 @@ class OllamaProvider implements LmProvider {
             pbuf.push(p["response"]);
             ++i
           } catch (error) {
-            console.warn('invalid json: ', part)
+            //console.warn('invalid json: ', part)
           }
         }
-        const t = pbuf.join("");
+        const t = pbuf.join("");*/
+        const t = JSON.parse(raw)["response"];
         buf.push(t);
         if (this.onToken) {
           this.onToken(t);
@@ -221,7 +224,7 @@ class OllamaProvider implements LmProvider {
       }
       text = buf.join("");
       finalStats = stats.inferenceEnds(i);
-      serverStats = lastBatch;
+      //serverStats = lastBatch;
     } else {
       const res = await this.api.post<Record<string, any>>("/api/generate", inferParams);
       if (res.ok) {

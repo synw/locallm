@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 import { Lm } from "../packages/api/dist/main.js";
 
-const template = "[INST] {prompt} [/INST]";
+const template = `<|im_start|>system
+You are a helpful assistant<|im_end|>
+<|im_start|>user
+{prompt}<|im_end|>
+<|im_start|>assistant`;
 
 async function main() {
   const lm = new Lm({
@@ -16,7 +20,6 @@ async function main() {
   const res = await lm.infer(_prompt, {
     stream: true,
     temperature: 0.5,
-    max_tokens: 200,
     stop: ["</s>"],
   });
   console.log("\n\n", res)
