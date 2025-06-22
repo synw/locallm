@@ -189,7 +189,7 @@ class OllamaProvider implements LmProvider {
       }
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
-      //let lastBatch: Record<string, any> = {};
+      let lastBatch: Record<string, any> = {};
       let i = 1;
       while (true) {
         if (i == 1) {
@@ -202,21 +202,33 @@ class OllamaProvider implements LmProvider {
         if (done) break;
         let raw = decoder.decode(value).trim();
         //console.log("RAW", raw);
-        /*const parts = raw.split('\n');
+        const parts = raw.split('\n');
         let pbuf = new Array();
         for (const part of parts) {
+          let p: Record<string, any>;
           try {
             //console.log(part);
-            const p = JSON.parse(part);
-            lastBatch = p;
-            pbuf.push(p["response"]);
+            p = JSON.parse(part);
             ++i
           } catch (error) {
-            //console.warn('invalid json: ', part)
+            // try to parse to whole thing
+            try {
+              p = JSON.parse(raw)
+            } catch (e) {
+              // error
+              let _p = part;
+              if (part.length >= 25) {
+                _p = part.slice(0, 25) + '...';
+              }
+              console.warn('Ollama provider: error parsing json: ', _p)
+              continue
+            }
           }
+          lastBatch = p;
+          pbuf.push(p["response"]);
         }
-        const t = pbuf.join("");*/
-        const t = JSON.parse(raw)["response"];
+        const t = pbuf.join("");
+        //const t = JSON.parse(raw)["response"];
         buf.push(t);
         if (this.onToken) {
           this.onToken(t);
