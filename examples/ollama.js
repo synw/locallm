@@ -2,8 +2,8 @@
 import { PromptTemplate } from "modprompt";
 import { Lm } from "../packages/api/dist/main.js";
 
-const model = "gemma3:4b";
-const template = new PromptTemplate("gemma");
+const model = "qwen3:30b";
+const template = new PromptTemplate("chatml");
 
 async function main() {
   const lm = new Lm({
@@ -19,12 +19,16 @@ async function main() {
   //console.log("Models", lm.models);
   await lm.loadModel(model, 8192);
   console.log("Loaded model", lm.model);
-  const _prompt = template.prompt("list the planets in the solar system sorted by gravity");
+  const _prompt = template.prompt("list the planets in the solar system sorted by gravity in percentage of Earth's gravity");
   console.log("Prompt:", _prompt);
   const res = await lm.infer(_prompt, {
     stream: true,
-    temperature: 0.1,
-    max_tokens: 1024,
+    ctx: 16384,
+    top_p: 0.95,
+    top_k: 20,
+    min_p: 0,
+    temperature: 0.4,
+    max_tokens: 8192,
     extra: {
       //format: "json",
       raw: true,
