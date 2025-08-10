@@ -13,6 +13,7 @@ async function main() {
     serverUrl: "http://localhost:8080",
     onToken: (t) => process.stdout.write(t),
   });
+  console.log(await lm.info())
   process.on('SIGINT', () => {
     lm.abort().then(() => process.exit());
   });

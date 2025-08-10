@@ -58,9 +58,9 @@ class LlamacppProvider implements LmProvider {
   async info(): Promise<Record<string, any>> {
     const res = await this.api.get<Record<string, any>>("/props");
     if (res.ok) {
-      //console.log("RES", res.data)
+      console.log("RES", res.data)
       this.model.ctx = res.data.default_generation_settings.n_ctx;
-      this.model.name = res.data.default_generation_settings.model.split("/").pop();
+      this.model.name = res.data.model_path.split("/").pop();
     }
     return this.model
   }
