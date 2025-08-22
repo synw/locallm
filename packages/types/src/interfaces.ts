@@ -420,7 +420,7 @@ interface ModelState {
  * @example
  * const providerType: LmProviderType = 'koboldcpp';
  */
-type LmProviderType = "llamacpp" | "koboldcpp" | "ollama" | "browser";
+type LmProviderType = "llamacpp" | "koboldcpp" | "ollama" | "openai" | "browser";
 
 export {
   OnLoadProgress,

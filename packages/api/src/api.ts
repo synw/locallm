@@ -1,8 +1,12 @@
 import { useApi } from "restmix";
-import { InferenceParams, InferenceResult, IngestionStats, LmDefaults, LmParams, LmProvider, LmProviderType, ModelConf, OnLoadProgress } from "@locallm/types";
+import {
+  InferenceParams, InferenceResult, IngestionStats, LmDefaults, LmParams, LmProvider, LmProviderType, ModelConf, OnLoadProgress
+} from "@locallm/types";
 import { KoboldcppProvider } from './providers/koboldcpp.js';
 import { OllamaProvider } from "./providers/ollama.js";
 import { LlamacppProvider } from "./providers/llamacpp.js";
+import { OpenaiCompatibleProvider } from "./providers/openai.js";
+import { OpenAI } from "openai";
 
 /**
  * Represents a Language Model (LM) which acts as a high-level interface to various underlying LM providers.
@@ -29,6 +33,7 @@ class Lm implements LmProvider {
   apiKey: string;
   serverUrl: string;
   defaults?: LmDefaults;
+  openai: OpenAI | undefined;
 
   /**
    * Constructs a new LM instance with the specified provider and parameters.
@@ -38,39 +43,46 @@ class Lm implements LmProvider {
    */
   constructor(params: LmParams) {
     this.providerType = params.providerType;
+    const commonParams = {
+      serverUrl: params.serverUrl,
+      apiKey: params.apiKey ?? "",
+      onToken: params.onToken,
+      onStartEmit: params.onStartEmit,
+      onError: params.onError,
+    }
+
     switch (params.providerType) {
       case "llamacpp":
         this.name = "llamacpp";
         this.provider = new LlamacppProvider({
           name: "Llamacpp",
-          serverUrl: params.serverUrl,
-          apiKey: params.apiKey ?? "",
-          onToken: params.onToken,
-          onStartEmit: params.onStartEmit,
-          onError: params.onError,
+          ...commonParams
         });
         break;
       case "koboldcpp":
         this.name = "Koboldcpp";
         this.provider = new KoboldcppProvider({
           name: "Koboldcpp",
-          serverUrl: params.serverUrl,
-          apiKey: params.apiKey ?? "",
-          onToken: params.onToken,
-          onStartEmit: params.onStartEmit,
-          onError: params.onError,
+          ...commonParams
         });
         break;
       case "ollama":
         this.name = "Ollama";
         this.provider = new OllamaProvider({
           name: "Ollama",
-          serverUrl: params.serverUrl,
-          apiKey: params.apiKey ?? "",
-          onToken: params.onToken,
-          onStartEmit: params.onStartEmit,
-          onError: params.onError,
+          ...commonParams
         });
+        break;
+      case "openai":
+        this.name = "openai";
+        this.provider = new OpenaiCompatibleProvider({
+          name: "Openai compatible",
+          ...commonParams
+        });
+        this.openai = new OpenAI({
+          apiKey: params.apiKey ?? "",
+          baseURL: params.serverUrl,
+        })
         break;
       default:
         throw new Error(`Unknown provider ${params.providerType}`)
