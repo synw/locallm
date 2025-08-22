@@ -14,6 +14,7 @@ An api to query local language models using different backends
 - [Koboldcpp](https://github.com/LostRuins/koboldcpp)
 - [Ollama](https://github.com/jmorganca/ollama)
 - [Wllama](https://github.com/ngxson/wllama) (for in browser inference)
+- Any Openai compatible endpoint
 
 ## Quickstart
 
@@ -21,8 +22,6 @@ An api to query local language models using different backends
 
 ```bash
 npm install @locallm/api
-# or
-yarn add @locallm/api
 ```
 
 Example with the Koboldcpp provider:
