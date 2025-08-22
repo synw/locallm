@@ -5,6 +5,7 @@ An api to query local language models using different backends. Supported backen
 - [Llama.cpp](https://github.com/ggerganov/llama.cpp/tree/master/examples/server)
 - [Koboldcpp](https://github.com/LostRuins/koboldcpp)
 - [Ollama](https://github.com/jmorganca/ollama)
+- Any Openai compatible endpoint
 
 :books: [Api doc](https://synw.github.io/locallm/)
 

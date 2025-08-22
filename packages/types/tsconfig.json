@@ -11,7 +11,7 @@
     "allowSyntheticDefaultImports": true,
     "outDir": "./dist",
     "allowJs": true,
-    "removeComments": true,
+    "removeComments": false,
     "strictFunctionTypes": true,
     "types": [
       "node"
@@ -39,5 +39,13 @@
     "node_modules",
     "dist",
     "test"
-  ]
+  ],
+  "typedocOptions": {
+    "name": "LocalLm types documentation",
+    "readme": "none",
+    "entryPoints": [
+      "src/*.ts",
+    ],
+    "out": "../../docs/types"
+  }
 }
