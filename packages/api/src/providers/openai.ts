@@ -69,7 +69,7 @@ class OpenaiCompatibleProvider implements LmProvider {
    * @returns {Promise<void>}
    */
     async loadModel(name: string, ctx?: number, urls?: string | string[], onLoadProgress?: OnLoadProgress): Promise<void> {
-        throw new Error("Not implemented for this provider");
+        this.model = { name: name, ctx: ctx }
     }
 
     /**
@@ -87,14 +87,13 @@ class OpenaiCompatibleProvider implements LmProvider {
     ): Promise<InferenceResult> {
         this.abortController = new AbortController();
         let inferenceParams: Record<string, any> = params;
-        inferenceParams.prompt = prompt;
         if ("max_tokens" in params) {
             inferenceParams.max_completion_tokens = params.max_tokens;
             delete inferenceParams.max_tokens;
         }
-        if ("extra" in params) {
-            inferenceParams = { ...inferenceParams, ...params.extra };
-            delete inferenceParams.extra;
+        if ("model" in inferenceParams) {
+            this.model = inferenceParams.model;
+            delete inferenceParams.model;
         }
         inferenceParams.stream = params.stream ?? true;
         inferenceParams.template = undefined;
@@ -108,7 +107,34 @@ class OpenaiCompatibleProvider implements LmProvider {
         const msgs: Array<ChatCompletionMessageParam> = params?.extra?.system ?
             [{ role: "system", content: params.extra.system }]
             : [];
+        if (params?.extra?.history) {
+            (params.extra.history as Array<{ user: string, assistant: string }>).forEach(
+                row => {
+                    msgs.push({
+                        role: "user",
+                        content: row.user,
+                    });
+                    msgs.push({
+                        role: "assistant",
+                        content: row.assistant,
+                    });
+                }
+            );
+        }
         msgs.push({ role: "user", content: prompt });
+        if (params?.extra) {
+            if (params.extra?.system) {
+                delete params.extra.system
+            }
+            if (params.extra?.history) {
+                delete params.extra.history
+            }
+            inferenceParams = { ...inferenceParams, ...params.extra };
+            delete inferenceParams.extra;
+        }
+        /*console.log("Model", this.model.name);
+        console.log("IP", JSON.stringify(inferenceParams));
+        console.log("MSGS", msgs);*/
         let i = 1;
         if (!params.stream) {
             const completion = await this.openai.chat.completions.create({
