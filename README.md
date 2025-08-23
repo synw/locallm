@@ -47,4 +47,14 @@ console.log(res);
 
 ## Examples
 
-Check the [examples](packages/api/examples) directory for more examples
+Check the [examples](packages/api/examples) directory for more examples. To run the examples:
+
+```bash
+git clone https://github.com/synw/locallm
+cd locallm/packages/api
+npm run build
+cd ../../examples
+npm install
+# run an example
+node llamacpp.js
+```
