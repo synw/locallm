@@ -1,7 +1,7 @@
 
 import type { useApi } from "restmix";
 
-/**
+/**.
  * Represents the configuration of a model.
  *
  * @interface ModelConf
@@ -77,7 +77,21 @@ interface InferenceParams {
   tsGrammar?: string;
   schema?: Record<string, any>;
   images?: Array<string>;
-  extra?: Record<string, any>;
+  extra?: InferenceParamsExtra;
+}
+
+interface HistoryTurn {
+  user?: string;
+  assistant?: string;
+  tools?: { calls: Array<ToolCallSpec>, results: Array<{ id: string, content: string }> };
+}
+
+interface InferenceParamsExtra {
+  system?: string;
+  history?: Array<HistoryTurn>;
+  tools?: Array<ToolSpec>;
+  assistant?: string;
+  [key: string]: any;
 }
 
 /**
@@ -160,6 +174,60 @@ interface InferenceResult {
   data: Record<string, any>;
   stats: InferenceStats;
   serverStats: Record<string, any>;
+  toolCalls?: Array<ToolCallSpec>;
+}
+
+interface ToolCallSpec {
+  id?: string;
+  name: string;
+  arguments?: {
+    [key: string]: string;
+  };
+}
+
+/**
+ * Specification for a tool that can be used within the conversation.
+ *
+ * @interface ToolDefSpec
+ * @typedef {ToolDefSpec}
+ * 
+ * @example
+ * const toolSpecExample: ToolDefSpec = {
+ *   name: "WeatherFetcher",
+ *   description: "Fetches weather information.",
+ *   arguments: {
+ *     location: {
+ *       description: "The location for which to fetch the weather.",
+ *       required: true
+ *     }
+ *   }
+ * };
+ */
+interface ToolDefSpec {
+  /**
+   * The name of the tool.
+   */
+  name: string;
+
+  /**
+   * A description of what the tool does.
+   */
+  description: string;
+
+  /**
+   * Arguments required by the tool, with descriptions for each argument.
+   */
+  arguments: {
+    [key: string]: {
+      description: string;
+      type?: string;
+      required?: boolean;
+    };
+  };
+}
+
+interface ToolSpec extends ToolDefSpec {
+  execute: <O = any>(args: { [key: string]: string; } | undefined) => Promise<O>;
 }
 
 /**
@@ -439,4 +507,7 @@ export {
   LmDefaults,
   ModelTemplate,
   ModelState,
+  ToolCallSpec,
+  ToolDefSpec,
+  ToolSpec,
 }

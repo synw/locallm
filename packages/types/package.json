@@ -1,6 +1,6 @@
 {
   "name": "@locallm/types",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Shared data types for the LocalLm api",
   "repository": "https://github.com/synw/locallm",
   "scripts": {
@@ -8,17 +8,18 @@
     "docs": "typedoc --entryPointStrategy expand"
   },
   "devDependencies": {
-    "restmix": "^0.5.0",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-typescript": "^12.1.4",
     "@types/node": "^24.3.0",
+    "openai": "5.15.0",
+    "restmix": "^0.5.0",
     "rollup": "^4.47.1",
     "ts-node": "^10.9.2",
     "tslib": "^2.8.1",
-    "typescript": "^5.9.2",
     "typedoc": "^0.28.10",
     "typedoc-plugin-markdown": "^4.8.1",
-    "typedoc-plugin-rename-defaults": "^0.7.3"
+    "typedoc-plugin-rename-defaults": "^0.7.3",
+    "typescript": "^5.9.2"
   },
   "type": "module",
   "files": [
