@@ -1,3 +1,6 @@
+import { ChatCompletionFunctionTool } from "openai/resources/index";
+import { ToolDefSpec, ToolSpec } from "../../../types/dist/interfaces";
+
 function parseJson(data: string, parseFunc?: (data: string) => Record<string, any>): Record<string, any> {
   let res = {};
   try {
@@ -47,4 +50,42 @@ async function convertImageUrlToBase64(imageUrl: string): Promise<string> {
     });
 }
 
-export { parseJson, convertImageDataToBase64, convertImageUrlToBase64 }
+function convertToolCallSpec(toolSpec: ToolSpec): ChatCompletionFunctionTool {
+  const req = Object.entries(toolSpec.arguments)
+    .filter(([, arg]) => arg.required)
+    .map(([key]) => key);
+  return {
+    type: 'function',
+    function: {
+      name: toolSpec.name,
+      description: toolSpec.description,
+      parameters: {
+        type: 'object',
+        properties: Object.fromEntries(
+          Object.entries(toolSpec.arguments).map(([key, arg]) => [
+            key,
+            {
+              type: arg?.type ? arg.type : 'string',
+              description: arg.description
+            }
+          ])
+        ),
+        required: req,
+      }
+    }
+  };
+}
+
+function generateId(length: number = 8): string {
+  return Math.random()
+    .toString(36)
+    .substring(2, length + 2);
+}
+
+export {
+  parseJson,
+  convertImageDataToBase64,
+  convertImageUrlToBase64,
+  convertToolCallSpec,
+  generateId,
+}
