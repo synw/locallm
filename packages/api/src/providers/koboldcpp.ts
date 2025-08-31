@@ -1,8 +1,9 @@
 import { useApi } from 'restmix';
 import { type ParsedEvent } from 'eventsource-parser'
 import { EventSourceParserStream } from 'eventsource-parser/stream';
-import { InferenceParams, InferenceResult, InferenceStats, IngestionStats, LmProvider, LmProviderParams, ModelConf, OnLoadProgress } from "@locallm/types";
-import { parseJson as parseJsonUtil } from './utils.js';
+import {
+  InferenceOptions, InferenceParams, InferenceResult, InferenceStats, IngestionStats, LmProvider, LmProviderParams, ModelConf, OnLoadProgress
+} from "@locallm/types";
 import { useStats } from '../stats.js';
 
 class KoboldcppProvider implements LmProvider {
@@ -92,8 +93,7 @@ class KoboldcppProvider implements LmProvider {
   async infer(
     prompt: string,
     params: InferenceParams,
-    parseJson = false,
-    parseJsonFunc?: (data: string) => Record<string, any>
+    options?: InferenceOptions,
   ): Promise<InferenceResult> {
     //console.log("INFER");
     // autoload model
@@ -144,7 +144,6 @@ class KoboldcppProvider implements LmProvider {
     }
 
     let text = "";
-    let data = {};
     const stats = useStats();
     stats.start();
     let finalStats = {} as InferenceStats;
@@ -197,12 +196,8 @@ class KoboldcppProvider implements LmProvider {
         throw new Error(`Error ${res.status} posting inference query ${res.data}`)
       }
     }
-    if (parseJson) {
-      data = parseJsonUtil(text, parseJsonFunc);
-    }
     const ir: InferenceResult = {
       text: text,
-      data: data,
       stats: finalStats,
       serverStats: serverStats,
     };

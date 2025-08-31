@@ -1,9 +1,8 @@
 import { useApi } from "restmix";
-import { EventSourceParserStream } from 'eventsource-parser/stream';
-import { InferenceParams, InferenceResult, InferenceStats, IngestionStats, LmProvider, LmProviderParams, ModelConf, OnLoadProgress } from "@locallm/types";
-import { parseJson as parseJsonUtil } from './utils.js';
+import {
+  InferenceOptions, InferenceParams, InferenceResult, InferenceStats, IngestionStats, LmProvider, LmProviderParams, ModelConf, OnLoadProgress
+} from "@locallm/types";
 import { useStats } from "../stats.js";
-import { ParsedEvent } from "eventsource-parser/dist/index.js";
 
 class OllamaProvider implements LmProvider {
   name: string;
@@ -110,8 +109,7 @@ class OllamaProvider implements LmProvider {
   async infer(
     prompt: string,
     params: InferenceParams,
-    parseJson = false,
-    parseJsonFunc?: (data: string) => Record<string, any>
+    options?: InferenceOptions,
   ): Promise<InferenceResult> {
     if (this.model.name == "") {
       throw new Error("Load a model first, using the loadModel method");
@@ -170,7 +168,6 @@ class OllamaProvider implements LmProvider {
     }
     //console.log("INFER PARAMS", inferParams);
     let text = "";
-    let data = {};
     const stats = useStats();
     stats.start();
     let finalStats = {} as InferenceStats;
@@ -249,13 +246,9 @@ class OllamaProvider implements LmProvider {
         throw new Error(`Error ${res.status} posting inference query ${res.data}`)
       }
     }
-    if (parseJson) {
-      data = parseJsonUtil(text, parseJsonFunc);
-    }
     //console.log("STATS", stats);
     const ir: InferenceResult = {
       text: text,
-      data: data,
       stats: finalStats,
       serverStats: serverStats,
     };

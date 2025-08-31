@@ -1,6 +1,6 @@
 import { useApi } from "restmix";
 import {
-  InferenceParams, InferenceResult, IngestionStats, LmDefaults, LmParams, LmProvider, LmProviderType, ModelConf, OnLoadProgress
+  InferenceOptions, InferenceParams, InferenceResult, IngestionStats, LmDefaults, LmParams, LmProvider, LmProviderType, ModelConf, OnLoadProgress
 } from "@locallm/types";
 import { KoboldcppProvider } from './providers/koboldcpp.js';
 import { OllamaProvider } from "./providers/ollama.js";
@@ -24,7 +24,7 @@ class Lm implements LmProvider {
   modelsInfo: () => Promise<void>;
   info: () => Promise<Record<string, any>>;
   loadModel: (name: string, ctx?: number, urls?: string | string[], onLoadProgress?: OnLoadProgress) => Promise<void>;
-  infer: (prompt: string, params: InferenceParams, parseJson?: boolean, parseJsonFunc?: (data: string) => Record<string, any>) => Promise<InferenceResult>;
+  infer: (prompt: string, params: InferenceParams, options?: InferenceOptions) => Promise<InferenceResult>;
   abort: () => Promise<void>;
   models = new Array<ModelConf>();
   model: ModelConf = { name: "", ctx: 2048 };

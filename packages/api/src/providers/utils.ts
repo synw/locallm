@@ -1,19 +1,5 @@
 import { ChatCompletionFunctionTool } from "openai/resources/index";
-import { ToolDefSpec, ToolSpec } from "../../../types/dist/interfaces";
-
-function parseJson(data: string, parseFunc?: (data: string) => Record<string, any>): Record<string, any> {
-  let res = {};
-  try {
-    if (parseFunc) {
-      res = parseFunc(data)
-    } else {
-      res = JSON.parse(data)
-    }
-  } catch (e) {
-    throw new Error(`Error parsing json data: ${data}`)
-  }
-  return res
-}
+import { ToolSpec } from "@locallm/types";
 
 async function convertImageDataToBase64(imageData: Buffer): Promise<string> {
   const base64String = imageData.toString('base64');
@@ -83,7 +69,6 @@ function generateId(length: number = 8): string {
 }
 
 export {
-  parseJson,
   convertImageDataToBase64,
   convertImageUrlToBase64,
   convertToolCallSpec,

@@ -1,6 +1,6 @@
 {
   "name": "@locallm/api",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "An api to query local language models using different backends",
   "repository": "https://github.com/synw/locallm",
   "scripts": {
@@ -13,13 +13,13 @@
     "restmix": "^0.5.0"
   },
   "devDependencies": {
-    "@locallm/types": "^0.3.0",
+    "@locallm/types": "^0.4.0",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.4",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^24.3.0",
-    "rollup": "^4.49.0",
+    "rollup": "^4.50.0",
     "ts-node": "^10.9.2",
     "tslib": "^2.8.1",
     "typedoc": "^0.28.11",

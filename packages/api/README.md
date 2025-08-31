@@ -17,7 +17,7 @@ npm install @locallm/api
 
 ## Usage
 
-Example with the Koboldcpp provider:
+Example with the Koboldcpp provider, manual template:
 
 ```ts
 import { Lm } from "@locallm/api";
@@ -33,7 +33,26 @@ const _prompt = template.replace("{prompt}", "list the planets in the solar syst
 await lm.infer(_prompt, {
   stream: true,
   temperature: 0.2,
-  n_predict: 200,
+});
+```
+
+Example with the Llama.cpp provider, openai compatible endpoint, server side template:
+
+```ts
+import { Lm } from "@locallm/api";
+
+const lm = new Lm({
+    providerType: "openai",
+    serverUrl: "http://localhost:8080/v1",
+    onToken: (t) => process.stdout.write(t),
+});
+process.on('SIGINT', () => {
+    lm.abort().then(() => process.exit());
+});
+const _prompt = "list the planets in the solar system";
+const res = await lm.infer(_prompt, {
+    stream: true,
+    temperature: 0.5,
 });
 ```
 

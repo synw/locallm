@@ -1,11 +1,10 @@
 import type {
-    InferenceParams, InferenceResult, InferenceStats, IngestionStats, LmProvider, LmProviderParams, ModelConf, OnLoadProgress, ToolCallSpec,
-    ToolSpec,
+    InferenceOptions, InferenceParams, InferenceResult, InferenceStats, IngestionStats, LmProvider, LmProviderParams, ModelConf, OnLoadProgress, ToolCallSpec, ToolSpec
 } from "@locallm/types";
 import { useApi } from "restmix";
 import OpenAI from "openai"
 import { useStats } from "../stats.js";
-import { convertToolCallSpec, generateId, parseJson as parseJsonUtil } from './utils.js';
+import { convertToolCallSpec, generateId } from './utils.js';
 import { ChatCompletionCreateParamsNonStreaming, ChatCompletionCreateParamsStreaming, ChatCompletionMessageFunctionToolCall, ChatCompletionMessageParam, ChatCompletionMessageToolCall, ChatCompletionTool } from "openai/resources/index.js";
 import { RequestOptions } from "openai/internal/request-options.js";
 
@@ -26,7 +25,7 @@ class OpenaiCompatibleProvider implements LmProvider {
     tools: Record<string, ToolSpec> = {};
 
     /**
- * Creates a new instance of the OpenaicppProvider.
+ * Creates a new instance of the OpenaiCompatibleProvider.
  *
  * @param {LmProviderParams} params - Configuration parameters for initializing the provider.
  */
@@ -81,8 +80,7 @@ class OpenaiCompatibleProvider implements LmProvider {
     async infer(
         prompt: string,
         params: InferenceParams,
-        parseJson = false,
-        parseJsonFunc?: (data: string) => Record<string, any>
+        options?: InferenceOptions,
     ): Promise<InferenceResult> {
         this.abortController = new AbortController();
         let inferenceParams: Record<string, any> = params;
@@ -104,12 +102,11 @@ class OpenaiCompatibleProvider implements LmProvider {
         let serverStats: Record<string, any> = {};
         let text: string;
         let msgs: Array<ChatCompletionMessageParam> = [];
-        if (params?.extra?.system) {
-            msgs = [{ role: "system", content: params.extra.system }];
-            delete params.extra.system
+        if (options?.system) {
+            msgs = [{ role: "system", content: options.system }];
         }
-        if (params?.extra?.history) {
-            params.extra.history.forEach(
+        if (options?.history) {
+            options.history.forEach(
                 row => {
                     if (row?.user) {
                         msgs.push({
@@ -148,26 +145,25 @@ class OpenaiCompatibleProvider implements LmProvider {
                     }
                 }
             );
-            delete params.extra.history
         }
         if (prompt != " ") {
             msgs.push({ role: "user", content: prompt });
         }
-        /*console.log("MSGS ----------\n");
-        console.log(msgs);
-        console.log("---------------");*/
+        if (options?.debug) {
+            console.log("MSGS ----------\n");
+            console.log(msgs);
+            console.log("---------------");
+        }
         let tools: Array<ChatCompletionTool> = [];
         this.tools = {};
-        if (params?.extra?.tools) {
-            params.extra.tools.forEach(t => {
+        if (options?.tools) {
+            options.tools.forEach(t => {
                 this.tools[t.name] = t;
                 tools.push(convertToolCallSpec(t));
             });
-            delete params.extra.tools;
         }
-        if (params?.extra?.assistant) {
-            msgs.push({ role: "assistant", content: params.extra.assistant });
-            delete params.extra.assistant;
+        if (options?.assistant) {
+            msgs.push({ role: "assistant", content: options.assistant });
         }
         if (params?.extra) {
             inferenceParams = { ...inferenceParams, ...params.extra };
@@ -281,15 +277,8 @@ class OpenaiCompatibleProvider implements LmProvider {
             text = buf.join("");
         }
         finalStats = stats.inferenceEnds(i);
-        let data = {};
-        if (parseJson) {
-            data = parseJsonUtil(text, parseJsonFunc);
-        } else {
-            //data = completion
-        }
         const ir: InferenceResult = {
             text: text,
-            data: data,
             stats: finalStats,
             serverStats: serverStats,
         };
@@ -309,8 +298,6 @@ class OpenaiCompatibleProvider implements LmProvider {
    */
     async abort(): Promise<void> {
         this.abortController.abort();
-        //const res = await this.api.post("/api/extra/abort", { genKey: "" });
-        //console.log(res)
     }
 }
 
