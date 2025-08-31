@@ -1,7 +1,6 @@
-
 import type { useApi } from "restmix";
 
-/**.
+/**
  * Represents the configuration of a model.
  *
  * @interface ModelConf
@@ -77,21 +76,30 @@ interface InferenceParams {
   tsGrammar?: string;
   schema?: Record<string, any>;
   images?: Array<string>;
-  extra?: InferenceParamsExtra;
+  extra?: Record<string, any>;
 }
 
+/**
+ * Represents a single turn in a conversation history.
+ *
+ * @interface HistoryTurn
+ * @property {string | undefined} user - The user's message in this turn.
+ * @property {string | undefined} assistant - The assistant's response in this turn.
+ * @property {{ calls: Array<ToolCallSpec>, results: Array<{ id: string, content: string }> } | undefined} tools - Tool calls and results for this turn.
+ * @example
+ * const historyTurn: HistoryTurn = {
+ *   user: "What's the weather like?",
+ *   assistant: "The weather is sunny with a temperature of 72°F.",
+ *   tools: {
+ *     calls: [{ id: '1', name: 'getWeather', arguments: { location: 'New York' } }],
+ *     results: [{ id: '1', content: 'Sunny, 72°F' }]
+ *   }
+ * };
+ */
 interface HistoryTurn {
   user?: string;
   assistant?: string;
   tools?: { calls: Array<ToolCallSpec>, results: Array<{ id: string, content: string }> };
-}
-
-interface InferenceParamsExtra {
-  system?: string;
-  history?: Array<HistoryTurn>;
-  tools?: Array<ToolSpec>;
-  assistant?: string;
-  [key: string]: any;
 }
 
 /**
@@ -149,13 +157,12 @@ interface InferenceStats extends IngestionStats {
  *
  * @interface InferenceResult
  * @property {string} text - The textual representation of the generated inference.
- * @property {Record<string, any>} data - Additional data related to the inference.
  * @property {InferenceStats} stats - Additional statistics or metadata related to the inference.
  * @property {Record<string, any>} serverStats - Additional server-related statistics.
+ * @property {Array<ToolCallSpec> | undefined} toolCalls - Tool calls made during inference.
  * @example
  * const inferenceResult: InferenceResult = {
  *   text: 'The quick brown fox jumps over the lazy dog.',
- *   data: { someKey: 'someValue' },
  *   stats: {
  *     ingestionTime: 150,
  *     inferenceTime: 300,
@@ -166,17 +173,31 @@ interface InferenceStats extends IngestionStats {
  *     totalTokens: 200,
  *     tokensPerSecond: 444
  *   },
- *   serverStats: { someServerKey: 'someServerValue' }
+ *   serverStats: { someServerKey: 'someServerValue' },
+ *   toolCalls: [{ id: '1', name: 'getWeather', arguments: { location: 'New York' } }]
  * };
  */
 interface InferenceResult {
   text: string;
-  data: Record<string, any>;
   stats: InferenceStats;
   serverStats: Record<string, any>;
   toolCalls?: Array<ToolCallSpec>;
 }
 
+/**
+ * Represents a tool call specification.
+ *
+ * @interface ToolCallSpec
+ * @property {string | undefined} id - The unique identifier for the tool call.
+ * @property {string} name - The name of the tool being called.
+ * @property {Record<string, string> | undefined} arguments - The arguments to pass to the tool.
+ * @example
+ * const toolCall: ToolCallSpec = {
+ *   id: '1',
+ *   name: 'getWeather',
+ *   arguments: { location: 'New York' }
+ * };
+ */
 interface ToolCallSpec {
   id?: string;
   name: string;
@@ -189,8 +210,9 @@ interface ToolCallSpec {
  * Specification for a tool that can be used within the conversation.
  *
  * @interface ToolDefSpec
- * @typedef {ToolDefSpec}
- * 
+ * @property {string} name - The name of the tool.
+ * @property {string} description - A description of what the tool does.
+ * @property {Record<string, { description: string, type?: string, required?: boolean }>} arguments - Arguments required by the tool, with descriptions for each argument.
  * @example
  * const toolSpecExample: ToolDefSpec = {
  *   name: "WeatherFetcher",
@@ -226,6 +248,28 @@ interface ToolDefSpec {
   };
 }
 
+/**
+ * Represents a tool specification with an execute function.
+ *
+ * @interface ToolSpec
+ * @extends ToolDefSpec
+ * @property {(args: Record<string, string> | undefined) => Promise<any>} execute - The function to execute the tool with the provided arguments.
+ * @example
+ * const toolSpec: ToolSpec = {
+ *   name: "WeatherFetcher",
+ *   description: "Fetches weather information.",
+ *   arguments: {
+ *     location: {
+ *       description: "The location for which to fetch the weather.",
+ *       required: true
+ *     }
+ *   },
+ *   execute: async (args) => {
+ *     const { location } = args || {};
+ *     return `Weather in ${location}: Sunny, 72°F`;
+ *   }
+ * };
+ */
 interface ToolSpec extends ToolDefSpec {
   execute: <O = any>(args: { [key: string]: string; } | undefined) => Promise<O>;
 }
@@ -289,6 +333,35 @@ type OnLoadProgress = (data: OnLoadProgressFull) => void;
 type BasicOnLoadProgress = (data: OnLoadProgressBasic) => void;
 
 /**
+ * Options for inference requests.
+ *
+ * @interface InferenceOptions
+ * @property {boolean | undefined} debug - Enable debug mode for detailed logging.
+ * @property {boolean | undefined} verbose - Enable verbose output.
+ * @property {Array<ToolSpec> | undefined} tools - Array of available tools for the conversation.
+ * @property {Array<HistoryTurn> | undefined} history - Conversation history to include in the inference.
+ * @property {string | undefined} system - System message to set the context for the conversation.
+ * @property {string | undefined} assistant - Assistant message to include in the context.
+ * @example
+ * const inferenceOptions: InferenceOptions = {
+ *   debug: true,
+ *   tools: [weatherTool],
+ *   history: [
+ *     { user: "Hello", assistant: "Hi there!" }
+ *   ],
+ *   system: "You are a helpful assistant."
+ * };
+ */
+interface InferenceOptions {
+  debug?: boolean;
+  verbose?: boolean;
+  tools?: Array<ToolSpec>;
+  history?: Array<HistoryTurn>;
+  system?: string;
+  assistant?: string;
+}
+
+/**
  * Defines the structure and behavior of an LM Provider.
  *
  * @interface LmProvider
@@ -301,13 +374,12 @@ type BasicOnLoadProgress = (data: OnLoadProgressBasic) => void;
  * @property {() => Promise<Record<string, any>>} info - Retrieves information about available server config.
  * @property {() => Promise<void>} modelsInfo - Retrieves information about available models.
  * @property {(name: string, ctx?: number, urls?: string | string[], onLoadProgress?: OnLoadProgress) => Promise<void>} loadModel - Loads a model by name, with optional context.
- * @property {(prompt: string, params: InferenceParams, parseJson?: boolean, parseJsonFunc?: (data: string) => Record<string, any>) => Promise<InferenceResult>} infer - Makes an inference based on provided prompt and parameters.
+ * @property {(prompt: string, params: InferenceParams, options?: InferenceOptions) => Promise<InferenceResult>} infer - Makes an inference based on provided prompt and parameters.
  * @property {() => Promise<void>} abort - Aborts a currently running inference task.
- * @property {(t: string) => void} onToken - Callback when a new token is received (typically for authentication).
+ * @property {(t: string) => void} onToken - Callback when a new token is received
  * @property {(data: IngestionStats) => void} onStartEmit - Callback triggered when inference starts.
  * @property {(result: InferenceResult) => void} onEndEmit - Callback triggered when inference ends.
  * @property {(err: string) => void} onError - Callback triggered on errors during inference.
- * @property {LmDefaults | undefined} defaults - Default settings for this provider.
  * @example
  * const lmProvider: LmProvider = {
  *   name: 'koboldcpp',
@@ -319,7 +391,7 @@ type BasicOnLoadProgress = (data: OnLoadProgressBasic) => void;
  *   info: async () => ({ config: 'some-config' }),
  *   modelsInfo: async () => {},
  *   loadModel: async (name, ctx, urls, onLoadProgress) => {},
- *   infer: async (prompt, params, parseJson, parseJsonFunc) => ({ text: 'result', data: {}, stats: {}, serverStats: {} }),
+ *   infer: async (prompt, params, options) => ({ text: 'result', stats: {}, serverStats: {} }),
  *   abort: async () => {},
  *   onToken: (t) => console.log(t),
  *   onStartEmit: (data) => console.log(data),
@@ -342,11 +414,10 @@ interface LmProvider {
    *
    * @param {string} prompt - The input text for the model to generate a response from.
    * @param {InferenceParams} params - Parameters that control the behavior of the inference process.
-   * @param {boolean | undefined} parseJson - Indicates whether the result should be parsed as JSON.
-   * @param {(data: string) => Record<string, any> | undefined} parseJsonFunc - A custom function to parse JSON data.
+   * @param {InferenceOptions | undefined} options - Some options for the inference query
    * @returns {Promise<InferenceResult>} The result of the inference process.
    */
-  infer: (prompt: string, params: InferenceParams, parseJson?: boolean, parseJsonFunc?: (data: string) => Record<string, any>) => Promise<InferenceResult>;
+  infer: (prompt: string, params: InferenceParams, options?: InferenceOptions) => Promise<InferenceResult>;
   abort: () => Promise<void>;
   onToken?: (t: string) => void;
   onStartEmit?: (data: IngestionStats) => void;
@@ -410,7 +481,7 @@ interface LmProviderParams {
  * Parameters for initializing a Language Model.
  *
  * @interface LmParams
- * @property {LmProviderType} providerType - Type of provider ("llamacpp", "koboldcpp", "ollama", "browser").
+ * @property {LmProviderType} providerType - Type of provider ("llamacpp", "koboldcpp", "ollama", "openai", "browser").
  * @property {string} serverUrl - The URL endpoint for the LM service.
  * @property {(t: string) => void} onToken - Callback when a new token is received.
  * @property {string | undefined} apiKey - Optional API key for authentication.
@@ -484,7 +555,7 @@ interface ModelState {
  * Represents the type of LM provider.
  *
  * @typedef LmProviderType
- * @type {"llamacpp" | "koboldcpp" | "ollama" | "browser"}
+ * @type {"llamacpp" | "koboldcpp" | "ollama" | "openai" | "browser"}
  * @example
  * const providerType: LmProviderType = 'koboldcpp';
  */
@@ -499,6 +570,7 @@ export {
   InferenceParams,
   InferenceResult,
   InferenceStats,
+  InferenceOptions,
   IngestionStats,
   LmProvider,
   LmProviderType,
@@ -510,4 +582,5 @@ export {
   ToolCallSpec,
   ToolDefSpec,
   ToolSpec,
+  HistoryTurn,
 }
