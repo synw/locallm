@@ -22,6 +22,12 @@ Forme juridique
 Société anonyme à directoire et conseil de surveillance`;
 const prompt = `Extract relevant company information from this text:\n\n${rawInfo}`;
 
+const template = `<|im_start|>system
+You are a helpful assistant<|im_end|>
+<|im_start|>user
+{prompt}<|im_end|>
+<|im_start|>assistant`;
+
 async function main() {
   const grammar = await compile(
     `interface Company {
@@ -33,7 +39,6 @@ async function main() {
          siret: string;
      }`, "Company");
 
-  const template = "<s>[INST] {prompt} [/INST]";
   const lm = new Lm({
     providerType: "llamacpp",
     serverUrl: "http://localhost:8080",

@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 import { Lm } from "../packages/api/dist/main.js";
 
-const template = "[INST] {prompt} [/INST]";
+const template = `<|im_start|>user
+{prompt}<|im_end|>
+<|im_start|>assistant`;
 
 async function main() {
   const lm = new Lm({
@@ -14,7 +16,7 @@ async function main() {
   });
   //await lm.loadModel("");
   const _prompt = template.replace("{prompt}", "list the planet of the solar system");
-  console.log('Prompt:', _prompt);
+  console.log('Prompt:', _prompt + "\n");
   const res = await lm.infer(_prompt, {
     stream: true,
     temperature: 0.5,

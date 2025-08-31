@@ -26,7 +26,7 @@ async function main() {
   });
   console.log("\n\Stats:\n", res.stats);
   const data = [
-    { key: "Think", value: res.stats.ingestionTimeSeconds, style: bg('blue') },
+    { key: "Ingest", value: res.stats.ingestionTimeSeconds, style: bg('blue') },
     { key: "Infer", value: res.stats.inferenceTimeSeconds, style: bg('green') },
     { key: "Total", value: res.stats.totalTimeSeconds, style: bg('yellow') },
   ];
