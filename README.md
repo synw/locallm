@@ -19,7 +19,7 @@ LocalLm provides a unified interface for multiple local language model backends,
 
 ## Supported Backends
 
-- **[Llama.cpp](https://github.com/ggerganov/llama.cpp/tree/master/examples/server)** - High-performance inference with C/C++ backend
+- **[Llama.cpp](https://github.com/ggerganov/llama.cpp)** - High-performance inference with C/C++ backend
 - **[Koboldcpp](https://github.com/LostRuins/koboldcpp)** - Feature-rich inference with GPU support
 - **[Ollama](https://github.com/jmorganca/ollama)** - Easy-to-use local model management
 - **[Wllama](https://github.com/ngxson/wllama)** - In-browser inference using WebAssembly
