@@ -1,12 +1,29 @@
 import type {
-    InferenceOptions, InferenceParams, InferenceResult, InferenceStats, IngestionStats, LmProvider, LmProviderParams, ModelConf, OnLoadProgress, ToolCallSpec, ToolSpec
+    InferenceOptions,
+    InferenceParams,
+    InferenceResult,
+    InferenceStats,
+    IngestionStats,
+    LmProvider,
+    LmProviderParams,
+    ModelConf,
+    OnLoadProgress,
+    ToolCallSpec,
+    ToolSpec,
 } from "@locallm/types";
+import OpenAI from "openai";
+import { RequestOptions } from "openai/internal/request-options.js";
+import {
+    ChatCompletionCreateParamsNonStreaming,
+    ChatCompletionCreateParamsStreaming,
+    ChatCompletionMessageFunctionToolCall,
+    ChatCompletionMessageParam,
+    ChatCompletionMessageToolCall,
+    ChatCompletionTool,
+} from "openai/resources/index.js";
 import { useApi } from "restmix";
-import OpenAI from "openai"
 import { useStats } from "../stats.js";
 import { convertToolCallSpec, generateId } from './utils.js';
-import { ChatCompletionCreateParamsNonStreaming, ChatCompletionCreateParamsStreaming, ChatCompletionMessageFunctionToolCall, ChatCompletionMessageParam, ChatCompletionMessageToolCall, ChatCompletionTool } from "openai/resources/index.js";
-import { RequestOptions } from "openai/internal/request-options.js";
 
 class OpenaiCompatibleProvider implements LmProvider {
     name: string;
@@ -92,10 +109,10 @@ class OpenaiCompatibleProvider implements LmProvider {
             this.model = inferenceParams.model;
             delete inferenceParams.model;
         }
+        if (options?.debug) {
+            console.log("Options", options);
+        }
         inferenceParams.stream = params.stream ?? true;
-        inferenceParams.template = undefined;
-        inferenceParams.gpu_layers = undefined;
-        inferenceParams.threads = undefined;
         const stats = useStats();
         stats.start();
         let finalStats = {} as InferenceStats;
@@ -122,25 +139,29 @@ class OpenaiCompatibleProvider implements LmProvider {
                     }
                     if (row?.tools) {
                         const toolCalls = new Array<ChatCompletionMessageToolCall>();
-                        row.tools.calls.forEach(tc => toolCalls.push({
-                            id: tc.id ?? "",
-                            type: "function",
-                            "function": {
-                                name: tc.name,
-                                arguments: JSON.stringify(tc.arguments)
-                            }
-                        }));
+                        const toolResponses = new Array<ChatCompletionMessageParam>();
+                        row.tools.forEach(tt => {
+                            toolCalls.push({
+                                id: tt.call.id ?? "",
+                                type: "function",
+                                "function": {
+                                    name: tt.call.name,
+                                    arguments: JSON.stringify(tt.call.arguments)
+                                }
+                            });
+                            toolResponses.push({
+                                role: "tool",
+                                tool_call_id: tt.call.id,
+                                content: tt.response,
+                            })
+                        });
                         msgs.push({
                             role: "assistant",
                             content: null,
                             tool_calls: toolCalls,
                         })
-                        for (const tr of row.tools.results) {
-                            msgs.push({
-                                role: "tool",
-                                tool_call_id: tr.id,
-                                content: tr.content,
-                            })
+                        for (const tr of toolResponses) {
+                            msgs.push(tr)
                         }
                     }
                 }
@@ -148,11 +169,6 @@ class OpenaiCompatibleProvider implements LmProvider {
         }
         if (prompt != " ") {
             msgs.push({ role: "user", content: prompt });
-        }
-        if (options?.debug) {
-            console.log("MSGS ----------\n");
-            console.log(msgs);
-            console.log("---------------");
         }
         let tools: Array<ChatCompletionTool> = [];
         this.tools = {};
@@ -169,10 +185,19 @@ class OpenaiCompatibleProvider implements LmProvider {
             inferenceParams = { ...inferenceParams, ...params.extra };
             delete inferenceParams.extra;
         }
-        /*console.log("Model", this.model.name);
-        console.log("IP", JSON.stringify(inferenceParams));
-        console.log("MSGS", msgs);*/
         const toolCalls = new Array<ToolCallSpec>();
+        if (options?.debug || options?.verbose) {
+            const tn = Object.keys(this.tools);
+            console.log(tn.length, "available tools:", tn);
+        }
+        if (options?.debug) {
+            console.dir(tools, { depth: 6 })
+        }
+        if (options?.debug || options?.verbose) {
+            console.log("Messages ----------\n");
+            console.dir(msgs, { depth: 6 });
+            console.log("-------------------");
+        }
         let i = 1;
         if (!params.stream) {
             const ip: ChatCompletionCreateParamsNonStreaming = {
@@ -181,6 +206,10 @@ class OpenaiCompatibleProvider implements LmProvider {
                 parallel_tool_calls: true,
                 ...inferenceParams,
             };
+            if (options?.debug || options?.verbose) {
+                console.log("Inference parameters:");
+                console.dir(inferenceParams, { depth: 4 });
+            }
             if (tools.length > 0) {
                 ip.tools = tools
             }
@@ -217,6 +246,10 @@ class OpenaiCompatibleProvider implements LmProvider {
                 ...inferenceParams,
                 stream: true,
             };
+            if (options?.debug || options?.verbose) {
+                console.log("Inference parameters:");
+                console.dir(inferenceParams, { depth: 4 });
+            }
             if (tools.length > 0) {
                 ip.tools = tools
             }
@@ -245,6 +278,9 @@ class OpenaiCompatibleProvider implements LmProvider {
                             if (!(tcName in modelRawToolCalls)) {
                                 modelRawToolCalls[tcName] = { id: "", arguments: new Array<string>() };
                                 currentToolCallName = tcName;
+                                if (options?.debug || options?.verbose) {
+                                    console.log("* Initiating tool call", currentToolCallName)
+                                }
                             }
                         }
                         if (part.choices[0].delta.tool_calls[0]?.id) {
@@ -283,7 +319,11 @@ class OpenaiCompatibleProvider implements LmProvider {
             serverStats: serverStats,
         };
         if (toolCalls.length > 0) {
-            ir.toolCalls = toolCalls
+            ir.toolCalls = toolCalls;
+            if (options?.debug) {
+                console.log("=> Tools calls:");
+                console.dir(toolCalls, { depth: 6 })
+            }
         }
         if (this.onEndEmit) {
             this.onEndEmit(ir)
@@ -302,5 +342,5 @@ class OpenaiCompatibleProvider implements LmProvider {
 }
 
 export {
-    OpenaiCompatibleProvider,
-}
+    OpenaiCompatibleProvider
+};

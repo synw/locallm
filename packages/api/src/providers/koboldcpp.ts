@@ -129,9 +129,6 @@ class KoboldcppProvider implements LmProvider {
       inferenceParams = { ...inferenceParams, ...params.extra };
       delete inferenceParams.extra;
     }
-    inferenceParams.template = undefined;
-    inferenceParams.gpu_layers = undefined;
-    inferenceParams.threads = undefined;
     const body = JSON.stringify(inferenceParams);
     //console.log("KBPARAMS", body);
     const url = `${this.serverUrl}/api/extra/generate/stream`;

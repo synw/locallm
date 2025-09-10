@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { Lm } from "../packages/api/dist/main.js";
 
-let model;
+let model; // Qwen 4b
 let apiKey = "";
 const serverUrl = "http://localhost:8080/v1" // llamacpp openai endpoint
 //const serverUrl = "http://localhost:5001/v1" // koboldcpp openai endpoint
@@ -70,23 +70,24 @@ async function main() {
         top_p: 0.95,
         min_p: 0,
         max_tokens: 4096,
-        extra: {
+    },
+        {
+            debug: true,
             system: system,
             model: model ?? "",
             tools: [get_current_weather, get_current_traffic]
-        }
-    });
+        });
     console.log(JSON.stringify(res, null, 2));
     const history = [{ user: _prompt }];
-    const toolsResults = [];
+    const toolCalls = [];
     if (res?.toolCalls) {
         for (const toolCall of res.toolCalls) {
             console.log("Tool call", JSON.stringify(toolCall, null, 2));
             const tr = tools[toolCall.name].execute(toolCall.arguments);
             console.log("tool result:", tr);
-            toolsResults.push({ id: toolCall.id, content: tr });
+            toolCalls.push({ call: toolCall, response: tr });
         }
-        history.push({ tools: { results: toolsResults, calls: res.toolCalls } })
+        history.push({ tools: toolCalls })
     } else {
         history.push({ assistant: res.text })
     }
@@ -97,13 +98,14 @@ async function main() {
         top_p: 0.95,
         min_p: 0,
         max_tokens: 4096,
-        extra: {
+    },
+        {
+            debug: true,
             system: system,
             model: model ?? "",
             tools: [get_current_weather, get_current_traffic],
             history: history,
-        }
-    });
+        });
     console.log()
     console.log("FINAL", JSON.stringify(res2, null, 2));
 }

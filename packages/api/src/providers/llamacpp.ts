@@ -109,10 +109,6 @@ class LlamacppProvider implements LmProvider {
       inferenceParams = { ...inferenceParams, ...params.extra };
       delete inferenceParams.extra;
     }
-    inferenceParams.template = undefined;
-    inferenceParams.gpu_layers = undefined;
-    inferenceParams.threads = undefined;
-
     const body = JSON.stringify(inferenceParams);
     //console.log("KBPARAMS", body);
     const url = `${this.serverUrl}/completion`;
@@ -123,13 +119,17 @@ class LlamacppProvider implements LmProvider {
     if (this.apiKey.length > 0) {
       headers["Authorization"] = `Bearer ${this.apiKey}`
     }
-
+    if (options?.debug) {
+      console.log("Template -------------");
+      console.log(prompt);
+      console.log("----------------------");
+    }
     let text = "";
     const stats = useStats();
     stats.start();
     let finalStats = {} as InferenceStats;
     let serverStats: Record<string, any> = {};
-    if (inferenceParams?.stream == true) {
+    if (inferenceParams?.stream === true) {
       const response = await fetch(url, {
         method: 'POST',
         headers: headers,
@@ -189,6 +189,9 @@ class LlamacppProvider implements LmProvider {
       stats: finalStats,
       serverStats: serverStats,
     };
+    if (options?.debug) {
+      console.dir(ir, { depth: 6 })
+    }
     if (this.onEndEmit) {
       this.onEndEmit(ir)
     }

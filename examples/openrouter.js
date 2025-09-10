@@ -20,8 +20,7 @@ async function main() {
     const res = await lm.infer(_prompt, {
         stream: true,
         temperature: 0.5,
-        extra: { system: system, model: model }
-    });
+    }, { system: system, model: model });
     console.log("\n\n", res)
 }
 
