@@ -1,26 +1,4 @@
 /**
- * Represents a tool call specification.
- *
- * @interface ToolCallSpec
- * @property {string | undefined} id - The unique identifier for the tool call.
- * @property {string} name - The name of the tool being called.
- * @property {Record<string, string> | undefined} arguments - The arguments to pass to the tool.
- * @example
- * const toolCall: ToolCallSpec = {
- *   id: '1',
- *   name: 'getWeather',
- *   arguments: { location: 'New York' }
- * };
- */
-interface ToolCallSpec {
-    id?: string;
-    name: string;
-    arguments?: {
-        [key: string]: string;
-    };
-}
-
-/**
  * Specification for a tool that can be used within the conversation.
  *
  * @interface ToolDefSpec
@@ -87,6 +65,28 @@ interface ToolDefSpec {
 interface ToolSpec extends ToolDefSpec {
     execute: <O = any>(args: { [key: string]: string; } | undefined) => Promise<O>;
     canRun?: (tool: ToolSpec) => Promise<boolean>;
+}
+
+/**
+ * Represents a tool call specification.
+ *
+ * @interface ToolCallSpec
+ * @property {string} id - The unique identifier for the tool call.
+ * @property {string} name - The name of the tool being called.
+ * @property {Record<string, string> | undefined} arguments - The arguments to pass to the tool.
+ * @example
+ * const toolCall: ToolCallSpec = {
+ *   id: '1',
+ *   name: 'getWeather',
+ *   arguments: { location: 'New York' }
+ * };
+ */
+interface ToolCallSpec {
+    id: string;
+    name: string;
+    arguments?: {
+        [key: string]: string;
+    };
 }
 
 export {

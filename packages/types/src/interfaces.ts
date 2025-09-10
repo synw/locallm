@@ -19,3 +19,5 @@ export type { ToolCallSpec } from "./tools.js";
 export type { ToolDefSpec } from "./tools.js";
 export type { ToolSpec } from "./tools.js";
 export type { HistoryTurn } from "./history.js";
+export type { ToolTurn } from "./history.js";
+export type { ImgData } from "./history.js";

@@ -20,9 +20,43 @@ import type { ToolCallSpec } from "./tools.js";
 interface HistoryTurn {
     user?: string;
     assistant?: string;
-    tools?: { calls: Array<ToolCallSpec>, results: Array<{ id: string, content: string }> };
+    think?: string;
+    images?: Array<ImgData>;
+    tools?: Array<ToolTurn>;
+    //tools?: { calls: Array<ToolCallSpec>, results: Array<{ id: string, content: string }> };
+}
+
+interface ToolTurn {
+    call: ToolCallSpec;
+    response: any;
+}
+
+/**
+ * Image data associated with a message or response.
+ *
+ * @interface ImgData
+ * @typedef {ImgData}
+ * 
+ * @example
+ * const imgExample: ImgData = {
+ *   id: 1,
+ *   data: 'base64image'
+ * };
+ */
+interface ImgData {
+    /**
+     * Unique identifier for the image.
+     */
+    id: number;
+
+    /**
+     * Base64 encoded image data.
+     */
+    data: string;
 }
 
 export {
     HistoryTurn,
+    ToolTurn,
+    ImgData,
 }
