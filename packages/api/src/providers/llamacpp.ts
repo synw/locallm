@@ -109,6 +109,10 @@ class LlamacppProvider implements LmProvider {
       inferenceParams = { ...inferenceParams, ...params.extra };
       delete inferenceParams.extra;
     }
+    // support for llama-swap
+    if (params?.model) {
+      inferenceParams.model = params.model.name;
+    }
     const body = JSON.stringify(inferenceParams);
     //console.log("KBPARAMS", body);
     const url = `${this.serverUrl}/completion`;
