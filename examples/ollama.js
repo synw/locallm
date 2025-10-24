@@ -2,8 +2,8 @@
 import { PromptTemplate } from "modprompt";
 import { Lm } from "../packages/api/dist/main.js";
 
-const model = "gemma3n:e2b";
-const template = new PromptTemplate("gemma");
+const model = "qwen3:4b-instruct";
+const template = new PromptTemplate("chatml");
 
 async function main() {
   const lm = new Lm({
@@ -28,6 +28,7 @@ async function main() {
     min_p: 0,
     temperature: 0.4,
     max_tokens: 2048,
+    extra: { raw: true }, // use no server templates
   });
   console.log("\n\nResult:\n", res)
 }

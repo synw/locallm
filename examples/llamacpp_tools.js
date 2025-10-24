@@ -40,21 +40,26 @@ async function main() {
     console.log("Is tool call:", isToolCall);
     if (isToolCall) {
         console.log("Tool calls:", toolsCall);
-        const toolsTurns = {};
+        const toolsTurns = [];
         toolsCall.forEach(tc => {
             // mock tool response
             const resp = { "temperature": 20.5, "traffic": "heavy" };
-            toolsTurns[tc.name] = { call: tc, response: template.encodeToolResponse(resp) };
+            toolsTurns.push({ call: tc, response: resp });
         });
         template.pushToHistory({ tools: toolsTurns });
     }
-    console.log("\nNext turn template:");
+    console.log("\n---------- Next turn template:");
     console.log(template.render());
-    /*const res2 = await lm.infer(template.prompt(prompt), {
+    console.log("--------------------------------");
+    const res2 = await lm.infer(template.prompt(prompt), {
         stream: true,
         temperature: 0.1,
         max_tokens: 4096
-    });*/
+    });
+    template.pushToHistory({ assistant: res2.text });
+    console.log("\n\n---------- Next turn template:");
+    console.log(template.render());
+    console.log("--------------------------------");
 }
 
 (async () => {
