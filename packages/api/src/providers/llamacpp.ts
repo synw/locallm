@@ -113,8 +113,13 @@ class LlamacppProvider implements LmProvider {
     if (params?.model) {
       inferenceParams.model = params.model.name;
     }
+    //console.log("OPTIONS", options);
     const body = JSON.stringify(inferenceParams);
-    //console.log("KBPARAMS", body);
+    if (options?.debug) {
+      console.log("Locallm: request body -------------");
+      console.log(inferenceParams);
+      console.log("-----------------------------------");
+    }
     const url = `${this.serverUrl}/completion`;
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -123,11 +128,11 @@ class LlamacppProvider implements LmProvider {
     if (this.apiKey.length > 0) {
       headers["Authorization"] = `Bearer ${this.apiKey}`
     }
-    if (options?.debug) {
+    /*if (options?.debug) {
       console.log("Template -------------");
       console.log(prompt);
       console.log("----------------------");
-    }
+    }*/
     let text = "";
     const stats = useStats();
     stats.start();
@@ -140,6 +145,9 @@ class LlamacppProvider implements LmProvider {
         body: body,
         signal: this.abortController.signal,
       });
+      if (!response.ok) {
+        throw new Error(`Inference server error: ${response.status} ${response.statusText}, ${response?.text}`)
+      }
       if (!response.body) {
         throw new Error("No response body")
       }
