@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { Lm } from "../packages/api/dist/main.js";
 
-let model; // Qwen 4b
+let model = "qwen1.7b"; // using llama-swap
 let apiKey = "";
 const serverUrl = "http://localhost:8080/v1" // llamacpp openai endpoint
 //const serverUrl = "http://localhost:5001/v1" // koboldcpp openai endpoint
@@ -70,11 +70,11 @@ async function main() {
         top_p: 0.95,
         min_p: 0,
         max_tokens: 4096,
+        model: { name: model }
     },
         {
-            debug: true,
+            verbose: true,
             system: system,
-            model: model ?? "",
             tools: [get_current_weather, get_current_traffic]
         });
     console.log(JSON.stringify(res, null, 2));
@@ -98,11 +98,11 @@ async function main() {
         top_p: 0.95,
         min_p: 0,
         max_tokens: 4096,
+        model: { name: model }
     },
         {
-            debug: true,
+            verbose: true,
             system: system,
-            model: model ?? "",
             tools: [get_current_weather, get_current_traffic],
             history: history,
         });

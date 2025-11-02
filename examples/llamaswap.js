@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { Lm } from "../packages/api/dist/main.js";
 
-const models = ["qwen1.7b", "qwencoder1.5b"]
+const models = ["qwen1.7b", "qwen4b"]
 
 const template = `<|im_start|>system
 You are a helpful assistant<|im_end|>
@@ -20,16 +20,16 @@ async function main() {
   });
   const _prompt = template.replace("{prompt}", "list the planet of the solar system");
   await lm.infer(_prompt, {
-    model: { name: models[0], ctx: 8192 },
+    model: { name: models[0] },
     stream: true,
     temperature: 0.5,
-  });
-  console.log("\nSwitching to model", models[1])
+  }, { debug: true });
+  console.log("\nSwitching to model", models[1]);
   await lm.infer(_prompt, {
-    model: { name: models[1], ctx: 8192 },
+    model: { name: models[1] },
     stream: true,
-    temperature: 0.5,
-  });
+    temperature: 0.2,
+  }, { debug: true });
 }
 
 (async () => {
