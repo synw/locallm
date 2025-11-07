@@ -3,20 +3,23 @@ import { Lm } from "../packages/api/dist/main.js";
 
 const system = "You are a helpful assistant";
 const _prompt = "list the planet of the solar system. Ouptut only the list";
-//const serverUrl = "http://localhost:8080/v1"; // llamacpp or llama-swap
-//const model = "qwen1.7b"; // llama-swap
-const serverUrl = "https://openrouter.ai/api/v1";
-const model = "qwen/qwen3-4b:free";
-const apiKey = process.env.OPENROUTER_API_KEY;
+const serverUrl = "http://localhost:8080/v1"; // llamacpp or llama-swap
+const model = "qwen1.7b"; // llama-swap
+const apiKey = "";
+//const serverUrl = "https://openrouter.ai/api/v1";
+//const model = "qwen/qwen3-4b:free";
+//const apiKey = process.env.OPENROUTER_API_KEY;
 
-async function main() {
+async function main()
+{
     const lm = new Lm({
         providerType: "openai",
         serverUrl: serverUrl,
         apiKey: apiKey,
         onToken: (t) => process.stdout.write(t),
     });
-    process.on('SIGINT', () => {
+    process.on('SIGINT', () =>
+    {
         lm.abort().then(() => process.exit());
     });
     const res = await lm.infer(_prompt, {
@@ -29,6 +32,7 @@ async function main() {
     console.log("\n\n", res)
 }
 
-(async () => {
+(async () =>
+{
     await main();
 })();
