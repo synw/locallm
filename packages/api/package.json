@@ -8,8 +8,8 @@
     "docs": "typedoc --entryPointStrategy expand"
   },
   "dependencies": {
-    "eventsource-parser": "^2.0.1",
-    "openai": "6.7.0",
+    "eventsource-parser": "^3.0.6",
+    "openai": "6.8.1",
     "restmix": "^0.5.0"
   },
   "devDependencies": {
@@ -18,7 +18,7 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.3.0",
     "@types/js-cookie": "^3.0.6",
-    "@types/node": "^24.9.2",
+    "@types/node": "^24.10.0",
     "rollup": "^4.52.5",
     "ts-node": "^10.9.2",
     "tslib": "^2.8.1",

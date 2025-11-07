@@ -1,5 +1,5 @@
 import { useApi } from 'restmix';
-import { type ParsedEvent } from 'eventsource-parser'
+import { type EventSourceMessage } from 'eventsource-parser'
 import { EventSourceParserStream } from 'eventsource-parser/stream';
 import {
   InferenceOptions, InferenceParams, InferenceResult, InferenceStats, IngestionStats, LmProvider, LmProviderParams, ModelConf, OnLoadProgress
@@ -171,7 +171,7 @@ class KoboldcppProvider implements LmProvider {
             }
           }
           if (this.onToken) {
-            const t = JSON.parse((value as ParsedEvent).data)["token"];
+            const t = JSON.parse((value as EventSourceMessage).data)["token"];
             this.onToken(t);
             buf.push(t);
           }

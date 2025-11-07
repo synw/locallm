@@ -1,5 +1,5 @@
 import { useApi } from 'restmix';
-import { type ParsedEvent } from 'eventsource-parser';
+import { type EventSourceMessage } from 'eventsource-parser';
 import { EventSourceParserStream } from 'eventsource-parser/stream';
 import {
   InferenceOptions, InferenceParams, InferenceResult, InferenceStats, IngestionStats, LmProvider, LmProviderParams, ModelConf, OnLoadProgress
@@ -167,7 +167,7 @@ class LlamacppProvider implements LmProvider {
             }
           }
           if (this.onToken) {
-            const payload = JSON.parse((value as ParsedEvent).data);
+            const payload = JSON.parse((value as EventSourceMessage).data);
             const t = payload["content"];
             this.onToken(t);
             buf.push(t);
