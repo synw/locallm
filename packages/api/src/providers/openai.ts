@@ -168,7 +168,9 @@ class OpenaiCompatibleProvider implements LmProvider {
         if (options?.tools) {
             options.tools.forEach(t => {
                 this.tools[t.name] = t;
-                tools.push(convertToolCallSpec(t));
+                const finalToolCall = convertToolCallSpec(t);
+                console.log("TC", finalToolCall);
+                tools.push(finalToolCall);
             });
         }
         if (options?.assistant) {
