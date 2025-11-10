@@ -169,7 +169,8 @@ class OpenaiCompatibleProvider implements LmProvider {
             options.tools.forEach(t => {
                 this.tools[t.name] = t;
                 const finalToolCall = convertToolCallSpec(t);
-                console.log("TC", finalToolCall);
+                //console.log("Tool call def:")
+                //console.dir(finalToolCall, { depth: 5 });
                 tools.push(finalToolCall);
             });
         }
@@ -180,7 +181,6 @@ class OpenaiCompatibleProvider implements LmProvider {
             inferenceParams = { ...inferenceParams, ...params.extra };
             delete inferenceParams.extra;
         }
-        const toolCalls = new Array<ToolCallSpec>();
         if (options?.debug || options?.verbose) {
             const tn = Object.keys(this.tools);
             console.log(tn.length, "available tools:", tn);
@@ -195,6 +195,8 @@ class OpenaiCompatibleProvider implements LmProvider {
         }
         let i = 1;
         let text: string;
+        let thinkingText = "";
+        const toolCalls = new Array<ToolCallSpec>();
         if (!params.stream) {
             const ip: ChatCompletionCreateParamsNonStreaming = {
                 messages: msgs,
@@ -207,7 +209,8 @@ class OpenaiCompatibleProvider implements LmProvider {
                 console.dir(inferenceParams, { depth: 4 });
             }
             if (tools.length > 0) {
-                ip.tools = tools
+                ip.tools = tools;
+                ip.tool_choice = "auto";
             }
             //console.log("IP", JSON.stringify(ip, null, 2));
             this.api.addHeader('Content-Type', 'application/json')
@@ -227,9 +230,10 @@ class OpenaiCompatibleProvider implements LmProvider {
             i = text.length > 0 ? text.length : (completion.usage?.completion_tokens ?? 0);
             serverStats = completion?.usage ?? {};
             if (completion.choices[0].finish_reason == "tool_calls") {
-                const tcs = completion.choices[0].message.tool_calls as Array<ChatCompletionMessageToolCall> ?? [];
-                tcs?.forEach(_tc => {
-                    const tc = _tc as ChatCompletionMessageFunctionToolCall;
+                //console.log("TOOL CALLS NO STREAM:");
+                //console.dir(completion.choices[0].message.tool_calls, { depth: 8 })
+                const tcs = completion.choices[0].message.tool_calls as Array<ChatCompletionMessageFunctionToolCall> ?? [];
+                tcs?.forEach(tc => {
                     const toolCall: ToolCallSpec = {
                         id: tc.id ?? generateId(),
                         name: tc.function.name,
@@ -258,7 +262,8 @@ class OpenaiCompatibleProvider implements LmProvider {
                 console.dir(inferenceParams, { depth: 4 });
             }
             if (tools.length > 0) {
-                ip.tools = tools
+                ip.tools = tools;
+                ip.tool_choice = "auto";
             }
             const headers: Record<string, string> = {
                 'Content-Type': 'application/json',
@@ -342,11 +347,29 @@ class OpenaiCompatibleProvider implements LmProvider {
                                     modelRawToolCalls[currentToolCallName].arguments.push(strArg);
                                 }
                             }
-                            const t = part.choices[0]?.delta?.reasoning_content ? part.choices[0].delta.reasoning_content : part.choices[0]?.delta?.content;
+                            let t: string;
+                            let isThinking = false;
+                            if (part.choices[0]?.delta?.reasoning_content) {
+                                isThinking = true;
+                                if (thinkingText.length == 0) {
+                                    t = "<think>\n" + part.choices[0]?.delta?.reasoning_content;
+                                } else {
+                                    t = part.choices[0]?.delta?.reasoning_content;
+                                }
+                                thinkingText += t;
+                            } else {
+                                if (buf.length == 0 && thinkingText.length > 0) {
+                                    t = "\n</think>\n\n" + part.choices[0]?.delta?.content
+                                } else {
+                                    t = part.choices[0]?.delta?.content
+                                }
+                            }
                             if (t) {
                                 //console.log("T", JSON.stringify(t, null, "  "), "///", JSON.stringify(part, null, "  "));
                                 this.onToken(t);
-                                buf.push(t);
+                                if (!isThinking) {
+                                    buf.push(t);
+                                }
                             }
                             ++i
 
@@ -370,14 +393,13 @@ class OpenaiCompatibleProvider implements LmProvider {
             while (true) {
                 const { done, value } = await reader.read();
                 if (done) {
-                    console.log('\nStream finished by server.');
                     break;
                 }
                 // Enqueue the raw chunk bytes into the parser
                 const chunk = new TextDecoder().decode(value);
                 parser.feed(chunk);
             }
-            text = buf.join("");
+            text = thinkingText + buf.join("");
         }
         finalStats = stats.inferenceEnds(i);
         const ir: InferenceResult = {

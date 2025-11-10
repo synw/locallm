@@ -69,6 +69,7 @@ async function main()
         lm.abort().then(() => process.exit());
     });
     const res = await lm.infer(_prompt, {
+        stream: false,
         temperature: 0.5,
         top_k: 40,
         top_p: 0.95,
