@@ -4,7 +4,7 @@ import { Lm } from "../packages/api/dist/main.js";
 const system = "You are a helpful assistant";
 const _prompt = "list the planet of the solar system. Ouptut only the list";
 const serverUrl = "http://localhost:8080/v1"; // llamacpp or llama-swap
-const model = "qwen1.7b"; // llama-swap
+const model = "qwen1.7b-t"; // llama-swap
 const apiKey = "";
 //const serverUrl = "https://openrouter.ai/api/v1";
 //const model = "qwen/qwen3-4b:free";

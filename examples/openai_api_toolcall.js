@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { Lm } from "../packages/api/dist/main.js";
 
-let model = "qwen1.7b"; // using llama-swap
+let model = "qwen4b-t"; // using llama-swap
 let apiKey = "";
 const serverUrl = "http://localhost:8080/v1" // llamacpp openai endpoint
 //const serverUrl = "http://localhost:5001/v1" // koboldcpp openai endpoint
@@ -15,12 +15,14 @@ const _prompt = `I am landing in Barcelona soon: I plan to reach my hotel and th
 How are the conditions in the city?`;
 //const _prompt = "What is the current weather in Barcelona?"
 
-function run_get_current_weather(args) {
+function run_get_current_weather(args)
+{
     console.log("Running the get_current_weather tool with args", args);
     return '{ "temp": 20.5, "weather": "rain" }'
 }
 
-function run_get_current_traffic(args) {
+function run_get_current_traffic(args)
+{
     console.log("Running the get_current_traffic tool with args", args);
     return '{ "trafic": "normal" }'
 }
@@ -54,14 +56,16 @@ const tools = {
     "get_current_traffic": get_current_traffic,
 }
 
-async function main() {
+async function main()
+{
     const lm = new Lm({
         providerType: "openai",
         serverUrl: serverUrl,
         apiKey: apiKey,
         onToken: (t) => process.stdout.write(t),
     });
-    process.on('SIGINT', () => {
+    process.on('SIGINT', () =>
+    {
         lm.abort().then(() => process.exit());
     });
     const res = await lm.infer(_prompt, {
@@ -110,6 +114,7 @@ async function main() {
     console.log("FINAL", JSON.stringify(res2, null, 2));
 }
 
-(async () => {
+(async () =>
+{
     await main();
 })();

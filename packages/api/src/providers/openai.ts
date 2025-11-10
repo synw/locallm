@@ -11,9 +11,8 @@ import type {
     ToolCallSpec,
     ToolSpec,
 } from "@locallm/types";
-import OpenAI from "openai";
-import { RequestOptions } from "openai/internal/request-options.js";
-import {
+import { createParser } from 'eventsource-parser';
+import type {
     ChatCompletionCreateParamsNonStreaming,
     ChatCompletionCreateParamsStreaming,
     ChatCompletionMessageFunctionToolCall,
@@ -38,7 +37,6 @@ class OpenaiCompatibleProvider implements LmProvider {
     abortController = new AbortController();
     apiKey: string;
     serverUrl: string;
-    openai: OpenAI;
     tools: Record<string, ToolSpec> = {};
 
     /**
@@ -54,10 +52,6 @@ class OpenaiCompatibleProvider implements LmProvider {
         this.onError = params.onError;
         this.apiKey = params.apiKey ?? "";
         this.serverUrl = params.serverUrl;
-        this.openai = new OpenAI({
-            apiKey: this.apiKey ?? "",
-            baseURL: this.serverUrl,
-        })
         this.api = useApi({
             serverUrl: params.serverUrl,
             credentials: "omit",
@@ -117,10 +111,9 @@ class OpenaiCompatibleProvider implements LmProvider {
         stats.start();
         let finalStats = {} as InferenceStats;
         let serverStats: Record<string, any> = {};
-        let text: string;
         let msgs: Array<ChatCompletionMessageParam> = [];
         if (options?.system) {
-            msgs = [{ role: "system", content: options.system }];
+            msgs = [{ role: "developer", content: options.system }];
         }
         if (options?.history) {
             options.history.forEach(
@@ -199,6 +192,7 @@ class OpenaiCompatibleProvider implements LmProvider {
             console.log("-------------------");
         }
         let i = 1;
+        let text: string;
         if (!params.stream) {
             const ip: ChatCompletionCreateParamsNonStreaming = {
                 messages: msgs,
@@ -214,13 +208,24 @@ class OpenaiCompatibleProvider implements LmProvider {
                 ip.tools = tools
             }
             //console.log("IP", JSON.stringify(ip, null, 2));
-            const completion = await this.openai.chat.completions.create(ip);
-            //console.log("RESP", JSON.stringify(completion, null, "  "));
-            text = completion.choices[0].message.content ?? "";
+            this.api.addHeader('Content-Type', 'application/json')
+            if (this.apiKey.length > 0) {
+                this.api.addHeader("Authorization", `Bearer ${this.apiKey}`);
+            }
+            const _url = `/chat/completions`;
+            //console.log("URL", _url);
+            const res = await this.api.post<Record<string, any>>(_url, ip, false, true);
+            if (!res.ok) {
+                throw new Error(`${res.statusText} ${res.status}`);
+            }
+            //const completion = await this.openai.chat.completions.create(ip);
+            //console.log("RESP", JSON.stringify(res, null, "  "));
+            const completion = res.data;
+            text = res.data.choices[0].message.content ?? "";
             i = text.length > 0 ? text.length : (completion.usage?.completion_tokens ?? 0);
             serverStats = completion?.usage ?? {};
             if (completion.choices[0].finish_reason == "tool_calls") {
-                const tcs = completion.choices[0].message.tool_calls ?? [];
+                const tcs = completion.choices[0].message.tool_calls as Array<ChatCompletionMessageToolCall> ?? [];
                 tcs?.forEach(_tc => {
                     const tc = _tc as ChatCompletionMessageFunctionToolCall;
                     const toolCall: ToolCallSpec = {
@@ -253,62 +258,122 @@ class OpenaiCompatibleProvider implements LmProvider {
             if (tools.length > 0) {
                 ip.tools = tools
             }
-            const opts: RequestOptions = {
-                signal: this.abortController.signal,
+            const headers: Record<string, string> = {
+                'Content-Type': 'application/json',
+                //'Accept': 'text/event-stream',
+            };
+            if (this.apiKey.length > 0) {
+                headers["Authorization"] = `Bearer ${this.apiKey}`
+            }
+            const _url = `${this.serverUrl}/chat/completions`;
+            const body = JSON.stringify(ip);
+            if (options?.debug) {
+                console.log("Locallm: request body -------------");
+                console.log(ip);
+                console.log("-----------------------------------");
             }
             //console.log("IP", JSON.stringify(ip, null, 2));
-            const completion = this.openai.chat.completions.stream(ip, opts);
-            //console.log("RESP", JSON.stringify(completion, null, "  "));
+            const response = await fetch(_url, {
+                method: 'POST',
+                headers: headers,
+                body: body,
+                signal: this.abortController.signal,
+            });
+            if (!response.ok) {
+                throw new Error(`Inference server error: ${response.status} ${response.statusText}, ${response}`)
+            }
+            if (!response.body) {
+                throw new Error("No response body")
+            }
             let buf = new Array<string>();
-            if (this.onToken) {
-                if (i == 0) {
-                    const ins = stats.inferenceStarts();
-                    if (this.onStartEmit) {
-                        this.onStartEmit(ins)
-                    }
-                }
-                const modelRawToolCalls: Record<string, { id: string, arguments: Array<string> }> = {};
-                let currentToolCallName = "";
-                for await (const part of completion) {
-                    //console.log("PART");
-                    //console.dir(part, { depth: 8 });
-                    if (part.choices[0]?.delta?.tool_calls) {
-                        if (part.choices[0].delta.tool_calls[0]?.function?.name) {
-                            const tcName = part.choices[0].delta.tool_calls[0].function.name;
-                            if (!(tcName in modelRawToolCalls)) {
-                                modelRawToolCalls[tcName] = { id: "", arguments: new Array<string>() };
-                                currentToolCallName = tcName;
-                                if (options?.debug || options?.verbose) {
-                                    console.log("* Initiating tool call", currentToolCallName)
-                                }
+            const reader = response.body.getReader();
+            let i = 1;
+            // @ts-ignore
+            const parser = createParser({
+                onEvent: (event) => {
+                    const done = event.data === '[DONE]';
+                    if (!done) {
+                        if (i == 1) {
+                            const ins = stats.inferenceStarts();
+                            if (this.onStartEmit) {
+                                this.onStartEmit(ins)
                             }
                         }
-                        if (part.choices[0].delta.tool_calls[0]?.id) {
-                            const tcId = part.choices[0].delta.tool_calls[0].id;
-                            modelRawToolCalls[currentToolCallName].id = tcId;
+                        if (this.onToken) {
+                            const payload = JSON.parse(event.data);
+                            //console.log("PAYLOAD:", payload);
+                            //console.dir(payload, { depth: 5 });
+                            const part = payload;
+                            if (i == 0) {
+                                const ins = stats.inferenceStarts();
+                                if (this.onStartEmit) {
+                                    this.onStartEmit(ins)
+                                }
+                            }
+                            const modelRawToolCalls: Record<string, { id: string, arguments: Array<string> }> = {};
+                            let currentToolCallName = "";
+
+                            //console.log("PART");
+                            //console.dir(part, { depth: 8 });
+                            if (part.choices[0]?.delta?.tool_calls) {
+                                console.log("Tool calls:");
+                                console.dir(part.choices[0]?.delta?.tool_calls, { depth: 8 });
+                                if (part.choices[0].delta.tool_calls[0]?.function?.name) {
+                                    const tcName = part.choices[0].delta.tool_calls[0].function.name;
+                                    if (!(tcName in modelRawToolCalls)) {
+                                        modelRawToolCalls[tcName] = {
+                                            id: part.choices[0].delta.tool_calls[0]?.id ?? "",
+                                            arguments: new Array<string>()
+                                        };
+                                        currentToolCallName = tcName;
+                                        if (options?.debug || options?.verbose) {
+                                            console.log("* Initiating tool call", currentToolCallName)
+                                        }
+                                    }
+                                }
+                                if (part.choices[0].delta.tool_calls[0]?.id) {
+                                    const tcId = part.choices[0].delta.tool_calls[0].id;
+                                    modelRawToolCalls[currentToolCallName].id = tcId;
+                                }
+                                if (part.choices[0].delta.tool_calls[0]?.function?.arguments) {
+                                    const strArg = part.choices[0].delta.tool_calls[0].function.arguments;
+                                    modelRawToolCalls[currentToolCallName].arguments.push(strArg);
+                                }
+                            }
+                            const t = part.choices[0]?.delta?.reasoning_content ? part.choices[0].delta.reasoning_content : part.choices[0]?.delta?.content;
+                            if (t) {
+                                //console.log("T", JSON.stringify(t, null, "  "), "///", JSON.stringify(part, null, "  "));
+                                this.onToken(t);
+                                buf.push(t);
+                            }
+                            ++i
+
+                            for (const [k, v] of Object.entries(modelRawToolCalls)) {
+                                const args = JSON.parse(v.arguments.join(""));
+                                const toolCall: ToolCallSpec = {
+                                    id: v.id ?? generateId(),
+                                    name: k,
+                                    arguments: args,
+                                }
+                                toolCalls.push(toolCall)
+                            }
                         }
-                        if (part.choices[0].delta.tool_calls[0]?.function?.arguments) {
-                            const strArg = part.choices[0].delta.tool_calls[0].function.arguments;
-                            modelRawToolCalls[currentToolCallName].arguments.push(strArg);
-                        }
+                        ++i
+                    } else {
+                        reader.cancel();
+                        return;
                     }
-                    const t = part.choices[0]?.delta?.content;
-                    if (t) {
-                        //console.log("T", JSON.stringify(t, null, "  "), "///", JSON.stringify(part, null, "  "));
-                        this.onToken(t);
-                        buf.push(t);
-                    }
-                    ++i
                 }
-                for (const [k, v] of Object.entries(modelRawToolCalls)) {
-                    const args = JSON.parse(v.arguments.join(""));
-                    const toolCall: ToolCallSpec = {
-                        id: v.id ?? generateId(),
-                        name: k,
-                        arguments: args,
-                    }
-                    toolCalls.push(toolCall)
+            });
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) {
+                    console.log('\nStream finished by server.');
+                    break;
                 }
+                // Enqueue the raw chunk bytes into the parser
+                const chunk = new TextDecoder().decode(value);
+                parser.feed(chunk);
             }
             text = buf.join("");
         }

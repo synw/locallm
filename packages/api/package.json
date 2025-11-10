@@ -19,7 +19,7 @@
     "@rollup/plugin-typescript": "^12.3.0",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^24.10.0",
-    "rollup": "^4.52.5",
+    "rollup": "^4.53.2",
     "ts-node": "^10.9.2",
     "tslib": "^2.8.1",
     "typedoc": "^0.28.14",
