@@ -9,10 +9,10 @@
   },
   "dependencies": {
     "eventsource-parser": "^3.0.6",
-    "openai": "6.8.1",
     "restmix": "^0.5.0"
   },
   "devDependencies": {
+    "openai": "6.8.1",
     "@locallm/types": "^0.4.2",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-terser": "^0.4.4",

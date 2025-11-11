@@ -287,7 +287,7 @@ class OpenaiCompatibleProvider implements LmProvider {
                 signal: this.abortController.signal,
             });
             if (!response.ok) {
-                throw new Error(`Inference server error: ${response.status} ${response.statusText}, ${response}`)
+                throw new Error(`Inference server error: ${response.status} ${response.statusText}, ${JSON.stringify(response,null,2)}`)
             }
             if (!response.body) {
                 throw new Error("No response body")
@@ -295,7 +295,15 @@ class OpenaiCompatibleProvider implements LmProvider {
             let buf = new Array<string>();
             const reader = response.body.getReader();
             let i = 1;
-            // @ts-ignore
+            let accumulatedToolCalls: Array<{
+            id: string;
+            function: {
+                name: string;
+                arguments: string;
+            };
+            type: string;
+            index: number;
+        }> = [];
             const parser = createParser({
                 onEvent: (event) => {
                     const done = event.data === '[DONE]';
@@ -310,7 +318,6 @@ class OpenaiCompatibleProvider implements LmProvider {
                             const payload = JSON.parse(event.data);
                             //console.log("PAYLOAD:", payload);
                             //console.dir(payload, { depth: 5 });
-                            const part = payload;
                             if (i == 0) {
                                 const ins = stats.inferenceStarts();
                                 if (this.onStartEmit) {
@@ -320,48 +327,80 @@ class OpenaiCompatibleProvider implements LmProvider {
                             const modelRawToolCalls: Record<string, { id: string, arguments: Array<string> }> = {};
                             let currentToolCallName = "";
 
-                            //console.log("PART");
-                            //console.dir(part, { depth: 8 });
-                            if (part.choices[0]?.delta?.tool_calls) {
-                                console.log("Tool calls:");
-                                console.dir(part.choices[0]?.delta?.tool_calls, { depth: 8 });
-                                if (part.choices[0].delta.tool_calls[0]?.function?.name) {
-                                    const tcName = part.choices[0].delta.tool_calls[0].function.name;
-                                    if (!(tcName in modelRawToolCalls)) {
-                                        modelRawToolCalls[tcName] = {
-                                            id: part.choices[0].delta.tool_calls[0]?.id ?? "",
+                            const choice = payload.choices[0];
+                            if (!choice) return;
+
+                            const delta = choice.delta;
+                            if (!delta) return;
+
+                            // Check for tool calls in the delta
+                            if (delta.tool_calls && delta.tool_calls.length > 0) {
+                                for (const toolCallDelta of delta.tool_calls) {
+                                    const index = toolCallDelta.index;
+
+                                    // Ensure the array is large enough
+                                    if (!accumulatedToolCalls[index]) {
+                                        accumulatedToolCalls[index] = {
+                                            id: toolCallDelta.id || '',
+                                            function: {
+                                                name: toolCallDelta.function?.name || '',
+                                                arguments: toolCallDelta.function?.arguments || ''
+                                            },
+                                            type: toolCallDelta.type || 'function',
+                                            index: index
+                                        };
+                                    } else {
+                                        // Update existing tool call with new information
+                                        if (toolCallDelta.id) {
+                                            accumulatedToolCalls[index].id = toolCallDelta.id;
+                                        }
+                                        if (toolCallDelta.function?.name) {
+                                            accumulatedToolCalls[index].function.name = toolCallDelta.function.name;
+                                        }
+                                        if (toolCallDelta.function?.arguments) {
+                                            accumulatedToolCalls[index].function.arguments += toolCallDelta.function.arguments;
+                                        }
+                                    }
+                                }
+                            }
+
+                             // Check for finish_reason if the tool call is complete
+                            const finishReason = choice.finish_reason;
+                            if (finishReason === 'tool_calls') {
+                                //console.log('\n--- Tool Call Ready ---');
+                                for (const toolCall of accumulatedToolCalls) {
+                                    //console.log('Tool Name:', toolCall.function.name);
+                                    //console.log('Arguments:', toolCall.function.arguments);
+                                    if (!(toolCall.function.name in modelRawToolCalls)) {
+                                        modelRawToolCalls[toolCall.function.name] = {
+                                            id: toolCall.id ?? "",
                                             arguments: new Array<string>()
                                         };
-                                        currentToolCallName = tcName;
+                                        currentToolCallName = toolCall.function.name;
                                         if (options?.debug || options?.verbose) {
                                             console.log("* Initiating tool call", currentToolCallName)
                                         }
                                     }
+                                    modelRawToolCalls[currentToolCallName].id = toolCall.id;
+                                    modelRawToolCalls[currentToolCallName].arguments.push(toolCall.function.arguments);
                                 }
-                                if (part.choices[0].delta.tool_calls[0]?.id) {
-                                    const tcId = part.choices[0].delta.tool_calls[0].id;
-                                    modelRawToolCalls[currentToolCallName].id = tcId;
-                                }
-                                if (part.choices[0].delta.tool_calls[0]?.function?.arguments) {
-                                    const strArg = part.choices[0].delta.tool_calls[0].function.arguments;
-                                    modelRawToolCalls[currentToolCallName].arguments.push(strArg);
-                                }
+                                reader.cancel();
                             }
                             let t: string;
                             let isThinking = false;
-                            if (part.choices[0]?.delta?.reasoning_content) {
+                            if (delta?.reasoning_content) {
                                 isThinking = true;
                                 if (thinkingText.length == 0) {
-                                    t = "<think>\n" + part.choices[0]?.delta?.reasoning_content;
+                                    t = "<think>\n" + delta?.reasoning_content;
                                 } else {
-                                    t = part.choices[0]?.delta?.reasoning_content;
+                                    t = delta?.reasoning_content;
                                 }
                                 thinkingText += t;
                             } else {
                                 if (buf.length == 0 && thinkingText.length > 0) {
-                                    t = "\n</think>\n\n" + part.choices[0]?.delta?.content
+                                    t = "\n</think>\n\n" + delta?.content
                                 } else {
-                                    t = part.choices[0]?.delta?.content
+                                    t = delta?.content
                                 }
                             }
                             if (t) {
