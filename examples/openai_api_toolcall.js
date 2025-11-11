@@ -69,7 +69,7 @@ async function main()
         lm.abort().then(() => process.exit());
     });
     const res = await lm.infer(_prompt, {
-        stream: false,
+        //stream: false,
         temperature: 0.5,
         top_k: 40,
         top_p: 0.95,
@@ -78,7 +78,7 @@ async function main()
         model: { name: model }
     },
         {
-            verbose: true,
+            //verbose: true,
             system: system,
             tools: [get_current_weather, get_current_traffic]
         });
@@ -106,13 +106,12 @@ async function main()
         model: { name: model }
     },
         {
-            verbose: true,
+            //verbose: true,
             system: system,
             tools: [get_current_weather, get_current_traffic],
             history: history,
         });
     console.log()
-    console.log("FINAL", JSON.stringify(res2, null, 2));
 }
 
 (async () =>
