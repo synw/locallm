@@ -1,5 +1,5 @@
-import { ChatCompletionFunctionTool } from "openai/resources/index";
-import { ToolSpec } from "@locallm/types";
+import type { ChatCompletionFunctionTool } from "openai/resources/index";
+import type { ToolSpec } from "@locallm/types";
 
 async function convertImageDataToBase64(imageData: Buffer): Promise<string> {
   const base64String = imageData.toString('base64');

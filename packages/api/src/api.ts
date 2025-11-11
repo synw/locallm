@@ -6,7 +6,6 @@ import { KoboldcppProvider } from './providers/koboldcpp.js';
 import { OllamaProvider } from "./providers/ollama.js";
 import { LlamacppProvider } from "./providers/llamacpp.js";
 import { OpenaiCompatibleProvider } from "./providers/openai.js";
-import { OpenAI } from "openai";
 
 /**
  * Represents a Language Model (LM) which acts as a high-level interface to various underlying LM providers.
@@ -33,7 +32,6 @@ class Lm implements LmProvider {
   apiKey: string;
   serverUrl: string;
   defaults?: LmDefaults;
-  openai: OpenAI | undefined;
 
   /**
    * Constructs a new LM instance with the specified provider and parameters.
@@ -79,10 +77,6 @@ class Lm implements LmProvider {
           name: "Openai compatible",
           ...commonParams
         });
-        this.openai = new OpenAI({
-          apiKey: params.apiKey ?? "",
-          baseURL: params.serverUrl,
-        })
         break;
       default:
         throw new Error(`Unknown provider ${params.providerType}`)

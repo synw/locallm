@@ -1,6 +1,6 @@
 {
   "name": "@locallm/api",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "An api to query local language models using different backends",
   "repository": "https://github.com/synw/locallm",
   "scripts": {
