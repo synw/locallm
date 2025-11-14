@@ -1,5 +1,3 @@
-import type { useApi } from "restmix";
-
 /**
  * Represents the configuration of a model.
  *
