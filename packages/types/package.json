@@ -1,6 +1,6 @@
 {
   "name": "@locallm/types",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Shared data types for the LocalLm api",
   "repository": "https://github.com/synw/locallm",
   "scripts": {
@@ -25,7 +25,7 @@
     "dist"
   ],
   "module": "./dist/main.js",
-  "types": "./dist/interfaces.d.ts",
+  "types": "./dist/main.d.ts",
   "exports": {
     ".": {
       "import": "./dist/main.js"
