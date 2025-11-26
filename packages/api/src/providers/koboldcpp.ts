@@ -50,13 +50,14 @@ class KoboldcppProvider implements LmProvider {
   /**
    * Not implemented for this provider
    *
-   * @returns {Promise<void>}
+   * @returns {Promise<ModelConf>}
    */
-  async modelsInfo(): Promise<void> {
+  async modelsInfo(): Promise<Array<ModelConf>> {
     console.warn("Not implemented for this provider")
+    return []
   }
 
-  async info(): Promise<Record<string, any>> {
+  async modelInfo(): Promise<ModelConf> {
     // load ctx
     const res = await this.api.get<{ value: number }>("/api/extra/true_max_context_length");
     if (res.ok) {
@@ -98,7 +99,7 @@ class KoboldcppProvider implements LmProvider {
     //console.log("INFER");
     // autoload model
     if (this.model.name.length > 0) {
-      await this.info()
+      await this.modelInfo()
     }
     this.abortController = new AbortController();
     if (params?.template) {

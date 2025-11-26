@@ -50,13 +50,14 @@ class LlamacppProvider implements LmProvider {
   /**
    * Not implemented for this provider
    *
-   * @returns {Promise<void>}
+   * @returns {Promise<ModelConf>}
    */
-  async modelsInfo(): Promise<void> {
+  async modelsInfo(): Promise<Array<ModelConf>> {
     console.warn("Not implemented for this provider")
+    return []
   }
 
-  async info(): Promise<Record<string, any>> {
+  async modelInfo(): Promise<ModelConf> {
     const res = await this.api.get<Record<string, any>>("/props");
     if (res.ok) {
       //console.log("RES", res.data)

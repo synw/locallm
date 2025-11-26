@@ -20,8 +20,8 @@ class Lm implements LmProvider {
   onStartEmit?: (data: IngestionStats) => void;
   onEndEmit?: (result: InferenceResult) => void;
   onError?: (err: string) => void;
-  modelsInfo: () => Promise<void>;
-  info: () => Promise<Record<string, any>>;
+  modelsInfo: () => Promise<Array<ModelConf>>;
+  modelInfo: () => Promise<ModelConf>;
   loadModel: (name: string, ctx?: number, urls?: string | string[], onLoadProgress?: OnLoadProgress) => Promise<void>;
   infer: (prompt: string, params: InferenceParams, options?: InferenceOptions) => Promise<InferenceResult>;
   abort: () => Promise<void>;
@@ -85,8 +85,9 @@ class Lm implements LmProvider {
     this.onToken = this.provider.onToken;
     this.onStartEmit = this.provider.onStartEmit;
     this.onError = this.provider.onError;
+    this.modelInfo = this.provider.modelInfo;
     this.modelsInfo = this.provider.modelsInfo;
-    this.info = this.provider.info;
+    //this.info = this.provider.info;
     this.loadModel = this.provider.loadModel;
     this.infer = this.provider.infer;
     this.abort = this.provider.abort;

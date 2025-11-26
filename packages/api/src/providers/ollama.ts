@@ -46,7 +46,7 @@ class OllamaProvider implements LmProvider {
    *
    * @returns {Promise<void>}
    */
-  async modelsInfo(): Promise<void> {
+  async modelsInfo(): Promise<Array<ModelConf>> {
     const res = await this.api.get<Record<string, any>>("/api/tags");
     if (res.ok) {
       //console.log("RES", res.data);
@@ -63,10 +63,12 @@ class OllamaProvider implements LmProvider {
     } else {
       throw new Error(`Error ${res.status} loading models ${res.text}`);
     }
+    return this.models
   }
 
-  async info(): Promise<Record<string, any>> {
-    throw new Error("Not implemented for this provider");
+  async modelInfo(): Promise<ModelConf> {
+    console.warn("Not implemented for this provider")
+    return this.model
   }
 
   /**

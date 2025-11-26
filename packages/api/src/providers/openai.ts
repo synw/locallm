@@ -58,16 +58,17 @@ class OpenaiCompatibleProvider implements LmProvider {
         });
     }
 
-    async modelsInfo(): Promise<void> {
-        const res = await this.api.get<Record<string, any>>("/v1/models");
+    async modelsInfo(): Promise<Array<ModelConf>> {
+        const res = await this.api.get<Record<string, any>>("/models");
         if (res.ok) {
             (res.data.data as Array<Record<string, any>>).forEach(row => this.models.push({ name: row.id, ctx: -1 }))
         }
+        return this.models
     }
 
-    async info(): Promise<Record<string, any>> {
+    async modelInfo(): Promise<ModelConf> {
         console.warn("Not implemented for this provider")
-        return {}
+        return this.model
     }
 
     /**
@@ -287,7 +288,7 @@ class OpenaiCompatibleProvider implements LmProvider {
                 signal: this.abortController.signal,
             });
             if (!response.ok) {
-                throw new Error(`Inference server error: ${response.status} ${response.statusText}, ${JSON.stringify(response,null,2)}`)
+                throw new Error(`Inference server error: ${response.status} ${response.statusText}, ${JSON.stringify(response, null, 2)}`)
             }
             if (!response.body) {
                 throw new Error("No response body")
@@ -296,14 +297,14 @@ class OpenaiCompatibleProvider implements LmProvider {
             const reader = response.body.getReader();
             let i = 1;
             let accumulatedToolCalls: Array<{
-            id: string;
-            function: {
-                name: string;
-                arguments: string;
-            };
-            type: string;
-            index: number;
-        }> = [];
+                id: string;
+                function: {
+                    name: string;
+                    arguments: string;
+                };
+                type: string;
+                index: number;
+            }> = [];
             const parser = createParser({
                 onEvent: (event) => {
                     const done = event.data === '[DONE]';
@@ -364,7 +365,7 @@ class OpenaiCompatibleProvider implements LmProvider {
                                 }
                             }
 
-                             // Check for finish_reason if the tool call is complete
+                            // Check for finish_reason if the tool call is complete
                             const finishReason = choice.finish_reason;
                             if (finishReason === 'tool_calls') {
                                 //console.log('\n--- Tool Call Ready ---');
