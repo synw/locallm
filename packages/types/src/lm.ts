@@ -9,8 +9,8 @@ import type { IngestionStats } from "./stats.js";
  * Represents the basic progress of a load operation.
  *
  * @interface OnLoadProgressBasic
- * @property {number} total - The total number of items to load.
- * @property {number} loaded - The number of items that have been loaded so far.
+ * @param {number} total - The total number of items to load.
+ * @param {number} loaded - The number of items that have been loaded so far.
  * @example
  * const onLoadProgress: OnLoadProgressBasic = {
  *   total: 100,
@@ -27,7 +27,7 @@ interface OnLoadProgressBasic {
  *
  * @interface OnLoadProgressFull
  * @augments OnLoadProgressBasic
- * @property {number} percent - The percentage of items that have been loaded so far.
+ * @param {number} percent - The percentage of items that have been loaded so far.
  * @example
  * const onLoadProgress: OnLoadProgressFull = {
  *   total: 100,
@@ -67,8 +67,8 @@ type BasicOnLoadProgress = (data: OnLoadProgressBasic) => void;
  * Default parameters that can be used with an LM provider.
  *
  * @interface LmDefaults
- * @property {ModelConf | undefined} model - Default model conf to use.
- * @property {InferenceParams | undefined} inferenceParams - Default inference parameters.
+ * @param {ModelConf | undefined} model - Default model conf to use.
+ * @param {InferenceParams | undefined} inferenceParams - Default inference parameters.
  * @example
  * const lmDefaults: LmDefaults = {
  *   model: { name: 'gpt-3', ctx: 2048 },
@@ -84,14 +84,14 @@ interface LmDefaults {
  * Parameters required when creating a new LM provider instance.
  *
  * @interface LmProviderParams
- * @property {string} name - Identifier for the LM provider.
- * @property {string} serverUrl - The URL endpoint for the provider's server.
- * @property {string | undefined} apiKey - The key used for authentication.
- * @property {(t: string) => void} onToken - Callback when a new token is received.
- * @property {(data: IngestionStats) => void} onStartEmit - Callback triggered when inference starts.
- * @property {(result: InferenceResult) => void} onEndEmit - Callback triggered when inference ends.
- * @property {(err: string) => void} onError - Callback triggered on errors.
- * @property {LmDefaults | undefined} defaults - Default settings.
+ * @param {string} name - Identifier for the LM provider.
+ * @param {string} serverUrl - The URL endpoint for the provider's server.
+ * @param {string | undefined} apiKey - The key used for authentication.
+ * @param {(t: string) => void} onToken - Callback when a new token is received.
+ * @param {(data: IngestionStats) => void} onStartEmit - Callback triggered when inference starts.
+ * @param {(result: InferenceResult) => void} onEndEmit - Callback triggered when inference ends.
+ * @param {(err: string) => void} onError - Callback triggered on errors.
+ * @param {LmDefaults | undefined} defaults - Default settings.
  * @example
  * const lmProviderParams: LmProviderParams = {
  *   name: 'koboldcpp',
@@ -118,14 +118,14 @@ interface LmProviderParams {
  * Parameters for initializing a Language Model.
  *
  * @interface LmParams
- * @property {LmProviderType} providerType - Type of provider ("llamacpp", "koboldcpp", "ollama", "openai", "browser").
- * @property {string} serverUrl - The URL endpoint for the LM service.
- * @property {(t: string) => void} onToken - Callback when a new token is received.
- * @property {string | undefined} apiKey - Optional API key for authentication.
- * @property {(data: IngestionStats) => void} onStartEmit - Callback triggered when inference starts.
- * @property {(result: InferenceResult) => void} onEndEmit - Callback triggered when inference ends.
- * @property {(err: string) => void} onError - Callback triggered on errors.
- * @property {LmDefaults | undefined} defaults - Default settings.
+ * @param {LmProviderType} providerType - Type of provider ("llamacpp", "koboldcpp", "ollama", "openai", "browser").
+ * @param {string} serverUrl - The URL endpoint for the LM service.
+ * @param {(t: string) => void} onToken - Callback when a new token is received.
+ * @param {string | undefined} apiKey - Optional API key for authentication.
+ * @param {(data: IngestionStats) => void} onStartEmit - Callback triggered when inference starts.
+ * @param {(result: InferenceResult) => void} onEndEmit - Callback triggered when inference ends.
+ * @param {(err: string) => void} onError - Callback triggered on errors.
+ * @param {LmDefaults | undefined} defaults - Default settings.
  * @example
  * const lmParams: LmParams = {
  *   providerType: 'koboldcpp',
@@ -152,21 +152,21 @@ interface LmParams {
  * Defines the structure and behavior of an LM Provider.
  *
  * @interface LmProvider
- * @property {string} name - Identifier for the LM provider.
- * @property {ReturnType<typeof useApi>} api - API utility being used.
- * @property {string} serverUrl - The URL endpoint for the provider's server.
- * @property {string} apiKey - The key used for authentication with the provider's API.
- * @property {ModelConf} model - Active model configuration.
- * @property {Array<ModelConf>} models - List of available model configurations.
- * @property {() => Promise<Record<string, any>>} info - Retrieves information about available server config.
- * @property {() => Promise<void>} modelsInfo - Retrieves information about available models.
- * @property {(name: string, ctx?: number, urls?: string | string[], onLoadProgress?: OnLoadProgress) => Promise<void>} loadModel - Loads a model by name, with optional context.
- * @property {(prompt: string, params: InferenceParams, options?: InferenceOptions) => Promise<InferenceResult>} infer - Makes an inference based on provided prompt and parameters.
- * @property {() => Promise<void>} abort - Aborts a currently running inference task.
- * @property {(t: string) => void} onToken - Callback when a new token is received
- * @property {(data: IngestionStats) => void} onStartEmit - Callback triggered when inference starts.
- * @property {(result: InferenceResult) => void} onEndEmit - Callback triggered when inference ends.
- * @property {(err: string) => void} onError - Callback triggered on errors during inference.
+ * @param {string} name - Identifier for the LM provider.
+ * @param {ReturnType<typeof useApi>} api - API utility being used.
+ * @param {string} serverUrl - The URL endpoint for the provider's server.
+ * @param {string} apiKey - The key used for authentication with the provider's API.
+ * @param {ModelConf} model - Active model configuration.
+ * @param {Array<ModelConf>} models - List of available model configurations.
+ * @param {() => Promise<ModelConf>} info - Retrieves information about available server config.
+ * @param {() => Promise<Array<ModelConf>>} modelsInfo - Retrieves information about available models.
+ * @param {(name: string, ctx?: number, urls?: string | string[], onLoadProgress?: OnLoadProgress) => Promise<void>} loadModel - Loads a model by name, with optional context.
+ * @param {(prompt: string, params: InferenceParams, options?: InferenceOptions) => Promise<InferenceResult>} infer - Makes an inference based on provided prompt and parameters.
+ * @param {() => Promise<void>} abort - Aborts a currently running inference task.
+ * @param {(t: string) => void} onToken - Callback when a new token is received
+ * @param {(data: IngestionStats) => void} onStartEmit - Callback triggered when inference starts.
+ * @param {(result: InferenceResult) => void} onEndEmit - Callback triggered when inference ends.
+ * @param {(err: string) => void} onError - Callback triggered on errors during inference.
  * @example
  * const lmProvider: LmProvider = {
  *   name: 'koboldcpp',
@@ -193,8 +193,8 @@ interface LmProvider {
     apiKey: string;
     model: ModelConf;
     models: Array<ModelConf>;
-    info: () => Promise<Record<string, any>>;
-    modelsInfo: () => Promise<void>;
+    modelInfo: () => Promise<ModelConf>;
+    modelsInfo: () => Promise<Array<ModelConf>>;
     loadModel: (name: string, ctx?: number, urls?: string | string[], onLoadProgress?: OnLoadProgress) => Promise<void>;
     /**
      * Makes an inference based on provided prompt and parameters.

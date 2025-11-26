@@ -5,7 +5,7 @@ export default {
   input: 'src/interfaces.ts',
   output: [
     {
-      file: 'dist/interfaces.es.js',
+      file: 'dist/main.js',
       format: 'esm'
     },
   ],

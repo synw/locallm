@@ -4,9 +4,9 @@ import type { ToolCallSpec } from "./tools.js";
  * Represents a single turn in a conversation history.
  *
  * @interface HistoryTurn
- * @property {string | undefined} user - The user's message in this turn.
- * @property {string | undefined} assistant - The assistant's response in this turn.
- * @property {{ calls: Array<ToolCallSpec>, results: Array<{ id: string, content: string }> } | undefined} tools - Tool calls and results for this turn.
+ * @param {string | undefined} user - The user's message in this turn.
+ * @param {string | undefined} assistant - The assistant's response in this turn.
+ * @param {{ calls: Array<ToolCallSpec>, results: Array<{ id: string, content: string }> } | undefined} tools - Tool calls and results for this turn.
  * @example
  * const historyTurn: HistoryTurn = {
  *   user: "What's the weather like?",
@@ -23,7 +23,6 @@ interface HistoryTurn {
     think?: string;
     images?: Array<ImgData>;
     tools?: Array<ToolTurn>;
-    //tools?: { calls: Array<ToolCallSpec>, results: Array<{ id: string, content: string }> };
 }
 
 interface ToolTurn {
