@@ -12,17 +12,21 @@ import type {
     ToolSpec,
 } from "@locallm/types";
 import { createParser } from 'eventsource-parser';
-import type {
-    ChatCompletionCreateParamsNonStreaming,
-    ChatCompletionCreateParamsStreaming,
-    ChatCompletionMessageFunctionToolCall,
-    ChatCompletionMessageParam,
-    ChatCompletionMessageToolCall,
-    ChatCompletionTool,
+import {
+    ChatCompletionContentPart,
+    ChatCompletionUserMessageParam,
+    type ChatCompletionContentPartText,
+    type ChatCompletionCreateParamsNonStreaming,
+    type ChatCompletionCreateParamsStreaming,
+    type ChatCompletionMessageFunctionToolCall,
+    type ChatCompletionMessageParam,
+    type ChatCompletionMessageToolCall,
+    type ChatCompletionTool,
 } from "openai/resources/index.js";
 import { useApi } from "restmix";
 import { useStats } from "../stats.js";
 import { convertToolCallSpec, generateId } from './utils.js';
+import { ImageURL } from "openai/resources/beta/threads/messages.js";
 
 class OpenaiCompatibleProvider implements LmProvider {
     name: string;
@@ -161,7 +165,19 @@ class OpenaiCompatibleProvider implements LmProvider {
                 }
             );
         }
-        if (prompt != " ") {
+        if (inferenceParams?.images) {
+            const usermsgs = new Array<ChatCompletionContentPart>();
+            usermsgs.push(
+                { type: "text", text: prompt }
+            );
+            (inferenceParams.images as Array<string>).forEach(imgStr => {
+                usermsgs.push(
+                    { type: "image_url", image_url: { url: `data:image/jpeg;base64,${imgStr}`, detail: "auto" } }
+                )
+            });
+            delete inferenceParams.images;
+            msgs.push({ role: "user", content: usermsgs })
+        } else {
             msgs.push({ role: "user", content: prompt });
         }
         let tools: Array<ChatCompletionTool> = [];
