@@ -34,7 +34,6 @@ interface ToolTurn {
  * Image data associated with a message or response.
  *
  * @interface ImgData
- * @typedef {ImgData}
  * 
  * @example
  * const imgExample: ImgData = {
@@ -43,14 +42,7 @@ interface ToolTurn {
  * };
  */
 interface ImgData {
-    /**
-     * Unique identifier for the image.
-     */
     id: number;
-
-    /**
-     * Base64 encoded image data.
-     */
     data: string;
 }
 

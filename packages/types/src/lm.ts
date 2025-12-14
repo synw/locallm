@@ -161,6 +161,7 @@ interface LmParams {
  * @param {() => Promise<ModelConf>} info - Retrieves information about available server config.
  * @param {() => Promise<Array<ModelConf>>} modelsInfo - Retrieves information about available models.
  * @param {(name: string, ctx?: number, urls?: string | string[], onLoadProgress?: OnLoadProgress) => Promise<void>} loadModel - Loads a model by name, with optional context.
+ * @param {(name: string) => Promise<void>} unloadModel - Unload a model 
  * @param {(prompt: string, params: InferenceParams, options?: InferenceOptions) => Promise<InferenceResult>} infer - Makes an inference based on provided prompt and parameters.
  * @param {() => Promise<void>} abort - Aborts a currently running inference task.
  * @param {(t: string) => void} onToken - Callback when a new token is received
@@ -196,6 +197,7 @@ interface LmProvider {
     modelInfo: () => Promise<ModelConf>;
     modelsInfo: () => Promise<Array<ModelConf>>;
     loadModel: (name: string, ctx?: number, urls?: string | string[], onLoadProgress?: OnLoadProgress) => Promise<void>;
+    unloadModel: (name: string) => Promise<void>;
     /**
      * Makes an inference based on provided prompt and parameters.
      *

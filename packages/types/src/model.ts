@@ -1,16 +1,14 @@
-
 /**
  * Represents the configuration of a model.
  *
  * @interface ModelConf
- * @template T - Extra parameters type
  * @property {string} name - The unique name of the model.
  * @property {number | undefined} ctx - The context window length, typically used to define how much of the previous data to consider.
  * @property {{ size: string, quant: string } | undefined} info - Some meta info about the model: parameter size and quantization level
  * @property {Record<string, any> | undefined} extra - Extra parameters like urls for browser models
  * @example
  * const modelConf: ModelConf = {
- *   name: 'gpt-3',
+ *   name: 'qwen4b',
  *   ctx: 2048,
  *   info: { size: '175B', quant: 'q4_0' },
  *   extra: { url: 'http://example.com/model' }
@@ -50,9 +48,9 @@ interface ModelTemplate {
  * @property {number | undefined} ctx - The loaded model context window size, 0 if no model is loaded.
  * @example
  * const modelState: ModelState = {
- *   models: { gpt3: { name: 'gpt-3', ctx: 2048 } },
+ *   models: { gpt3: { name: 'qwen4b', ctx: 2048 } },
  *   isModelLoaded: true,
- *   loadedModel: 'gpt-3',
+ *   loadedModel: 'qwen4b',
  *   ctx: 2048
  * };
  */
@@ -86,7 +84,7 @@ interface ModelStatusUnloaded {
  * @example
  * const loadingStatus: ModelStatusLoading = {
  *   value: "loading",
- *   args: ["--model", "gpt-3"]
+ *   args: ["--model", "qwen4b"]
  * };
  */
 interface ModelStatusLoading {
@@ -105,7 +103,7 @@ interface ModelStatusLoading {
  * @example
  * const failedStatus: ModelStatusFailed = {
  *   value: "failed",
- *   args: ["--model", "gpt-3"],
+ *   args: ["--model", "qwen4b"],
  *   failed: true,
  *   exit_code: 1
  * };
@@ -126,7 +124,7 @@ interface ModelStatusFailed {
  * @example
  * const loadedStatus: ModelStatusLoaded = {
  *   value: "loaded",
- *   args: ["--model", "gpt-3"]
+ *   args: ["--model", "qwen4b"]
  * };
  */
 interface ModelStatusLoaded {
@@ -136,13 +134,10 @@ interface ModelStatusLoaded {
 
 /**
  * Represents the status of a model.
- *
- * @typedef {ModelStatusUnloaded | ModelStatusLoading | ModelStatusFailed | ModelStatusLoaded} ModelStatus
- * @description Union type representing all possible model statuses.
  * @example
  * const status: ModelStatus = {
  *   value: "loaded",
- *   args: ["--model", "gpt-3"]
+ *   args: ["--model", "qwen4b"]
  * };
  */
 type ModelStatus = ModelStatusUnloaded | ModelStatusLoading | ModelStatusFailed | ModelStatusLoaded;
@@ -159,8 +154,8 @@ type ModelStatus = ModelStatusUnloaded | ModelStatusLoading | ModelStatusFailed 
  * const modelData: ModelData = {
  *   id: "model-123",
  *   in_cache: true,
- *   path: "/models/gpt-3",
- *   status: { value: "loaded", args: ["--model", "gpt-3"] }
+ *   path: "/models/qwen4b",
+ *   status: { value: "loaded", args: ["--model", "qwen4b"] }
  * };
  */
 interface ModelData {
@@ -181,8 +176,8 @@ interface ModelData {
  *     {
  *       id: "model-123",
  *       in_cache: true,
- *       path: "/models/gpt-3",
- *       status: { value: "loaded", args: ["--model", "gpt-3"] }
+ *       path: "/models/qwen4b",
+ *       status: { value: "loaded", args: ["--model", "qwen4b"] }
  *     }
  *   ]
  * };
