@@ -1,6 +1,6 @@
 {
   "name": "@locallm/api",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "An api to query local language models using different backends",
   "repository": "https://github.com/synw/locallm",
   "scripts": {
@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "openai": "6.9.1",
-    "@locallm/types": "^0.6.2",
+    "@locallm/types": "^0.6.4",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.3.0",

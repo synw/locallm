@@ -23,6 +23,7 @@ class Lm implements LmProvider {
   modelsInfo: () => Promise<Array<ModelConf>>;
   modelInfo: () => Promise<ModelConf>;
   loadModel: (name: string, ctx?: number, urls?: string | string[], onLoadProgress?: OnLoadProgress) => Promise<void>;
+  unloadModel: (name: string) => Promise<void>;
   infer: (prompt: string, params: InferenceParams, options?: InferenceOptions) => Promise<InferenceResult>;
   abort: () => Promise<void>;
   models = new Array<ModelConf>();
@@ -87,8 +88,8 @@ class Lm implements LmProvider {
     this.onError = this.provider.onError;
     this.modelInfo = this.provider.modelInfo;
     this.modelsInfo = this.provider.modelsInfo;
-    //this.info = this.provider.info;
     this.loadModel = this.provider.loadModel;
+    this.unloadModel = this.provider.unloadModel;
     this.infer = this.provider.infer;
     this.abort = this.provider.abort;
     this.serverUrl = this.provider.serverUrl;

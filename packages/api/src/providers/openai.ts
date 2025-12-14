@@ -87,6 +87,16 @@ class OpenaiCompatibleProvider implements LmProvider {
     }
 
     /**
+  * Unloads a specified model
+  *
+  * @param {string} name - The name of the model to unload.
+  * @returns {Promise<void>}
+  */
+    async unloadModel(name: string): Promise<void> {
+        throw new Error("Not implemented for this provider");
+    }
+
+    /**
      * Makes an inference based on the provided prompt and parameters.
      *
      * @param {string} prompt - The input text to base the inference on.

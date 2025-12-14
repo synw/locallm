@@ -2,7 +2,17 @@ import { useApi } from 'restmix';
 import { type EventSourceMessage } from 'eventsource-parser';
 import { EventSourceParserStream } from 'eventsource-parser/stream';
 import {
-  InferenceOptions, InferenceParams, InferenceResult, InferenceStats, IngestionStats, LmProvider, LmProviderParams, ModelConf, OnLoadProgress
+  InferenceOptions,
+  InferenceParams,
+  InferenceResult,
+  InferenceStats,
+  IngestionStats,
+  LmProvider,
+  LmProviderParams,
+  ModelConf,
+  OnLoadProgress,
+  ModelApiResponse,
+  ModelData,
 } from "@locallm/types";
 import { useStats } from '../stats.js';
 
@@ -15,7 +25,7 @@ class LlamacppProvider implements LmProvider {
   onError?: (err: string) => void;
   // state
   model: ModelConf = { name: "", ctx: 2048 };
-  models = new Array<ModelConf>();
+  models = new Array<ModelConf<ModelData>>();
   abortController = new AbortController();
   apiKey: string;
   serverUrl: string;
@@ -48,13 +58,27 @@ class LlamacppProvider implements LmProvider {
   }
 
   /**
-   * Not implemented for this provider
+   * Load the models list
    *
    * @returns {Promise<ModelConf>}
    */
-  async modelsInfo(): Promise<Array<ModelConf>> {
-    console.warn("Not implemented for this provider")
-    return []
+  async modelsInfo(): Promise<Array<ModelConf<ModelData>>> {
+    const res = await this.api.get<ModelApiResponse>("/models");
+    if (res.ok) {
+      //console.log("-------------------------")
+      const mcs = new Array<ModelConf<ModelData>>();
+      res.data.data.forEach(d => {
+        const mc: ModelConf<ModelData> = {
+          name: d.id,
+          extra: d,
+        };
+        mcs.push(mc)
+      });
+      this.models = mcs;
+    } else {
+      throw new Error(`Error ${res.status} loading models ${res.text}`);
+    }
+    return this.models
   }
 
   async modelInfo(): Promise<ModelConf> {
@@ -68,15 +92,38 @@ class LlamacppProvider implements LmProvider {
   }
 
   /**
-   * Loads a specified model for inferences. Note: it will query the server
-   * and retrieve current model info (name and ctx).
+   * Loads a specified model for inference
    *
    * @param {string} name - The name of the model to load.
    * @param {number | undefined} [ctx] - The optional context window length, defaults to the model ctx.
    * @returns {Promise<void>}
    */
   async loadModel(name: string, ctx?: number, urls?: string | string[], onLoadProgress?: OnLoadProgress): Promise<void> {
-    throw new Error("Not implemented for this provider");
+    const res = await this.api.post<Record<string, any>>("/models/load", { model: name });
+    if (res.ok) {
+      //console.log("RES", res.data)
+      if (res.data?.success !== true) {
+        throw new Error(`can not load model: ${res.status} ${res.statusText} ${res.data}`)
+      }
+      this.model = { name: name };
+    }
+  }
+
+  /**
+  * Unloads a specified model
+  *
+  * @param {string} name - The name of the model to unload.
+  * @returns {Promise<void>}
+  */
+  async unloadModel(name: string): Promise<void> {
+    const res = await this.api.post<Record<string, any>>("/models/unload", { model: name });
+    if (res.ok) {
+      //console.log("RES", res.data)
+      if (res.data?.success !== true) {
+        throw new Error(`can not unload model: ${res.status} ${res.statusText} ${res.data}`)
+      }
+      this.model = { name: "", ctx: 2048 };
+    }
   }
 
   /**
