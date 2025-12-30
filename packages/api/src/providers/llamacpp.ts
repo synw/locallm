@@ -143,7 +143,7 @@ class LlamacppProvider implements LmProvider {
       prompt = params.template.replace("{prompt}", prompt);
       delete params.template;
     }
-    let inferenceParams: Record<string, any> = params;
+    let inferenceParams: Record<string, any> = Object.assign({}, params);
     inferenceParams.prompt = prompt;
     if ("max_tokens" in params) {
       inferenceParams.n_predict = params.max_tokens;

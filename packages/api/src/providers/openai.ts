@@ -109,7 +109,7 @@ class OpenaiCompatibleProvider implements LmProvider {
         options?: InferenceOptions,
     ): Promise<InferenceResult> {
         this.abortController = new AbortController();
-        let inferenceParams: Record<string, any> = params;
+        let inferenceParams: Record<string, any> = Object.assign({}, params);
         if ("max_tokens" in params) {
             inferenceParams.max_completion_tokens = params.max_tokens;
             delete inferenceParams.max_tokens;
