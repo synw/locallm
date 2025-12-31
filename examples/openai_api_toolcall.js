@@ -3,7 +3,7 @@ import { Lm } from "../packages/api/dist/main.js";
 
 let model = "qwen4b-t"; // using llama-swap
 let apiKey = "";
-const serverUrl = "http://localhost:8080/v1" // llamacpp openai endpoint
+const serverUrl = "http://localhost:8080/v1"; // llamacpp openai endpoint
 //const serverUrl = "http://localhost:5001/v1" // koboldcpp openai endpoint
 //const serverUrl = "http://localhost:11434/v1" // ollama openai endpoint
 //model = "granite3.3:2b";
@@ -15,16 +15,16 @@ const _prompt = `I am landing in Barcelona soon: I plan to reach my hotel and th
 How are the conditions in the city?`;
 //const _prompt = "What is the current weather in Barcelona?"
 
-function run_get_current_weather(args)
+function run_get_current_weather (args)
 {
     console.log("Running the get_current_weather tool with args", args);
-    return '{ "temp": 20.5, "weather": "rain" }'
+    return '{ "temp": 20.5, "weather": "rain" }';
 }
 
-function run_get_current_traffic(args)
+function run_get_current_traffic (args)
 {
     console.log("Running the get_current_traffic tool with args", args);
-    return '{ "trafic": "normal" }'
+    return '{ "trafic": "normal" }';
 }
 
 const get_current_weather = {
@@ -54,9 +54,9 @@ const get_current_traffic = {
 const tools = {
     "get_current_weather": get_current_weather,
     "get_current_traffic": get_current_traffic,
-}
+};
 
-async function main()
+async function main ()
 {
     const lm = new Lm({
         providerType: "openai",
@@ -92,9 +92,9 @@ async function main()
             console.log("tool result:", tr);
             toolCalls.push({ call: toolCall, response: tr });
         }
-        history.push({ tools: toolCalls })
+        history.push({ tools: toolCalls });
     } else {
-        history.push({ assistant: res.text })
+        history.push({ assistant: res.text });
     }
     console.log("History:\n", JSON.stringify(history, null, 2));
     const res2 = await lm.infer(" ", {
@@ -111,7 +111,7 @@ async function main()
             tools: [get_current_weather, get_current_traffic],
             history: history,
         });
-    console.log()
+    console.log();
 }
 
 (async () =>
