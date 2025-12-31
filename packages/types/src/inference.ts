@@ -87,6 +87,8 @@ interface InferenceOptions {
     history?: Array<HistoryTurn>;
     system?: string;
     assistant?: string;
+    onToolCall?: (tc: ToolCallSpec) => void;
+    onToolCallEnd?: (tr: any) => void;
 }
 
 /**
