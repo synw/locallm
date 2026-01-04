@@ -70,14 +70,21 @@ interface InferenceParams {
  * @property {Array<HistoryTurn> | undefined} history - Conversation history to include in the inference.
  * @property {string | undefined} system - System message to set the context for the conversation.
  * @property {string | undefined} assistant - Assistant message to include in the context.
+ * @property {boolean | undefined} isToolsRouter - Use this call as a tools router not an agent
+ * @property {(tc: ToolCallSpec) => void | undefined} onToolCall - Callback function to handle tool calls.
+ * @property {(tr: any) => void | undefined} onToolCallEnd - Callback function to handle tool call completion.
  * @example
  * const inferenceOptions: InferenceOptions = {
  *   debug: true,
+ *   verbose: true,
  *   tools: [weatherTool],
  *   history: [
  *     { user: "Hello", assistant: "Hi there!" }
  *   ],
- *   system: "You are a helpful assistant."
+ *   system: "You are a helpful assistant.",
+ *   assistant: "How can I help you today?",
+ *   onToolCall: (toolCall) => console.log('Tool called:', toolCall),
+ *   onToolCallEnd: (result) => console.log('Tool call completed:', result)
  * };
  */
 interface InferenceOptions {
@@ -87,6 +94,7 @@ interface InferenceOptions {
     history?: Array<HistoryTurn>;
     system?: string;
     assistant?: string;
+    isToolsRouter?: boolean;
     onToolCall?: (tc: ToolCallSpec) => void;
     onToolCallEnd?: (tr: any) => void;
 }

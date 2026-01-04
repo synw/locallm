@@ -46,6 +46,7 @@ interface ToolDefSpec {
  * @interface ToolSpec
  * @extends ToolDefSpec
  * @property {(args: Record<string, string> | undefined) => Promise<any>} execute - The function to execute the tool with the provided arguments.
+ * @property {(tool: ToolCallSpec) => Promise<boolean>} canRun - Optional function to determine if the tool can run based on the tool call spec.
  * @example
  * const toolSpec: ToolSpec = {
  *   name: "WeatherFetcher",
@@ -59,12 +60,16 @@ interface ToolDefSpec {
  *   execute: async (args) => {
  *     const { location } = args || {};
  *     return `Weather in ${location}: Sunny, 72°F`;
+ *   },
+ *   canRun: async (tool) => {
+ *     const args = tool.arguments;
+ *     return args?.location !== undefined && args.location.trim().length > 0;
  *   }
  * };
  */
 interface ToolSpec extends ToolDefSpec {
     execute: <O = any>(args: { [key: string]: string; } | undefined) => Promise<O>;
-    canRun?: (tool: ToolSpec) => Promise<boolean>;
+    canRun?: (tool: ToolCallSpec) => Promise<boolean>;
 }
 
 /**
