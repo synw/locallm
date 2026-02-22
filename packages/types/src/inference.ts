@@ -1,6 +1,6 @@
 import type { ModelConf } from "./model.js";
 import type { ToolSpec } from "./tools.js";
-import type { HistoryTurn } from "./history.js";
+import type { HistoryTurn, ToolTurn } from "./history.js";
 import type { InferenceStats } from "./stats.js";
 import type { ToolCallSpec } from "./tools.js";
 
@@ -72,7 +72,9 @@ interface InferenceParams {
  * @property {string | undefined} assistant - Assistant message to include in the context.
  * @property {boolean | undefined} isToolsRouter - Use this call as a tools router not an agent
  * @property {(tc: ToolCallSpec) => void | undefined} onToolCall - Callback function to handle tool calls.
- * @property {(tr: any) => void | undefined} onToolCallEnd - Callback function to handle tool call completion.
+ * @property {(id: string, tr: any) => void | undefined} onToolCallEnd - Callback function to handle tool call completion.
+ * @property {(tc: Array<ToolCallSpec>) => void | undefined} onToolsTurnStart - Callback function to handle the start of a tools turn.
+ * @property {(tt: Array<ToolTurn>) => void | undefined} onToolsTurnEnd - Callback function to handle the end of a tools turn.
  * @example
  * const inferenceOptions: InferenceOptions = {
  *   debug: true,
@@ -84,7 +86,9 @@ interface InferenceParams {
  *   system: "You are a helpful assistant.",
  *   assistant: "How can I help you today?",
  *   onToolCall: (toolCall) => console.log('Tool called:', toolCall),
- *   onToolCallEnd: (result) => console.log('Tool call completed:', result)
+ *   onToolCallEnd: (result) => console.log('Tool call completed:', result),
+ *   onToolsTurnStart: (toolCalls) => console.log('Tools turn started:', toolCalls),
+ *   onToolsTurnEnd: (toolResults) => console.log('Tools turn completed:', toolResults)
  * };
  */
 interface InferenceOptions {
@@ -96,7 +100,11 @@ interface InferenceOptions {
     assistant?: string;
     isToolsRouter?: boolean;
     onToolCall?: (tc: ToolCallSpec) => void;
-    onToolCallEnd?: (tr: any) => void;
+    onToolCallEnd?: (id: string, tr: any) => void;
+    onToolsTurnStart?: (tc: Array<ToolCallSpec>) => void;
+    onToolsTurnEnd?: (tt: Array<ToolTurn>) => void;
+    onTurnEnd?: (ht: HistoryTurn) => void;
+    onAssistant?: (txt: string) => void;
 }
 
 /**
