@@ -105,6 +105,7 @@ interface InferenceOptions {
     onToolsTurnEnd?: (tt: Array<ToolTurn>) => void;
     onTurnEnd?: (ht: HistoryTurn) => void;
     onAssistant?: (txt: string) => void;
+    onThink?: (txt: string) => void;
 }
 
 /**
