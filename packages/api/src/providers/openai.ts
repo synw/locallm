@@ -14,19 +14,16 @@ import type {
 import { createParser } from 'eventsource-parser';
 import {
     ChatCompletionContentPart,
-    ChatCompletionUserMessageParam,
-    type ChatCompletionContentPartText,
     type ChatCompletionCreateParamsNonStreaming,
     type ChatCompletionCreateParamsStreaming,
     type ChatCompletionMessageFunctionToolCall,
     type ChatCompletionMessageParam,
     type ChatCompletionMessageToolCall,
-    type ChatCompletionTool,
+    type ChatCompletionTool
 } from "openai/resources/index.js";
 import { useApi } from "restmix";
 import { useStats } from "../stats.js";
 import { convertToolCallSpec, generateId } from './utils.js';
-import { ImageURL } from "openai/resources/beta/threads/messages.js";
 
 class OpenaiCompatibleProvider implements LmProvider {
     name: string;
@@ -121,17 +118,19 @@ class OpenaiCompatibleProvider implements LmProvider {
         if (options?.debug) {
             console.log("Options", options);
         }
-        inferenceParams.stream = params.stream ?? true;
+        inferenceParams.stream = params?.stream ?? true;
+        //console.log("STREAM", inferenceParams.stream, params?.stream)
         const stats = useStats();
         stats.start();
         let finalStats = {} as InferenceStats;
         let serverStats: Record<string, any> = {};
         let msgs: Array<ChatCompletionMessageParam> = [];
         if (options?.system) {
-            msgs = [{ role: "developer", content: options.system }];
+            msgs = [{ role: "system", content: options.system }];
         }
         if (options?.history) {
             options.history.forEach(
+                // @ts-ignore
                 row => {
                     if (row?.user) {
                         msgs.push({
@@ -148,6 +147,8 @@ class OpenaiCompatibleProvider implements LmProvider {
                     if (row?.tools) {
                         const toolCalls = new Array<ChatCompletionMessageToolCall>();
                         const toolResponses = new Array<ChatCompletionMessageParam>();
+
+                        // @ts-ignore
                         row.tools.forEach(tt => {
                             toolCalls.push({
                                 id: tt.call.id ?? "",
@@ -193,6 +194,7 @@ class OpenaiCompatibleProvider implements LmProvider {
         let tools: Array<ChatCompletionTool> = [];
         this.tools = {};
         if (options?.tools) {
+            // @ts-ignore
             options.tools.forEach(t => {
                 this.tools[t.name] = t;
                 const finalToolCall = convertToolCallSpec(t);
@@ -224,7 +226,7 @@ class OpenaiCompatibleProvider implements LmProvider {
         let text: string;
         let thinkingText = "";
         const toolCalls = new Array<ToolCallSpec>();
-        if (!params.stream) {
+        if (!inferenceParams.stream) {
             const ip: ChatCompletionCreateParamsNonStreaming = {
                 messages: msgs,
                 model: this.model.name,
@@ -351,7 +353,7 @@ class OpenaiCompatibleProvider implements LmProvider {
                                     this.onStartEmit(ins)
                                 }
                             }
-                            const modelRawToolCalls: Record<string, { id: string, arguments: Array<string> }> = {};
+                            const modelRawToolCalls: Record<string, { name: string, arguments: Array<string> }> = {};
                             let currentToolCallName = "";
 
                             const choice = payload.choices[0];
@@ -399,8 +401,8 @@ class OpenaiCompatibleProvider implements LmProvider {
                                     //console.log('Tool Name:', toolCall.function.name);
                                     //console.log('Arguments:', toolCall.function.arguments);
                                     if (!(toolCall.function.name in modelRawToolCalls)) {
-                                        modelRawToolCalls[toolCall.function.name] = {
-                                            id: toolCall.id ?? "",
+                                        modelRawToolCalls[toolCall.id] = {
+                                            name: toolCall.function.name,
                                             arguments: new Array<string>()
                                         };
                                         currentToolCallName = toolCall.function.name;
@@ -408,8 +410,8 @@ class OpenaiCompatibleProvider implements LmProvider {
                                             console.log("* Initiating tool call", currentToolCallName)
                                         }
                                     }
-                                    modelRawToolCalls[currentToolCallName].id = toolCall.id;
-                                    modelRawToolCalls[currentToolCallName].arguments.push(toolCall.function.arguments);
+                                    //modelRawToolCalls[currentToolCallName].id = toolCall.id;
+                                    modelRawToolCalls[toolCall.id].arguments.push(toolCall.function.arguments);
                                 }
                                 reader.cancel();
                             }
@@ -418,20 +420,24 @@ class OpenaiCompatibleProvider implements LmProvider {
                             if (delta?.reasoning_content) {
                                 isThinking = true;
                                 if (thinkingText.length == 0) {
-                                    t = "<think>\n" + delta?.reasoning_content;
+                                    t = "<think>\n" + delta.reasoning_content;
                                 } else {
-                                    t = delta?.reasoning_content;
+                                    t = delta.reasoning_content;
                                 }
                                 thinkingText += t;
                             } else {
                                 if (buf.length == 0 && thinkingText.length > 0) {
-                                    t = "\n</think>\n\n" + delta?.content
+                                    if (delta?.content) {
+                                        t = "\n</think>\n\n" + delta?.content
+                                    } else {
+                                        t = "\n</think>"
+                                    }
                                 } else {
                                     t = delta?.content
                                 }
                             }
                             if (t) {
-                                //console.log("T", JSON.stringify(t, null, "  "), "///", JSON.stringify(part, null, "  "));
+                                //console.log("T", t);
                                 this.onToken(t);
                                 if (!isThinking) {
                                     buf.push(t);
@@ -440,10 +446,17 @@ class OpenaiCompatibleProvider implements LmProvider {
                             ++i
 
                             for (const [k, v] of Object.entries(modelRawToolCalls)) {
-                                const args = JSON.parse(v.arguments.join(""));
+                                let args: any;
+                                try {
+                                    //console.log("TRY", `parsing tool call args:\n${k}: ${v.arguments}`);
+                                    //console.log(`TRY MRTC:\n${typeof modelRawToolCalls} ${JSON.stringify(modelRawToolCalls, null, 2)}`);
+                                    args = JSON.parse(v.arguments.join(""));
+                                } catch (e) {
+                                    throw new Error(`parsing tool call args:\n${v.arguments}\nMRTC:\n${typeof modelRawToolCalls} ${JSON.stringify(modelRawToolCalls, null, 2)}`)
+                                }
                                 const toolCall: ToolCallSpec = {
-                                    id: v.id ?? generateId(),
-                                    name: k,
+                                    id: k ?? generateId(),
+                                    name: v.name,
                                     arguments: args,
                                 }
                                 toolCalls.push(toolCall)

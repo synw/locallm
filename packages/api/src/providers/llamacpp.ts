@@ -31,7 +31,7 @@ class LlamacppProvider implements LmProvider {
   serverUrl: string;
 
   /**
-   * Creates a new instance of the KoboldcppProvider.
+   * Creates a new instance of the LlamacppProvider.
    *
    * @param {LmProviderParams} params - Configuration parameters for initializing the provider.
    */
