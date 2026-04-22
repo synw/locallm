@@ -157,12 +157,10 @@ class LlamacppProvider implements LmProvider {
       inferenceParams = { ...inferenceParams, ...params.extra };
       delete inferenceParams.extra;
     }
-    // support for llama-swap
     if (params?.model) {
       inferenceParams.model = params.model.name;
     }
-    //console.log("OPTIONS", options);
-    const body = JSON.stringify(inferenceParams);
+    //console.log("OPTIONS", options);    
     if (options?.debug) {
       console.log("Locallm: request body -------------");
       console.log(inferenceParams);
@@ -187,6 +185,9 @@ class LlamacppProvider implements LmProvider {
     let finalStats = {} as InferenceStats;
     let serverStats: Record<string, any> = {};
     if (inferenceParams?.stream === true) {
+      // get prompt processing progress info in stream
+      inferenceParams.return_progress = true;
+      const body = JSON.stringify(inferenceParams);
       const response = await fetch(url, {
         method: 'POST',
         headers: headers,

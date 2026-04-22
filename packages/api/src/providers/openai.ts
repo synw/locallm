@@ -333,6 +333,12 @@ class OpenaiCompatibleProvider implements LmProvider {
                 type: string;
                 index: number;
             }> = [];
+            let startThinkTag = "<think>";
+            let endThinkTag = "</think>";
+            if (options?.thinkingTags) {
+                startThinkTag = options.thinkingTags.start;
+                endThinkTag = options.thinkingTags.end;
+            }
             const parser = createParser({
                 onEvent: (event) => {
                     const done = event.data === '[DONE]';
@@ -392,7 +398,6 @@ class OpenaiCompatibleProvider implements LmProvider {
                                     }
                                 }
                             }
-
                             // Check for finish_reason if the tool call is complete
                             const finishReason = choice.finish_reason;
                             if (finishReason === 'tool_calls') {
@@ -420,7 +425,7 @@ class OpenaiCompatibleProvider implements LmProvider {
                             if (delta?.reasoning_content) {
                                 isThinking = true;
                                 if (thinkingText.length == 0) {
-                                    t = "<think>\n" + delta.reasoning_content;
+                                    t = `${startThinkTag}\n` + delta.reasoning_content;
                                 } else {
                                     t = delta.reasoning_content;
                                 }
@@ -428,9 +433,9 @@ class OpenaiCompatibleProvider implements LmProvider {
                             } else {
                                 if (buf.length == 0 && thinkingText.length > 0) {
                                     if (delta?.content) {
-                                        t = "\n</think>\n\n" + delta?.content
+                                        t = `\n${endThinkTag}\n\n` + delta?.content
                                     } else {
-                                        t = "\n</think>"
+                                        t = `\n${endThinkTag}`
                                     }
                                 } else {
                                     t = delta?.content
@@ -444,7 +449,6 @@ class OpenaiCompatibleProvider implements LmProvider {
                                 }
                             }
                             ++i
-
                             for (const [k, v] of Object.entries(modelRawToolCalls)) {
                                 let args: any;
                                 try {
