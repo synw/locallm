@@ -17,6 +17,8 @@ import type { ToolCallSpec } from "./tools.js";
  * @property {number | undefined} min_p - The minimum probability for a token to be considered, relative to the probability of the most likely token.
  * @property {number | undefined} temperature - Adjusts randomness in sampling; higher values mean more randomness.
  * @property {number | undefined} repeat_penalty - Adjusts penalty for repeated tokens.
+ * @property {number | undefined} presence_penalty - Adjusts penalty for presence.
+ * @property {number | undefined} frequency_penalty - Repeat alpha frequency penalty.
  * @property {number | undefined} tfs - Set the tail free sampling value.
  * @property {Array<string> | undefined} stop - List of stop words or phrases to halt predictions.
  * @property {string | undefined} grammar - The gnbf grammar to use for grammar-based sampling.
@@ -51,6 +53,10 @@ interface InferenceParams {
     min_p?: number;
     temperature?: number;
     repeat_penalty?: number;
+    presence_penalty?: number;
+    frequency_penalty?: number;
+    logit_bias?: Array<Array<number | false>>;
+    seed?: number;
     tfs?: number;
     stop?: Array<string>;
     grammar?: string;
@@ -99,6 +105,7 @@ interface InferenceOptions {
     system?: string;
     assistant?: string;
     isToolsRouter?: boolean;
+    thinkingTags: { start: string, end: string };
     onToolCall?: (tc: ToolCallSpec) => void;
     onToolCallEnd?: (id: string, tr: any) => void;
     onToolsTurnStart?: (tc: Array<ToolCallSpec>) => void;
