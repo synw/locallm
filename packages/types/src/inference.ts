@@ -105,7 +105,7 @@ interface InferenceOptions {
     system?: string;
     assistant?: string;
     isToolsRouter?: boolean;
-    thinkingTags: { start: string, end: string };
+    thinkingTags?: { start: string, end: string };
     onToolCall?: (tc: ToolCallSpec) => void;
     onToolCallEnd?: (id: string, tr: any) => void;
     onToolsTurnStart?: (tc: Array<ToolCallSpec>) => void;
